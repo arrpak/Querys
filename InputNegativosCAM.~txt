@@ -1,0 +1,14 @@
+--INSERT INTO fn3outputinputinformation
+SELECT output,'Eliminados','Diario',input,'E',null,NULL,NULL,NULL,'Y'
+FROM fn3estimationinput
+WHERE estsession='20110228.MG'
+AND   output LIKE 'VentaMarcaCAM%'
+AND factor=1
+AND input <>'PosterKaka2009'
+AND input IN
+(SELECT distinct code FROM fn3input where (setinput LIKE '%2007%' OR setinput LIKE '%2008%' OR
+ setinput LIKE '%2009%' or setinput LIKE '%2010%' or setinput LIKE '%2011%'))
+AND Value<0
+AND (input,output) not IN
+(SELECT input,output FROM fn3outputinputinformation where type='E')
+ORDER BY output,input

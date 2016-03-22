@@ -1,0 +1,159 @@
+CREATE OR REPLACE VIEW promo (
+  header,
+  promotion,
+  inidateint
+) AS
+SELECT header,promotion,fecha AS inidateint
+from
+(SELECT *
+FROM fn3promotiondate
+WHERE
+--header='MARCA' AND
+inidateint>=dat ('19920101')
+AND node IN ('CAM','PEN','ESP')
+ORDER BY promotion) t1,
+(
+SELECT DISTINCT(fecha) AS fecha
+FROM fn3fuerzaequipo
+WHERE equipo='RMA'
+) t2
+WHERE fecha>=inidateint AND
+fecha<=enddateint
+/
+
+
+CREATE OR REPLACE VIEW promoemu (
+  header,
+  promotion,
+  inidateint
+) AS
+SELECT header,promotion,fecha AS inidateint
+from
+(SELECT *
+FROM emupromotiondate
+WHERE
+--header='MARCA' AND
+inidateint>=dat ('19920101')
+AND node IN ('CAM','PEN','ESP')
+ORDER BY promotion) t1,
+(
+SELECT DISTINCT(fecha) AS fecha
+FROM fn3fuerzaequipo
+WHERE equipo='RMA'
+) t2
+WHERE fecha>=inidateint AND
+fecha<=enddateint
+/
+
+
+SELECT header,To_Char(inidateint),inidateint,rowconcat('SELECT distinct promotion FROM promo
+WHERE header='''||header||''' and to_char(inidateint)=to_char('''||inidateint||''')','   -   ')
+FROM promo
+WHERE inidateint<=dat('20091201')
+GROUP BY header,To_Char(inidateint),inidateint
+ORDER BY inidateint;
+
+
+
+SELECT header,To_Char(inidateint),inidateint,rowconcat('SELECT distinct promotion FROM promoemu
+WHERE header='''||header||''' and to_char(inidateint)=to_char('''||inidateint||''')','   -   ')
+FROM promoemu
+WHERE inidateint<=dat('20091201')
+GROUP BY header,To_Char(inidateint),inidateint
+ORDER BY inidateint;
+
+
+SELECT header,To_Char(inidateint),inidateint,rowconcat('SELECT distinct promotion FROM promoemu
+WHERE header='''||header||''' and to_char(inidateint)=to_char('''||inidateint||''')','   -   ')
+FROM promoemu
+WHERE inidateint>dat('20091201')
+GROUP BY header,To_Char(inidateint),inidateint
+ORDER BY inidateint;
+
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION rowconcat(q in VARCHAR2, sep IN varchar2) RETURN VARCHAR2 IS
+     ret  VARCHAR2(32767);
+     hold VARCHAR2(32767);
+     cur  sys_refcursor;
+   BEGIN
+    OPEN cur FOR q;
+     LOOP
+       FETCH cur INTO hold;
+       EXIT WHEN cur%NOTFOUND;
+      IF ret IS NULL THEN
+        ret := hold;
+      ELSE
+        ret := ret || sep || hold;
+      END IF;
+    END LOOP;
+    RETURN ret;
+  END;
+/
+
+SELECT To_Char(inidateint),rowconcat('SELECT distinct promotion FROM promo
+WHERE to_char(inidateint)='||To_Char(inidateint),',')
+FROM promo
+WHERE inidateint=dat('20091005')
+GROUP BY inidateint;
+
+
+SELECT To_Char(inidateint),inidateint,rowconcat('SELECT distinct promotion FROM promo
+WHERE to_char(inidateint)=to_char('''||inidateint||''')','   -   ')
+FROM promo2
+WHERE inidateint>=dat('20091201')
+GROUP BY To_Char(inidateint),inidateint
+ORDER BY inidateint;
+
+
+
+
+
+
+SELECT To_Char(infodate) FROM fn3nodeinformation
+WHERE infodate=dat('20091101');
+
+ SELECT distinct promotion
+FROM promo
+WHERE inidateint=dat('20091005')
+
+SELECT rowconcat('SELECT DISTINCT code FROM fn3dating', ',') FROM dual
+
+
+SELECT FATHERNODE, rowconcat('SELECT CODE  FROM fn3NODE
+WHERE FATHERNODE ='||FATHERNODE,',')     AS HIJOS
+FROM fn3node
+GROUP BY  FATHERNODE
+
+
+CURSOR d IS
+SELECT inidateint,Count(*)
+FROM fn3promotiondate
+WHERE header='MARCA'
+AND inidateint=dat ('20091005')
+AND node IN ('CAM','PEN','ESP')
+GROUP BY inidateint;
+
+
+BEGIN
+  FOR i IN c LOOP
+    BEGIN
+      FOR j IN c LOOP
+        texto=
+--Dbms_Output.Put_Line('total: '|| i.text);
+END LOOP ;
+END;
+/
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,6 @@
+select  puntoventa,fn2operacion.servicio,decision+incremdecision,
+fn2operacion.servicio-decision-incremdecision as dif
+from fn2operacion,opemarca
+where fecha=to_date('2001/02/13','yyyy/mm/dd') and
+fn2operacion.puntoventa=opemarca.ruta||punto  and
+fecha=dia;

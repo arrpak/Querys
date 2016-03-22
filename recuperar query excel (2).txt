@@ -1,0 +1,19 @@
+Public Sub qq1()
+ Worksheets("Hoja1").PivotTables(1).PivotCache.CommandText = "select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes, to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi where isi.input = ei.input and  esi.setinput = isi.setinput and  ei.estsession = 'e20100124Com.IC' and  ei.dating     = 'Diario' and  ei.input != 'noise'   )"
+End Sub
+
+
+
+
+
+
+
+
+Public Sub qq()
+Debug.Print Worksheets("Hoja1").PivotTables(1).PivotCache.CommandText
+End Sub
+
+
+Public Sub qq1()
+ Worksheets("Hoja1").PivotTables(1).PivotCache.CommandText = "SELECT * from ezcreporteejemplares"
+End Sub

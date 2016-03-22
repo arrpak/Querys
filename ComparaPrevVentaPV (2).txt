@@ -1,0 +1,15 @@
+SELECT det.newsstand,dateprint,det.forsession,(case when (det.decision + increaseDec) <= 15
+              then  ceil(det.decision + increaseDec)
+              else  ROUND(det.decision + increaseDec) end) AS Tirada,fs.forecast,
+              service+incidence-RETURN AS Venta
+FROM fn3printingdetail det,fn3forecastseries fs,fn3operation ope
+WHERE 
+node='AND' AND
+dateprint=To_Date('20051201','yyyymmdd')
+AND fs.valuedate=det.dateprint
+AND fs.forsession=det.forsession
+AND 'VentaMarca'||det.newsstand=output
+AND ope.newsstand=det.newsstand
+AND operationdate=dateprint
+AND det.header=ope.header
+AND det.product=ope.product

@@ -1,0 +1,44 @@
+define pridet='20080517';
+define orderf=1;
+
+SELECT FECHA, DELEGACION, PVSERVICIO, TOTAL
+FROM
+(
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTAL,
+              1 AS ORDEN
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAVCMU')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+UNION
+(SELECT fecha,'TOTAL',Sum(PVServicio),Sum(total),
+              2 AS ORDEN
+from
+(select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTAL
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAVCMU')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate)
+GROUP BY fecha)
+)ORDER BY ORDEN, DELEGACION
+

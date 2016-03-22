@@ -1,0 +1,79 @@
+
+BEGIN
+   ServicioMax('MARCA','EXT',Dat('20071011'),1,Dat('20071004'),Dat('20071003'),Dat('20070926'),Dat('20070919'));
+END;
+/
+
+
+BEGIN
+  ServicioMin4('MARCA','EXT',Dat('20071011'),1,Dat('20071004'),Dat('20071003'),Dat('20070926'),Dat('20070919'));
+END;
+/
+
+
+BEGIN
+   ServicioMin4('MARCA','AND',Dat('20071006'),1,Dat('20070929'),Dat('20070929'),Dat('20070929'),Dat('20070929'));
+END;
+
+
+
+BEGIN
+   SERVICIOMIN4('EXPANSION','CAM',Dat('20071010'),1,Dat('20070925'),Dat('20070927'),Dat('20070911'),Dat('20070911'));
+END;
+/
+
+
+
+
+
+BEGIN
+   ServicioMax('MARCA','CAM',Dat('20071116'),1,Dat('20071108'),Dat('20071102'),Dat('20071108'),Dat('20071026'));
+END;
+
+
+BEGIN
+   ServicioMin4('MARCA','CAM',Dat('20071116'),1,Dat('20071108'),Dat('20071102'),Dat('20071108'),Dat('20071026'));
+END;
+
+
+
+
+
+BEGIN
+   ServicioMax('MARCA','CAM',Dat('20071117'),1,Dat('20071103'),Dat('20071027'),Dat('20071110'),Dat('20071110'));
+END;
+/
+
+
+BEGIN
+   ServicioMin4('MARCA','CAM',Dat('20071117'),1,Dat('20071103'),Dat('20071027'),Dat('20071110'),Dat('20071110'));
+END;
+/
+
+
+
+
+BEGIN
+   ServicioMax('MARCA','CAM',Dat('20071118'),1,Dat('20071014'),Dat('20071104'),Dat('20071104'),Dat('20071111'));
+END;
+/
+
+
+BEGIN
+   ServicioMin4('MARCA','CAM',Dat('20071118'),1,Dat('20071111'),Dat('20071104'),Dat('20071028'),Dat('20071028'));
+END;
+/
+
+
+
+
+BEGIN
+   ServicioMax('MARCA','EXT',Dat('20071119'),1,Dat('20071112'),Dat('20071029'),Dat('20071015'),Dat('20071021'));
+END;
+/
+
+
+BEGIN
+   ServicioMin4('MARCA','EXT',Dat('20071119'),1,Dat('20071112'),Dat('20071029'),Dat('20071015'),Dat('20071021'));
+END;
+/

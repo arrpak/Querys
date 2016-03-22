@@ -1,0 +1,13 @@
+select opemarca.ruta||opemarca.punto,
+       tab1999.servicio as serv1999,
+       decision + incremdecision as serv2000
+from   
+opemarca,
+(select ruta, punto, servicio
+from   opemarca
+where  dia = to_date('1999/11/01', 'YYYY/MM/DD') and
+       servicio > 0 and
+       devolucion = 0) tab1999
+where opemarca.dia = to_date('2000/11/01', 'YYYY/MM/DD') and
+      opemarca.ruta  = tab1999.ruta and
+      opemarca.punto = tab1999.punto; 

@@ -1,0 +1,44 @@
+SELECT code,fathernode,level
+FROM (
+SELECT DISTINCT code, fathernode
+FROM Fn3Node
+WHERE header='MARCA'
+  AND product='DIARIO'
+ -- AND newsstand IS NULL
+) aux
+WHERE LEVEL>7
+START WITH code = 'ESP'
+CONNECT BY PRIOR code=fathernode
+
+
+
+SELECT code,fathernode,level
+FROM (
+SELECT DISTINCT code, fathernode
+FROM Fn3Node
+WHERE header='MARCA'
+  AND product='DIARIO'
+  AND newsstand IS NULL
+) aux
+START WITH code = 'ESP'
+CONNECT BY PRIOR code=fathernode
+
+
+
+
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT DISTINCT b.code, (CASE WHEN a.code=b.code THEN a.path ELSE a.path||a.code||'/' END) AS path, (CASE WHEN a.code=b.code THEN a.orden ELSE a.orden+1 END) AS orden FROM (
+SELECT 'ESP' AS code, '/' AS path, 0 AS orden FROM dual
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+) a, fn3node b WHERE (header='MARCA' and product='DIARIO' and  newsstand is null and a.code=b.fathernode )OR( header='MARCA' and product='DIARIO' and  newsstand is null AND a.code=b.code)
+ORDER BY orden, path, code;

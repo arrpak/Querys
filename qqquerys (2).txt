@@ -1,0 +1,67 @@
+////Puntos con mayor devolucion
+/////////////////////////////////////////////////
+
+
+select puntoventa,servicio+incidencia as entregado,devolucion/(servicio+incidencia) as porc,
+servicio+incidencia-devolucion as venta
+from fn2operacion
+where  devolucion<servicio+incidencia and
+          devolucion/(servicio+incidencia)>0.65 and
+          fecha=to_date('2001/03/26','yyyy/mm/dd') and
+	servicio+incidencia>0 
+order by porc desc;
+
+
+
+/////////////
+
+
+select fn2detalletirada.puntoventa,servicio+incidencia as entregado,
+         decision+increndecision as tirada 
+
+
+////////////////////////////////////////////////
+DIFERENCIAS ENTRE SERVICIO Y DECISION
+select count(*)
+select fn2detalletirada.puntoventa,decision+increndecision as dec,servicio+incidencia as ser,
+servicio+incidencia-decision-increndecision as dif
+from fn2detalletirada,fn2operacion
+where fn2detalletirada.puntoventa=fn2operacion.puntoventa and
+	orden=3 and
+	servicio+incidencia<>decision+increndecision and
+	fn2detalletirada.fecha=to_date('2001/04/15','yyyy/mm/dd') and
+	fn2detalletirada.fecha=fn2operacion.fecha
+	order by dif;
+/////////////////////////////////////////////////
+select sum(devolucion)/sum(servicio+incidencia)
+from fn2operacion
+where fecha=to_date('20010323','yyyymmdd');
+////////////////////////////////////////////////////
+AGOTADOS DE UN DIA
+select count(*) from fn2operacion
+where fecha=to_date('20010401','yyyymmdd') and
+	servicio>0 and
+      devolucion=0;
+////////////////////////////////////////////////
+NUMERO DE OPERATIVOS
+select count(*) from fn2puntoventa
+where operativo='S';
+////////////////////////////////////////////////
+NUMERO DE SERVICIOS AGOTADOS ANUAL
+select count(*) from fn2operacion
+where fecha>to_date('20010102','yyyymmdd') and
+	fecha<to_date('20011231','yyyymmdd') and
+	servicio>0 and
+      devolucion=0;
+/////////////////////////////////////////////////
+NUMERO DE SERVICIOS ANUAL
+select count(*) from fn2operacion
+where fecha>to_date('20010102','yyyymmdd') and
+	fecha<to_date('20011231','yyyymmdd') and
+	servicio>0
+/////////////////////////////////////////////////
+DEVOLUCION ANUAL
+select sum(devolucion)/sum(servicio+incidencia)
+from fn2operacion
+where fecha>to_date('20010102','yyyymmdd') and
+	fecha<to_date('20011231','yyyymmdd');

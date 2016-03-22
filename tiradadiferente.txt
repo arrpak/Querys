@@ -1,0 +1,18 @@
+select tab01.newsstand, tab01.dec, tab02.dec
+from
+(
+select newsstand, decision dec
+from fn3printingdetail
+where header = 'EXPANSION' and
+      dateprint = to_date('2002/05/07', 'YYYY/MM/DD') and
+      orderf = 1
+) tab01,
+(
+select newsstand, decision dec
+from fn3printingdetail
+where header = 'EXPANSION' and
+      dateprint = to_date('2002/05/07', 'YYYY/MM/DD') and
+      orderf = 2
+) tab02
+where tab01.newsstand = tab02.newsstand and
+      tab01.dec != tab02.dec;

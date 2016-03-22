@@ -1,0 +1,19 @@
+SELECT op.NEWSSTAND,op.service+op.incidence-op.RETURN AS VenPV,op.RETURN AS DevPV,
+       fathernode,operationdate,ni.service+ni.incidence-returncont+estimatedsale AS VenNodo
+FROM fn3operation op,fn3node nod,fn3nodeinformation ni
+WHERE
+op.header='MARCA'
+AND op.product='DIARIO'
+AND op.SERVICE>0
+AND op.operationdate>SYSDATE-30
+AND op.newsstand LIKE '003055631375'
+AND op.newsstand=nod.newsstand
+AND op.header=nod.header
+AND op.product=nod.product
+AND ni.node=nod.fathernode
+AND ni.infodate=op.operationdate
+AND op.header=ni.header
+AND op.product=ni.product
+ORDER BY op.newsstand
+--GROUP BY op.NEWSSTAND,fathernode,operationdate,ni.service
+

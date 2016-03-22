@@ -1,0 +1,13 @@
+ insert into fn3closingfixed
+  select newsstand,modifieddate,modifieddate,modifieddate-1
+  from fn3servicemodified
+  where header='MARCA' and product='DIARIO' and
+  modifieddate>sysdate-60 and
+  newsstand like '028%' and
+  service=0 and
+  newsstand||modifieddate||modifieddate not in
+ (
+ select newsstand||datefrom||dateuntil
+ from fn3closingfixed
+ where newsstand like '028%' and
+ datefrom>sysdate-300);

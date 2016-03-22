@@ -1,0 +1,29 @@
+SET PAGESIZE 400
+SET LINESIZE 300
+select fecha,delegacion,sum(pvservicio),sum(venta)
+from(
+select to_char(operationdate,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+         SUM(service+incidence-return) as Venta
+from fn3operation pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.newsstand = cod.newsstand and
+      pri.operationdate = to_date('20070114', 'YYYYMMDD')
+group by operationdate, cod.delegate
+union
+(
+select to_char(operationdate,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+         SUM(service+incidence-return) as Venta
+from fn3operationnotcontrolled pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.newsstand = cod.newsstand and
+      pri.operationdate = to_date('20070114', 'YYYYMMDD')
+group by operationdate, cod.delegate
+))group by fecha,delegacion
+;
+

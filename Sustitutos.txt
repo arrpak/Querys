@@ -1,0 +1,72 @@
+set pagesize 5000;
+select new.code as codigo ,new.town as town ,
+       new.postcode as postcode,sust.code as sustituto
+from fn3newsstand new,
+     fn3newsstand sust,
+     fn3newsstandon non,
+     fn3node nod
+where 
+nod.header='MARCA' and 
+nod.product='DIARIO' and
+dateoff is null and
+substr(fathernode,1,3)='AND' and 
+non.newsstand=new.code and
+non.newsstand=nod.newsstand and
+new.town=sust.town and
+new.postcode=sust.postcode
+;
+
+
+select code
+from fn3newsstand
+where postcode='codigo' and
+code <> pv;
+
+
+
+
+
+
+
+
+
+
+
+select kio.newsstand,kio.operationdate,kio.service+kio.incidence-kio.return as ventakio,
+       sust.newsstand,sust.operationdate,sust.service+sust.incidence-sust.return as ventakio
+from fn3operation kio,fn3operation sust
+where kio.operationdate>to_date('20030101','yyyymmdd') and
+kio.newsstand = '028000100002'and 
+kio.service>0 and
+kio.header='MARCA' and 
+kio.product='DIARIO' and
+sust.service=0 and
+kio.operationdate=sust.operationdate and
+kio.header=sust.header and
+kio.product=sust.product and
+sust.newsstand in
+('028000101496','028002500971','028200502159');
+
+
+
+
+
+
+
+select new.code as codigo ,new.town as town ,
+       new.postcode as postcode,sust.code as sustituto
+from fn3newsstand new,
+     fn3newsstand sust,
+     fn3newsstandon non,
+     fn3node nod
+where dateoff is null and
+substr(fathernode,1,3)='EXT' and 
+nod.header='MARCA' and nod.product='DIARIO' and
+non.newsstand=new.code and
+non.newsstand=nod.newsstand and
+new.town=sust.town and
+new.postcode=sust.postcode
+;
+
+
+

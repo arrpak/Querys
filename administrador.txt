@@ -1,0 +1,62 @@
+alter table
+   fn3productnodehistorical
+add
+   (
+   comunicationdate date
+   );
+   
+   
+   
+   
+   insert into  fn3productnodehistorical
+select delegado,comunidad,n,fechaportada,coddist,distribuidora,provincia,promocion,entrega,tirada,servicio,entr,dev,venta,porcdevol,devolest,ventaest,porccontr,pv,pvcont,porcpvagot,porcpv0,
+devmedxpv,pvagot,ejspvagot,pv0,ejspv0,zona,precio,observaciones,to_date('20070517','yyyymmdd')
+from fn3productnodetmp;
+
+
+delete table fn3productnodetmp;
+
+ alter table fn3productnodetmp modify
+ (fechaportada varchar2(15));
+
+ alter table fn3productnodetmp modify
+ (fechaportada date);
+
+
+
+
+ALTER TABLE "FORMARCA"."FN3PRODUCTNODEHISTORICAL"
+    ADD (CONSTRAINT "FN3PRODUCTNODEHISTORICALPK" UNIQUE("DELEGADO","COMUNIDAD","N" ,
+    "FECHAPORTADA","DISTRIBUIDORA","PROVINCIA","COMUNICATIONDATE")) ;
+
+
+
+DROP CONSTRAINT FN3PRODUCTNODEHISTORICALP;
+
+
+
+
+SELECT *
+FROM dba_constraints
+WHERE table_name='FN3PRODUCTNODE2';
+
+SELECT *
+FROM
+ALL_CONS_COLUMNS
+WHERE table_name='FN3PRODUCTNODE2';
+
+SELECT *
+FROM dict
+WHERE table_name LIKE '%COLUMN%'
+
+
+
+
+
+
+
+
+
+
+
+

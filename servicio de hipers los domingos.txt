@@ -1,0 +1,6 @@
+ select puntoventa,decision
+    from fn2cierreregular,fn2forecastdetail
+  where exprtol like '%CieHiper%' and
+ valuedate=to_date('20011202','yyyymmdd') and
+ forsession='2001113007.PV' and
+  outputdef='VentaMarca'||puntoventa

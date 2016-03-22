@@ -1,0 +1,23 @@
+define pridet='20100512';
+define orderf=1;
+
+--SUMA TIRADA MARCA CAM
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+       --SUM(ROUND(decision + increaseDec))+ser.service AS TOTAL,
+       100*Ceil((SUM(ROUND(decision + increaseDec))+ser.service)/100) AS TOTAL_____MARCA
+from
+(SELECT *
+FROM FN3SERVICECAM) ser,
+fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+      pri.dateprint = to_date('&pridet', 'YYYYMMDD') and
+      ser.header=pri.header and
+      to_char(pri.dateprint,'DY')= ser.weekday
+group by dateprint,delegate,ser.service;

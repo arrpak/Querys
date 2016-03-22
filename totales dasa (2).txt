@@ -1,0 +1,34 @@
+define pridet = '20080206';
+define orderf = 1;
+
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('ARA')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      50*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))/50) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CYLSOR2')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate;

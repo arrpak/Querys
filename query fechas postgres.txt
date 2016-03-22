@@ -1,0 +1,199 @@
+select forsession,tipoalarma,dia_prevision,año,diasem,mes,hora,minuto,horaminuto,valprev
+from 
+(
+select null,'DatoReal' as forsession,tipoalarma,null,null,null,
+        valuedate::timestamp::date as dia_prevision,
+       date_part('year',valuedate) as año,
+       case when date_part( 'isodow', valuedate ) = 1 then 'lunes' 
+        when date_part( 'isodow', valuedate ) = 2 then 'martes' 
+        when date_part( 'isodow', valuedate ) = 3 then 'miércoles' 
+        when date_part( 'isodow', valuedate ) = 4 then 'jueves' 
+        when date_part( 'isodow', valuedate ) = 5 then 'viernes' 
+        when date_part( 'isodow', valuedate ) = 6 then 'sábado' 
+        else 'domingo' end as diasem,
+       case when date_part( 'month', valuedate ) = 1 then 'enero' 
+        when date_part( 'month', valuedate ) = 2 then 'febrero' 
+        when date_part( 'month', valuedate ) = 3 then 'marzo' 
+        when date_part( 'month', valuedate ) = 4 then 'abril' 
+        when date_part( 'month', valuedate ) = 5 then 'mayo' 
+        when date_part( 'month', valuedate ) = 6 then 'junio' 
+        when date_part( 'month', valuedate ) = 7 then 'julio' 
+        when date_part( 'month', valuedate ) = 8 then 'agosto' 
+        when date_part( 'month', valuedate ) = 9 then 'septiembre' 
+        when date_part( 'month', valuedate ) = 10 then 'octubre' 
+        when date_part( 'month', valuedate ) = 11 then 'noviembre' 
+        else 'diciembre'end as mes,
+        case when date_part('hour',valuedate) = 0 then '00'
+        when date_part('hour',valuedate) = 1 then '01'
+        when date_part('hour',valuedate) = 2 then '02'
+        when date_part('hour',valuedate) = 3 then '03'
+        when date_part('hour',valuedate) = 4 then '04'
+        when date_part('hour',valuedate) = 5 then '05'
+        when date_part('hour',valuedate) = 6 then '06'
+        when date_part('hour',valuedate) = 7 then '07'
+        when date_part('hour',valuedate) = 8 then '08'
+        when date_part('hour',valuedate) = 9 then '09'
+        else concat(date_part('hour',valuedate),'') end as hora,
+        case when date_part('minute',valuedate) = 0 then '00' 
+        else '30' end as minuto,
+        case when date_part('hour',valuedate) = 0 then '00'
+        when date_part('hour',valuedate) = 1 then '01'
+        when date_part('hour',valuedate) = 2 then '02'
+        when date_part('hour',valuedate) = 3 then '03'
+        when date_part('hour',valuedate) = 4 then '04'
+        when date_part('hour',valuedate) = 5 then '05'
+        when date_part('hour',valuedate) = 6 then '06'
+        when date_part('hour',valuedate) = 7 then '07'
+        when date_part('hour',valuedate) = 8 then '08'
+        when date_part('hour',valuedate) = 9 then '09'
+        else concat(date_part('hour',valuedate),'') end||
+        case when date_part('minute',valuedate) = 0 then '00' 
+        else '30' end as horaminuto,
+        null,null,null, valuedate, val as valprev
+        from
+(select 'Total' as tipoAlarma,                                           
+         dt_salto + hh_salto as valueDate,                              
+         sum(qt_saltos) as val                                          
+  from SAl_F_Saltos_Alarma_A01 SAl                                  
+  where to_char(dt_salto, 'yyyymmdd') >= '20150201'       and  to_char(dt_salto, 'yyyymmdd') not in ( '20150321', '20150322')                  
+group by 1 ,2  
+Union                                                                   
+select Pri.co_prioridad||'Tot'as tipoAlarma,
+         dt_salto + hh_salto as valueDate,                              
+         sum(qt_saltos) as val                                          
+  from                                                                  
+    SAl_F_Saltos_Alarma_A01        SAl,                                 
+    SAl_D_Prioridad_Grupo          PGr,                                 
+    SAl_D_Prioridad                Pri,                                 
+    SAl_D_Prioridad_Tipo_Hie       Hie,                                 
+    SAl_D_Tipo_Alarma              Tip                                  
+  where SAl.id_prioridad               = PGr.id_prioridad               
+    and SAl.id_tipo_alarma             = Hie.id_tipo_alarma             
+    and PGr.id_prioridad_grupo         = Hie.id_prioridad_grupo         
+    and PGr.id_prioridad               = Pri.id_prioridad               
+    and Hie.id_tipo_alarma             = Tip.id_tipo_alarma  
+    and  Pri.co_prioridad||'Tot'       in ('IntTot', 'EmeTot', 'InfTot')
+    and to_char(dt_salto, 'yyyymmdd') >= '20150201'          and  to_char(dt_salto, 'yyyymmdd') not in ( '20150321', '20150322')                         
+group by 1 ,2                                                              
+Union                                                                   
+select case when Pri.co_prioridad||'Tot' = 'IntTot' and (extract(hour from hh_salto)  between 0 and 6 or extract(hour from hh_salto)  = 23) then 'IntTot.Noche' 
+            when Pri.co_prioridad||'Tot' = 'IntTot' and (extract(hour from hh_salto) between 7 and 14 ) then 'IntTot.Mannana'
+            when Pri.co_prioridad||'Tot' = 'IntTot' and (extract(hour from hh_salto)  between 15 and 22 ) then 'IntTot.Tarde' 
+
+            when Pri.co_prioridad||'Tot' = 'EmeTot' and (extract(hour from hh_salto)  between 0 and 6 or extract(hour from hh_salto)  = 23) then 'EmeTot.Noche' 
+            when Pri.co_prioridad||'Tot' = 'EmeTot' and (extract(hour from hh_salto) between 7 and 14 ) then 'EmeTot.Mannana'
+            when Pri.co_prioridad||'Tot' = 'EmeTot' and (extract(hour from hh_salto)  between 15 and 22 ) then 'EmeTot.Tarde' 
+            
+            when Pri.co_prioridad||'Tot' = 'InfTot' and (extract(hour from hh_salto)  between 0 and 6 or extract(hour from hh_salto)  = 23) then 'InfTot.Noche' 
+            when Pri.co_prioridad||'Tot' = 'InfTot' and (extract(hour from hh_salto) between 7 and 14 ) then 'InfTot.Mannana'
+            when Pri.co_prioridad||'Tot' = 'InfTot' and (extract(hour from hh_salto)  between 15 and 22 ) then 'InfTot.Tarde' 
+
+            else Pri.co_prioridad||'Tot'  end as tipoAlarma,
+
+         dt_salto + hh_salto as valueDate,                              
+         sum(qt_saltos) as val                                          
+  from                                                                  
+    SAl_F_Saltos_Alarma_A01        SAl,                                 
+    SAl_D_Prioridad_Grupo          PGr,                                 
+    SAl_D_Prioridad                Pri,                                 
+    SAl_D_Prioridad_Tipo_Hie       Hie,                                 
+    SAl_D_Tipo_Alarma              Tip                                  
+  where SAl.id_prioridad               = PGr.id_prioridad               
+    and SAl.id_tipo_alarma             = Hie.id_tipo_alarma             
+    and PGr.id_prioridad_grupo         = Hie.id_prioridad_grupo         
+    and PGr.id_prioridad               = Pri.id_prioridad               
+    and Hie.id_tipo_alarma             = Tip.id_tipo_alarma             
+    and to_char(dt_salto, 'yyyymmdd') >= '20150201'          and  to_char(dt_salto, 'yyyymmdd') not in ( '20150321', '20150322')                         
+group by 1 ,2                                                           
+union                                                                   
+select case when PGr.co_prioridad_grupo = 'InfRes' and (extract(hour from hh_salto)  between 0 and 6 or extract(hour from hh_salto)  = 23) then 'InfRes.Noche' 
+            when PGr.co_prioridad_grupo = 'InfRes' and (extract(hour from hh_salto) between 7 and 14 ) then 'InfRes.Mannana'
+            when PGr.co_prioridad_grupo = 'InfRes' and (extract(hour from hh_salto)  between 15 and 22 ) then 'InfRes.Tarde' 
+            else PGr.co_prioridad_grupo  end as tipoAlarma,                        
+         dt_salto + hh_salto as valueDate, 
+         sum(qt_saltos) as val                                          
+  from                                                                  
+    SAl_F_Saltos_Alarma_A01        SAl,                                 
+    SAl_D_Prioridad_Grupo          PGr,                                 
+    SAl_D_Prioridad                Pri,                                 
+    SAl_D_Prioridad_Tipo_Hie       Hie,                                 
+    SAl_D_Tipo_Alarma              Tip                                  
+  where SAl.id_prioridad               = PGr.id_prioridad               
+    and SAl.id_tipo_alarma             = Hie.id_tipo_alarma             
+    and PGr.id_prioridad_grupo         = Hie.id_prioridad_grupo         
+    and PGr.id_prioridad               = Pri.id_prioridad               
+    and Hie.id_tipo_alarma             = Tip.id_tipo_alarma             
+    and to_char(dt_salto, 'yyyymmdd') >= '20150201'             and  to_char(dt_salto, 'yyyymmdd') not in ( '20150321', '20150322')                   
+group by 1, 2    
+union
+select  PGr.co_prioridad_grupo as tipoAlarma,                        
+         dt_salto + hh_salto as valueDate, 
+         sum(qt_saltos) as val                                          
+  from                                                                  
+    SAl_F_Saltos_Alarma_A01        SAl,                                 
+    SAl_D_Prioridad_Grupo          PGr,                                 
+    SAl_D_Prioridad                Pri,                                 
+    SAl_D_Prioridad_Tipo_Hie       Hie,                                 
+    SAl_D_Tipo_Alarma              Tip                                  
+  where SAl.id_prioridad               = PGr.id_prioridad               
+    and SAl.id_tipo_alarma             = Hie.id_tipo_alarma             
+    and PGr.id_prioridad_grupo         = Hie.id_prioridad_grupo         
+    and PGr.id_prioridad               = Pri.id_prioridad               
+    and Hie.id_tipo_alarma             = Tip.id_tipo_alarma   
+    and  PGr.co_prioridad_grupo        = 'InfRes'          
+    and to_char(dt_salto, 'yyyymmdd') >= '20150201'             and  to_char(dt_salto, 'yyyymmdd') not in ( '20150321', '20150322')                   
+group by 1, 2                                                       
+)  t
+where to_char(valuedate,'yyyy-mm-dd')>=
+(select concat(to_char(min(dia_prevision),'yyyy-mm'),'-01')
+from forecastseries_mho
+where forsession='E.20151229.01.Forecast.Combinada')
+and to_char(valuedate,'yyyy-mm-dd')<(select to_char(min(dia_prevision),'yyyy-mm-dd')
+from forecastseries_mho
+where forsession='E.20151229.01.Forecast.Combinada')
+union
+select formho.comunicationdate,
+       formho.forsession, 
+       formho.output, 
+       formho.grupoalarma, 
+       formho.tipoalarma, 
+       formho.fechado, 
+       formho.dia_prevision,
+       date_part( 'year', formho.dia_prevision ) as año,
+       case when date_part( 'isodow', formho.dia_prevision ) = 1 then 'lunes' else
+       case when date_part( 'isodow', formho.dia_prevision ) = 2 then 'martes' else
+       case when date_part( 'isodow', formho.dia_prevision ) = 3 then 'miércoles' else
+       case when date_part( 'isodow', formho.dia_prevision ) = 4 then 'jueves' else
+       case when date_part( 'isodow', formho.dia_prevision ) = 5 then 'viernes' else
+       case when date_part( 'isodow', formho.dia_prevision ) = 6 then 'sábado' else
+       case when date_part( 'isodow', formho.dia_prevision ) = 7 then 'domingo'
+       end end end end end end end as diasem,
+       case when date_part( 'month', formho.dia_prevision ) = 1 then 'enero' else
+       case when date_part( 'month', formho.dia_prevision ) = 2 then 'febrero' else
+       case when date_part( 'month', formho.dia_prevision ) = 3 then 'marzo' else
+       case when date_part( 'month', formho.dia_prevision ) = 4 then 'abril' else
+       case when date_part( 'month', formho.dia_prevision ) = 5 then 'mayo' else
+       case when date_part( 'month', formho.dia_prevision ) = 6 then 'junio' else
+       case when date_part( 'month', formho.dia_prevision ) = 7 then 'julio' else
+       case when date_part( 'month', formho.dia_prevision ) = 8 then 'agosto' else
+       case when date_part( 'month', formho.dia_prevision ) = 9 then 'septiembre' else
+       case when date_part( 'month', formho.dia_prevision ) = 10 then 'octubre' else
+       case when date_part( 'month', formho.dia_prevision ) = 11 then 'noviembre' else
+       case when date_part( 'month', formho.dia_prevision ) = 12 then 'diciembre'
+       end end end end end end end end end end end end as mes,
+       formho.hora_prevision, 
+       formho.minuto_prevision,
+       case when char_length(formho.hora_prevision) = 1 then '0'||formho.hora_prevision 
+       else formho.hora_prevision end || minuto_prevision as horaminuto,
+       formho.franja_horaria, 
+       formho.peso_reparto_mho, 
+       formho.prevision_dia,
+       (to_timestamp(to_char(formho.dia_prevision, 'yyyymmdd') ||             
+       case when char_length(formho.hora_prevision) = 1 then '0'||formho.hora_prevision 
+       else formho.hora_prevision end || minuto_prevision, 'YYYYMMDDHH24MISS')) as valuedate,
+       sum(formho.prevision_mho) as valprev                              
+from forecastseries_mho formho                                       
+where formho.forsession = 'E.20151229.01.Forecast.Combinada'
+  and formho.dia_prevision >= '01-05-2015' and formho.dia_prevision <= '31-12-2016'
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14)  tab
+order by 3,7,8

@@ -1,0 +1,80 @@
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2EstSession
+--
+-- PURPOSE: Definicion de la tabla de estimaciones por sesión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  sessionIni           char(80),
+  estSessionNodoPadre  char(80),
+  fechaIni             date,
+  fechaFin             date,
+  descripcion          char(80), 
+  foreign key (sessionIni) references Fn2estSession(codigo),
+  foreign key (estSessionNodoPadre) references Fn2estSession(codigo),
+  CONSTRAINT pk_EstSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX
+ )  
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2ForSession 
+--
+-- PURPOSE: Definicion de la tabla de sesión de previsión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  estSession           char(80),
+  forSessionNodoPadre  char(80),
+  fechaIni             date        not Null,
+  fechaFin             date        not Null,
+  descripcion          char(80),
+  foreign key        (estSession) references Fn2EstSession(codigo),
+  foreign key (forSessionNodoPadre) references Fn2ForSession(codigo),
+  CONSTRAINT pk_forSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX 
+ ) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+
+//modificacion sobre Fn2EstSession
+ALTER TABLE "FORMARCA"."FN2ESTSESSION" ADD(CONSTRAINT "FK_SESSIONINI_EST"
+FOREIGN KEY("SESSIONINI") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+ALTER TABLE "FORMARCA"."FN2ESTSESSION" ADD(CONSTRAINT "FK_NODOPADRE_EST"
+FOREIGN KEY("ESTSESSIONNODOPADRE") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+//modificamos Fn2ForSession
+ALTER TABLE "FORMARCA"."FN2FORSESSION" ADD(CONSTRAINT "FK_NODOPADRE_FOR"
+FOREIGN KEY("FORSESSIONNODOPADRE") REFERENCES
+"FORMARCA"."FN2FORSESSION"("CODIGO"));
+
+//modificamos Fn2Estimation
+ALTER TABLE "FORMARCA"."FN2ESTIMATION" ADD(CONSTRAINT "FK_ESTSESSION_ESTIMA"
+FOREIGN KEY("ESTSESSION") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+
+SELECT estsession from fn2estimation
+minus
+SELECT codigo from fn2estsession;
+
+

@@ -1,0 +1,21 @@
+ select node as Nodo, 
+infoDate as fecha, 
+ to_char(infoDate , 'Dy') as DIA,  round(sum(NUMPV),2) as numPV, 
+ round(sum(service), 2) as serv, 
+ round(sum(incidence), 2) as inc, 
+ round(sum(return), 2) as dev, 
+ round(to_number(decode(sum(SERVICE+INCIDENCE+RETURN), 0, '',
+sum(SERVICE + INCIDENCE - RETURN))), 2) as VENTA, 
+ round(sum(NUMPV - NUMOPEN), 2) as nPVClose, 
+ to_number(substr(decode(sum(RETURN), 0, decode(sum (SERVICE + INCIDENCE), 0, '', 0), 
+ decode(sum(SERVICE + INCIDENCE), 0, '', 
+sum((RETURN))/sum((SERVICE + INCIDENCE)))),1,6)) as PORCDEV, 
+ to_number(substr(decode(sum(NUMPV), 0, '', sum(NUMOUTOFF)/sum(NUMPV)),1,6)) as PORCAGO, 
+ to_number(substr(decode(sum(service), 0, '', sum(SERVOUTOFF)/sum(service)),1,6)) as PorcAgoPonde, 
+ to_number(substr(decode(sum(NUMPV), 0, '', sum(NUMPV-NUMOPEN)/sum(NUMPV)),1,6)) as RatioCierre 
+ from fn3NodeInformation 
+ where header = 'MARCA' and 
+ product = 'DIARIO' and 
+ node in ('CAM','CAMAER' , 'CAMATI' , 'CAMCAP' , 'CAMGAS' , 'CAMPER' , 'CAMSIE' , 'CAMVIA' , 'CAMVIP' , 'CAMVLR') 
+ and INFODATE >=  to_date('20011111', 'yyyymmdd')   and INFODATE <=  to_date('20011111', 'yyyymmdd')   group by node, infoDate
+ order by node, infoDate

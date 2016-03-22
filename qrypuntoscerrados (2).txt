@@ -1,0 +1,36 @@
+SELECT t1.newsstand,MaxOp,MaxPri,Maxpri-MaxOp
+FROM
+(SELECT newsstand,Max(Operationdate) as MaxOp
+FROM
+(SELECT newsstand,operationdate
+FROM fn3operation
+WHERE
+header='MARCA' AND
+operationdate>SYSDATE-200 AND
+service>0
+UNION
+SELECT newsstand,operationdate
+FROM fn3operationnotcontrolled
+WHERE
+header='MARCA' AND
+operationdate>SYSDATE-200 AND
+service>0
+)
+GROUP BY newsstand
+) t1,
+(
+SELECT newsstand,Max(dateprint) AS MaxPri
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND
+dateprint>SYSDATE-60
+AND decision>0
+GROUP BY newsstand) t2,
+(SELECT newsstand
+FROM fn3newsstandon
+WHERE (dateoff IS NULL ) )t3
+WHERE
+t1.newsstand=t2.newsstand
+AND t2.newsstand=t3.newsstand
+AND Maxpri-MaxOp>20
+ORDER BY Maxpri-MaxOp DESC,t1.newsstand

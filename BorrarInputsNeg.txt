@@ -1,0 +1,56 @@
+INSERT INTO fn3outputinputinformation
+SELECT output,'Eliminados','Diario',input,'E',null,NULL,NULL,NULL,'Y'
+FROM fn3estimationinput
+WHERE estsession='20081120II.MG'
+--AND   output LIKE 'VentaMarcaCAT%'
+AND orderf=0
+AND input IN
+(SELECT code FROM fn3input where (setinput LIKE '%2007%' OR setinput LIKE '%2008%' OR setinput LIKE '%2009%'))
+AND Value<0
+AND (input,output) not IN
+(SELECT input,output FROM fn3outputinputinformation where type='E')
+ORDER BY input
+
+
+
+
+DELETE    Fn3outputinputinformation
+WHERE SETINPUT='Eliminados' AND TYPE='F'
+
+
+
+
+INSERT INTO fn3outputinputinformation
+SELECT output,'Eliminados',Dating,input,'E',NULL,NULL,NULL,NULL,'Y'
+FROM fn3estimationinput
+WHERE estsession='20080717.MG'
+AND   output LIKE 'VentaMarcaCAMVIA' AND dating='CtLV' and orderf=0
+AND input IN
+(SELECT code FROM fn3input where (setinput LIKE '%2007%' OR setinput LIKE '%2008%'))
+AND Value<0
+AND (output,'Eliminados',input)
+NOT IN
+(SELECT  output,'Eliminados',input
+FROM  fn3outputinputinformation
+where output LIKE 'VentaMarcaCAMVIA' and type='E')
+
+
+
+
+Create table fn3outputinputinformationaux2
+as select *
+from fn3outputinputinformation
+where
+output='VentaMarcaCAMVIA' and type='E'
+
+delete 	from fn3outputinputinformation
+where
+output='VentaMarcaCAMVIA' and type='E'
+
+
+
+
+
+
+
+

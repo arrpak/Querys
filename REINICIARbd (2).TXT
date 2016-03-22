@@ -1,0 +1,11 @@
+con user oracle
+
+./oracle.stop
+sudo /sbin/reboot
+
+pedirá la password de oracle tras ejecutar esto.
+Introducirla y listo, se reiniciará
+
+Una vez reiniciado
+
+./oracle.start

@@ -1,0 +1,17 @@
+SELECT t1.output,t1.valuedate,t1.forecast AS PrevisionOld,t2.forecast AS PrevisionNew,t1.decision AS DecOld,t2.decision AS DecNew
+FROM
+(SELECT *
+FROM fn3forecastseries
+WHERE forsession='2008121017.PV'
+AND output LIKE 'VentaMarca028%'
+AND valuedate=dat('20081213')) t1,
+(SELECT *
+FROM fn3forecastseries
+WHERE forsession='2008121017VP.PV'
+AND output LIKE 'VentaMarca028%'
+AND valuedate=dat('20081213')) t2
+WHERE
+--t1.valuedate=dat('20081213') AND
+t1.output=t2.output
+AND t2.dating=t2.dating
+AND t1.valuedate=t2.valuedate

@@ -1,0 +1,45 @@
+CREATE TABLE Fn3partidotmp
+(
+competicion VARCHAR2(50),
+temporada VARCHAR2(50),
+fecha DATE,
+equipolocal VARCHAR2(3),
+goleslocal NUMBER,
+golesvisitante NUMBER,
+equipovisitante VARCHAR2(3),
+INFO1 VARCHAR(200),
+INFO2 VARCHAR(200))
+;
+
+delete	   Fn3partidotmp
+where (goleslocal is null or golesvisitante is null)
+
+delete	   Fn3partidotmp
+where fecha is null
+
+ALter table  Fn3partidotmp
+add valido varchar2(1)
+
+ALter table  Fn3partidotmp
+rename column  fecha to fechapartido
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+select *
+from fn3partidotmp
+where equipolocal='COS'
+and competicion='MUNDIAL' AND TEMPORADA='2002'
+UNION
+(select *
+from fn3partidotmp
+where equipovisitante='COS'
+and competicion='MUNDIAL' AND TEMPORADA='2002')
+
+
+
+
+
+
+
+

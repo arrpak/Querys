@@ -1,0 +1,25 @@
+select fn3operation.newsstand,service,decision+increasedec as dec
+from fn3operation,fn3printingdetail
+where fn3operation.header='EXPANSION' 
+      and fn3operation.product='DIARIO'
+      and operationdate=to_date('20020509','yyyymmdd')
+      and dateprint=operationdate
+      and fn3operation.newsstand=fn3printingdetail.newsstand
+      and fn3operation.header=fn3printingdetail.header 
+      and fn3operation.product=fn3printingdetail.product
+      and decision+increasedec!=service
+      and orderf=1
+union
+select fn3operationnotloaded.newsstand,service,decision+increasedec as dec
+from fn3operationnotloaded,fn3printingdetail
+where fn3operationnotloaded.header='EXPANSION' 
+      and fn3operationnotloaded.product='DIARIO'
+      and operationdate=to_date('20020509','yyyymmdd')
+      and dateprint=operationdate
+      and fn3operationnotloaded.newsstand=fn3printingdetail.newsstand
+      and fn3operationnotloaded.header=fn3printingdetail.header 
+      and fn3operationnotloaded.product=fn3printingdetail.product
+      and decision+increasedec!=service
+      and orderf=1;
+
+

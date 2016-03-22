@@ -1,0 +1,39 @@
+
+SELECT SubStr(fs.output,11,12),fs.valuedate,fs.forecast,(case when (fs.decision) <= 15
+              then  ceil(fs.decision)
+              else  ROUND(fs.decision) end),
+              DATO.tirada,service+incidence,return
+FROM fn3forecastseries fs,fn3operation ope,
+(SELECT DISTINCT(forsession),orderf,dateprint,node,header,product
+FROM fn3printingnodeforsession
+WHERE
+node='AND' AND
+header='MARCA' AND product='DIARIO'
+AND dateprint=To_Date('20051202','yyyymmdd') )prevusada,
+(SELECT orderf,dateprint,node
+FROM fn3printing
+WHERE header='MARCA' AND product='DIARIO'
+AND dateprint=To_Date('20051202','yyyymmdd')
+AND node='AND'
+AND used='Y') ordenusado,
+(SELECT newsstand,dateprint,(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) tirada,orderf,header,product
+FROM fn3printingdetail
+WHERE dateprint=To_Date('20051202','yyyymmdd')
+AND node='AND') dato
+WHERE fs.valuedate=To_Date('20051202','yyyymmdd')
+AND prevusada.dateprint=To_Date('20051202','yyyymmdd')
+AND ordenusado.dateprint=To_Date('20051202','yyyymmdd')
+AND fs.forsession=prevusada.forsession
+AND prevusada.orderf=ordenusado.orderf
+AND prevusada.node=ordenusado.node
+AND DATO.NEWSSTAND=SubStr(fs.output,11,12)
+AND dato.header=prevusada.header
+AND dato.product=prevusada.product
+AND dato.orderf=ordenusado.orderf
+AND dato.dateprint=prevusada.dateprint
+AND ope.header='MARCA'
+AND ope.product='DIARIO'
+AND ope.operationdate=dato.dateprint
+AND ope.newsstand=dato.newsstand

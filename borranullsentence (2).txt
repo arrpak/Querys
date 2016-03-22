@@ -1,0 +1,4 @@
+update Fn3ProcessControl
+set trace = to_char(NULL)
+where process = 'probdia.bat' and
+      process = idsession;

@@ -1,0 +1,495 @@
+---Suma de previsiones----
+/*
+select code
+from fn3forsession
+where enddate>sysdate;
+*/
+
+
+define   fors='F2011092930.MG';
+define forspv='F2011092930.PV';
+
+define   fors2='F2011092223.MG';
+
+
+
+----------------------------------------------------
+-------------MADRID----------------------------
+----------------------------------------------------
+
+select valuedate,count(*),round(sum(forecast))
+from emuforecastseries
+where
+forsession='&fors'
+group by valuedate;
+
+----------------------------------------------------
+--Suma de PV MADRID
+----------------------------------------------------
+
+select valuedate,count(*),round(sum(round(forecast)))
+ from emuforecastseries
+where
+ forsession='&forspv'
+ group by
+ valuedate;
+
+----------------------------------------------------
+----------------------------------------------------
+--comparativo previsiones
+----------------------------------------------------
+
+
+
+select t1.valuedate,round(t1.forecast) as PrevNew,round(t2.forecast) as PrevOld
+from
+(select valuedate,count(*),sum(forecast) as forecast
+from EMUforecastseries
+where
+forsession='&fors'
+group by valuedate) t1,
+(select valuedate,count(*),sum(forecast) as forecast
+from EMUforecastseries
+where
+forsession='&fors2'
+group by valuedate) t2
+where t1.valuedate=t2.valuedate(+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------
+-------------ANDALUCIA------------------------------
+----------------------------------------------------
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='&fors'
+and output like 'VentaMarcaAND%'
+group by valuedate;
+
+
+
+
+select valuedate,count(*),sum(forecast),sum(decision)
+from fn3forecastseries
+where
+forsession='&forspv'
+and decision>0
+group by valuedate;
+
+
+
+
+select output,valuedate,forecast,decision
+from fn3forecastseries
+where
+forsession='&forspv'
+and decision>0
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------
+-------------EXTREMADURA----------------------------
+----------------------------------------------------
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='&fors'
+and output like 'VentaMarcaEXT%'
+group by valuedate;
+
+
+
+
+
+
+
+----------------------------------------------------
+-------------LEVANTE--------------------------------
+----------------------------------------------------
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='&fors'
+and (output like 'VentaMarcaCAV%' or output like 'VentaMarcaCMU%')
+group by valuedate;
+
+
+----------------------------------------------------
+-------------BARCELONA----------------------------
+----------------------------------------------------
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='&fors'
+and output like 'VentaMarcaCATBAR%'
+group by valuedate;
+
+----------------------------------------------------
+-------------NORTE----------------------------
+----------------------------------------------------
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='&fors'
+and (output like 'VentaMarcaVAS%' OR output like 'VentaMarcaNAV%' OR
+    output like 'VentaMarcaBUR%' OR output like 'VentaMarcaCCA%' OR output like 'VentaMarcaLRI%')
+group by valuedate;
+
+
+
+
+
+
+
+
+----------------------------------------------------
+----------------------------------------------------
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2007091320.MG'
+and
+(
+valuedate=to_date('20070913','yyyymmdd') or
+valuedate=to_date('20070914','yyyymmdd') or
+valuedate=to_date('20070915','yyyymmdd') or
+valuedate=to_date('20070916','yyyymmdd') or
+valuedate=to_date('20070917','yyyymmdd') or
+valuedate=to_date('20070918','yyyymmdd') or
+valuedate=to_date('20070919','yyyymmdd') or
+valuedate=to_date('20070920','yyyymmdd') )
+and (output like 'VentaMarcaCAV%' or output like 'VentaMarcaCMU%')
+group by valuedate;
+
+----------------------------------------------------
+----------------------------------------------------
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2007091320.MG'
+and
+(
+valuedate=to_date('20070913','yyyymmdd') or
+valuedate=to_date('20070914','yyyymmdd') or
+valuedate=to_date('20070915','yyyymmdd') or
+valuedate=to_date('20070916','yyyymmdd') or
+valuedate=to_date('20070917','yyyymmdd') or
+valuedate=to_date('20070918','yyyymmdd') or
+valuedate=to_date('20070919','yyyymmdd') or
+valuedate=to_date('20070920','yyyymmdd') )
+and (output like 'VentaMarcaCATBAR%')
+group by valuedate;
+
+
+----------------------------------------------------
+----------------------------------------------------
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2007091320.MG'
+and
+(
+valuedate=to_date('20070913','yyyymmdd') or
+valuedate=to_date('20070914','yyyymmdd') or
+valuedate=to_date('20070915','yyyymmdd') or
+valuedate=to_date('20070916','yyyymmdd') or
+valuedate=to_date('20070917','yyyymmdd') or
+valuedate=to_date('20070918','yyyymmdd') or
+valuedate=to_date('20070919','yyyymmdd') or
+valuedate=to_date('20070920','yyyymmdd') )
+and (output like 'VentaMarcaCATBAR')
+group by valuedate;
+
+
+----------------------------------------------------
+----------------------------------------------------
+
+select valuedate,sum(forecast)
+from fn3forecastseries
+where
+forsession='2007042807.MG'
+and
+(
+valuedate=to_date('20070430','yyyymmdd') or
+valuedate=to_date('20070501','yyyymmdd') or
+valuedate=to_date('20070502','yyyymmdd') or
+valuedate=to_date('20070503','yyyymmdd') or
+valuedate=to_date('20070504','yyyymmdd') or
+valuedate=to_date('20070505','yyyymmdd') )
+and output like 'VentaMarcaAND%'
+group by valuedate;
+----------------------------------------------------
+----------------------------------------------------
+select valuedate,sum(forecast)
+from fn3forecastseries
+where
+forsession='2007042807.PV'
+and
+(
+valuedate=to_date('20070430','yyyymmdd') or
+valuedate=to_date('20070501','yyyymmdd') or
+valuedate=to_date('20070502','yyyymmdd') or
+valuedate=to_date('20070503','yyyymmdd') or
+valuedate=to_date('20070504','yyyymmdd') or
+valuedate=to_date('20070505','yyyymmdd') )
+and output like 'VentaMarcaEXT%'
+group by valuedate;
+
+----------------------------------------------------
+----------------------------------------------------
+----------------------------------------------------
+----------------------------------------------------
+
+--Suma de PV ANDALUCIA
+select valuedate,count(*),sum(round(forecast)),sum(round(decision))
+    ,(sum(round(decision))-sum(round(forecast)))/sum(round(decision)) AS Porc
+ from fn3forecastseries
+where
+substr(output,11,3) in('029','004','014','023','041','011','021','052','018') and
+forsession='2007042807.PV'
+and
+(
+valuedate=to_date('20070430','yyyymmdd') or
+valuedate=to_date('20070501','yyyymmdd') or
+valuedate=to_date('20070502','yyyymmdd') or
+valuedate=to_date('20070503','yyyymmdd') or
+valuedate=to_date('20070504','yyyymmdd') or
+valuedate=to_date('20070505','yyyymmdd') )
+AND DECISION>0
+group by
+valuedate;
+
+----------------------------------------------------
+----------------------------------------------------
+
+--Suma de PV EXTREMADURA
+select valuedate,count(*),sum(round(forecast)),sum(round(decision))
+    ,(sum(round(decision))-sum(round(forecast)))/sum(round(decision)) AS Porc
+ from fn3forecastseries
+where
+substr(output,11,3) in('006','010') and
+ forsession='2007020815.PV'
+ and
+ (
+ valuedate=to_date('20070207','yyyymmdd') or
+ valuedate=to_date('20070208','yyyymmdd') or
+ valuedate=to_date('20070209','yyyymmdd') or
+ valuedate=to_date('20070210','yyyymmdd') or
+ valuedate=to_date('20070211','yyyymmdd') or
+ valuedate=to_date('20070212','yyyymmdd') )
+ AND DECISION>0
+ group by
+ valuedate;
+
+
+
+
+
+
+select valuedate,count(*),sum(round(forecast)),sum(round(decision))
+    ,(sum(round(decision))-sum(round(forecast)))/sum(round(decision)) AS Porc
+ from fn3forecastseries
+where
+forsession='2005031926.PV'
+and substr(output,11,3) in('006','010')
+and(
+valuedate=to_date('20050317','yyyymmdd') or
+valuedate=to_date('20050318','yyyymmdd') or
+valuedate=to_date('20050319','yyyymmdd') or
+valuedate=to_date('20050320','yyyymmdd') or
+valuedate=to_date('20050321','yyyymmdd') or
+valuedate=to_date('20050322','yyyymmdd') or
+valuedate=to_date('20050323','yyyymmdd')
+ )
+--AND DECISION>0
+group by
+valuedate;
+
+
+select valuedate,count(*),sum(round(forecast)),sum(round(decision))
+    ,(sum(round(decision))-sum(round(forecast)))/sum(round(decision)) AS Porc
+ from fn3forecastseries
+where
+forsession='2005051926.PV'
+and substr(output,11,3) in('028')
+and
+(
+valuedate=to_date('20050519','yyyymmdd') or
+valuedate=to_date('20050520','yyyymmdd') or
+valuedate=to_date('20050521','yyyymmdd') or
+valuedate=to_date('20050522','yyyymmdd') or
+valuedate=to_date('20050523','yyyymmdd') or
+valuedate=to_date('20050524','yyyymmdd') or
+valuedate=to_date('20050525','yyyymmdd')
+AND DECISION>0)
+group by
+valuedate;
+
+
+--Estado de la prevision
+set linesize 400;
+select count(*),state,stateinfo
+ from fn3forecast
+where
+substr(output,11,3) in
+('006','010','011','021','029','041','052','014','023','004','018','028') and
+forsession='2005042603.PV'
+group by state,stateinfo;
+
+
+
+-- Numero de diag
+select count(*),stateinfo
+ from fn3forecast
+where forsession='2002101219_CAM'
+ stateinfo like'%diag%'
+ group by stateinfo;
+
+
+
+select count(*),state
+from fn3forecast
+where forsession='2003040815_CAM.PV'
+group by state;
+
+------------------------------------------NODOS
+select substr(forsession,1,40),substr(output,1,30),valuedate,forecast
+from fn3forecastseries
+where output='VentaMarcaCAMPER' and
+valuedate=to_date('20020404','yyyymmdd');
+
+
+
+
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2009071724_ActPrev.MG'
+and
+output like 'VentaMarcaCAM%'
+group by valuedate;
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2009071724.MG'
+and
+output like 'VentaMarcaCAM%'
+group by valuedate;
+
+
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2009071724_ActPrev.PV'
+--and output like 'VentaMarcaCAM%'
+group by valuedate
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2009071724.PV'
+--and output like 'VentaMarcaCAM%'
+group by valuedate
+
+
+
+insert into fn3forecastseries
+select 	'2009071724.PV',output,dating,valuedate,forecast,variance,decision,filter,noise,forcens,used,closed
+from fn3forecastseries
+where
+forsession='2009071724_ActPrev.PV'
+
+
+
+insert into fn3forecastseries
+select 	'2009071724.MG',output,dating,valuedate,forecast,variance,decision,filter,noise,forcens,used,closed
+from fn3forecastseries
+where
+forsession='2009071724_ActPrev.MG'
+
+
+
+
+select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2009071724.PV'
+group by valuedate;
+
+
+select valuedate,count(*),sum(forecast)	,sum(round(decision))
+from fn3forecastseries
+where
+forsession='2009071724_ActPrev.PV'
+group by valuedate;
+
+
+
+select valuedate,count(*),sum(forecast)	,sum(round(decision))
+from fn3forecastseries
+where
+forsession='2009071724.PV'
+group by valuedate;
+
+
+
+
+ select valuedate,count(*),sum(forecast),output
+from fn3forecastseries
+where
+forsession='2009071724_ActPrev.MG'
+group by valuedate,output;
+
+
+4
+
+ select valuedate,count(*),sum(forecast),sum(decision)
+from fn3forecastseries
+where
+forsession='2009072229.PV'
+group by valuedate;
+
+
+
+
+
+
+
+
+
+ select valuedate,count(*),sum(forecast)
+from fn3forecastseries
+where
+forsession='2009071724.MG'
+group by valuedate;

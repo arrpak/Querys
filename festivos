@@ -1,0 +1,14 @@
+SELECT DISTINCT province
+FROM
+(SELECT code, municipality, province
+ FROM fn3festivemunicipality,
+      fn3festivedate
+ WHERE code = festive) taux
+ORDER BY province
+
+
+SELECT Count(*),REGION
+ FROM fn3festivemunicipality,
+      fn3festivedate
+       WHERE code = festive
+       GROUP BY REGION

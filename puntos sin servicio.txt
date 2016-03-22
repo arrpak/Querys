@@ -1,0 +1,8 @@
+ select codigodistribuidor,rutadistribuidor,fn2cierreprefijado.puntoventa,desdefecha,hastafecha
+  from fn2cierreprefijado,fn2puntoventa,fn2codificacion
+   where hastafecha=to_date('2222/02/22','yyyy/mm/dd') and
+   desdefecha!=to_date('2222/02/22','yyyy/mm/dd') and
+  fn2puntoventa.operativo='S' and
+  fn2cierreprefijado.puntoventa=fn2puntoventa.codigo and
+  fn2codificacion.puntoventa=fn2puntoventa.codigo
+ order by rutadistribuidor

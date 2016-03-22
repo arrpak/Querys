@@ -1,0 +1,108 @@
+
+INSERT INTO fn3outputinputinformation
+SELECT output,'Eliminados',dating,input,'E',NULL,NULL,NULL,NULL,'Y'
+--SELECT *
+FROM fn3estimationinput
+WHERE estsession='20070620.MG'
+AND Value<0.005
+and value<>0
+AND factor=1
+and output like 'VentaMarca%'
+AND orderf=0
+AND input IN
+('DVDAventuraF1Primero','DVDAventuraF1Resto','CamaraVideoSupraCamCartilla','CamaraVideoSupraCamCupon',
+'CamisetaCorazonBlancoCartilla','CamisetaCorazonBlancoComodin','CamisetaCorazonBlancoCupon',
+'AdiosFigo','AgendaRMACartilla','AgendaRMAComodin','AgendaRMACupon','Agenda2003Cartilla',
+'Agenda2003Comodin','Agenda2003Cupon','AirFootballCartilla','AirFootballComodin','AirFootballCupon',
+'AlbumGPMotorAlbum','AlbumGPMotorLamina','AlbumGPMotorLaminaTend','AlbumPaniniLiga0607Entrega','AlbumPaniniLiga0607Lamina',
+'AlbumPaniniMundial06Entrega','AlbumPaniniMundial06Lamina','AlbumRMA','AlcoholimetroCartilla','AlcoholimetroCupon',
+'AlonsoCampeonF1','AlonsoCampeonF106','AlonsoGanaGP','AlonsoGanaGpEspanna','AlonsoGanaJapon06','AlonsoSegundoGPEspF1',
+'AltavocesMP3AirisCartilla','AltavocesMP3AirisCupon','AscensoSev','BalonBetCupon','BalonOroRMACartilla','BalonOroRMACartilla2',
+'BalonOroRMAComodin','BalonOroRMAComodinTendencia','BalonOroRMACuponMV','BalonOroRMACuponS','BalonOroRMATendencia',
+'BanderaMadrid2012','BanderaRMA2007Cartilla','BanderaRMA2007Cupon',
+'BETCampeonCopaRey','BETClas2Champions','BETClas2FinalCopa','BETClas2LiguillaChampions','BetGanChe',
+'BetGanCopEur','BluetoothRetrovisorCartilla','BluetoothRetrovisorCupon','BolsaAdidasChampionsLeagueCartilla',
+'BolsaAdidasChampionsLeagueCupon','BolsaAdidasChampionsLeagueTend','BolsaDeporteCartilla','BolsaDeporteCartilla',
+'BolsaDeporteComodin','BolsaDeporteComodinTend','BolsaDeporteCuponIncrem','BotellazoJuandeRamos',
+'CalendarioLiga0304','CalendarioLiga0607','CamaraVideoSupraCamCartilla','CamaraVideoSupraCamCupon',
+'CamisetaCorazonBlancoCartilla','CamisetaCorazonBlancoComodin','CamisetaCorazonBlancoCupon','CamisetaHulkCartilla',
+'CamisetaHulkComodin','CamisetaHulkCupon','CamisetaHulkTend','CamisetasHistResinaBETCartilla','CamisetasHistResinaBETCupon',
+'CargadorManual2Cartilla','CargadorManual2Comodin','CargadorManual2Cupon','CargadorManual2Tend','CarnavalM',
+'CdCancionMundial','CeseCamacho','CeseCamacho04','CeseRma','CeseValdano','ChalecoRenaultCartilla',
+'ChalecoRenaultComodin','ChalecoRenaultComodin1Desp','ChalecoRenaultCuponIncrem','ChatmisetaCupon','Chelsea1Barca2',
+'ClasEurEspAus','ClasEuroSpaChi','ClasEuroSpaNor','ClasEuroSpaSmr','ClasMunEspAus','ClasMunEspDin','ClasMunEspEsl',
+'CocheRenaultF1Cartilla','CocheRenaultF1Comodin','CocheRenaultF1ComodinTende','CocheRenaultF1CuponEscal','CocheRenaultF1CuponTende',
+'ComicSpidermanFasciculo','ConquistaEuropaCartilla','ConquistaEuropa.esc','ConquistaEuropa.rp','ConquistaEuropaTend',
+'CopaDavisEsp2Usa0','CopaLigaComodin','CopaLigaCuponD','CopaLigaCuponLV','CopaLigaCuponS','CopEurManRma',
+'CopIntRmaCam','CuartoPartidoMundial06SpaFra','DebutRonaldo','DeclaracionesEtoo','DemoMotoGP3','DescuentoGafasSunPlanetCartilla',
+'DescuentoGafasSunPlanetCupon','DespertadorCartilla','DespertadorComodin','DespertadorCuponLX','DespertadorCuponV',
+'DespertadorTrendComodin','DespertadorTrendCuponLX','DimisionFlorentino','DimisionLopera','DomingoLiga','DVDArtesMarcialesPrimero',
+'DVDArtesMarcialesResto','DVDArtesMarcialesResto.rp','DVDAventuraF1','DVDAventuraF1Primero','DVDAventuraF1Resto',
+'DVDBond007','DVDBond007.rp','DVDCineDelOestePrimero','DVDCineDelOesteResto','DVDCineDelOeste.rp','DvdDuelosDeOro.rp',
+'DvdDuelosDeOro.rp2','DvdDuelosOroResto','DvdDuelosOroRestoTend','DvdDuelosOro1','DvdDuelosOro2','DVDGrandesFinalesTenis',
+'DVDGrandesFinalesTenis.rp','DVDPortatilAirisCartilla','DVDPortatilAirisComodinTend','DVDPortatilAirisCuponTend',
+'DVDPortatilAirisCuponVG','DVDPortatilAirisDespistados','DVDPortatilAirisReserva','EleccRMA2006','EscudoSEVOroCartilla',
+'EscudoSEVOroComodin','EscudoSEVOroCupon','EscudosHistoriaRMACaja','EspGanArg',
+'EspGanCamBalMun','EspGanCamMun','EspPieSue','Esp2Din12007','EuroBasket2003Victoria','Eur00SpaFra',
+'Eur00YugEsp','FalleceMarcoPantani','F.Alonso.Rem','FichajeAlvesRmaRumor','FichajeBatista','FichajeBeckham',
+'FichajeCamacho','FichajeEmersonCannavaro','FichajeFigo','FichajeLuxemburgo','FichajeReyes','FichajeRobinho',
+'FichajeRonaldo','FichajeRonaldo','FichajeSamuel','FichajeSaviola','FichajeSergioRamos','FichajesRMA','FinLiga19980516',
+'FinLiga20040523','FollonIndianapolis','GanaCopaDavis','GaspartConvocaElecciones','GaspartDimision','GolMessi',
+'GolPalopUefa2007','GolPortillo','GrabadorDVDAirisCupon','GrabadorDVDAiris2Cartilla','GrabadorDVDAiris2Cupon',
+'GrabadorDVDAiris2Reserva','GrabadorDVDAiris2Tend','GuiaLiga2003Ini','GuiaVuelta2002',
+'HomeCinemaBajaVentaEsc','HomeCinemaCompensacion','HomeCinemaDespistados','HomeCinemaStepJS',
+'HomeCinemaStepMXV','IniMundial2006','InpFutAgrCoc','InpFutAgrHom','InsigniaCampeonesCupon','InsigniasOroLFPCuponJV',
+'InsigniasOroLFPCuponL','InsigniasOroLFPCuponMX','InsigniasOroLFPIni','InsigniasOroLFPReserva','InsigniasOroLFPTendLX',
+'JuevesLiga','LivGanaChampions','LlaveroCamisetaCuponJV','LlaveroCamisetaCuponLX','LlaveroCamisetaEntregaII_III',
+'LlaveroCamisetaIni','LlaveroCamisetaTend','LoteSudaderaEspannaIni','LotNav','LotNin','LunesLiga','MartesLiga',
+'MedallasAtenas04','MedallasAtlanta96','MedallasSidney00','MesTecnologicoCartilla','MesTecnologicoCupon',
+'MesTecnologicoCuponDic','MiercolesLiga','MiniBalonesIni','MiniBalonesJVResto','MiniBalonesJV1Sem','MiniBalonesLXResto',
+'MiniBalonesLX1Sem','MiniBalonesSab','MiniBalonesTend','MinibotasCuponVG','MinibotasEntrega','MinibotasExpositor',
+'MochilaBETComodin','MochilaBETCupon','MochilaMarcaCartilla','MochilaMarcaComodin','MochilaMarcaCuponMV','MochilaMarcaCuponS',
+'MochilaMarcaTendencia','MochilaReebokCasillasAsCartilla','MochilaRMACartilla','MochilaRMACupon','MochilaSEVBETComodin',
+'MochilaSEVBETCupon','MochilaSEVComodin','MochilaSEVCupon','MonedasRMACuponLX','MonedasRMAMonedaYCartilla',
+'MonedasRMAMoneda2','MotoCupon','MovilAmenaCartilla','MovilAmenaCupon','MP3MP4AcuaticoCartilla','MP3MP4AcuaticoComodin',
+'MP3MP4AcuaticoCupon','Mundial1994BolEsp','Mundial2006Bra0Fra1','NadalCamRG','NochesHotelNHCupon','NuevoMarcaDom',
+'Olimpiada2004VictoriasEspanna','OtrosLiga','PackBalonMundial2006Cupon','PackBalonMundial2006CuponBase','PackBalonMundial2006Ini',
+'PackBalonMundial2006Sab','PackGorrasAdidasMundialArgentina','PackGorrasAdidasMundialArgentinaCupon','PackGorrasAdidasMundialBrasil',
+'PackGorrasAdidasMundialEspanna','PackGorrasAdidasMundialEspannaCupon','PackGorrasAdidasMundialInglaterra','PackGorrasAdidasMundialInglaterraCupon',
+'ParquesReunidosComodin','ParquesReunidosIICartilla','ParquesReunidosIICupon','ParquesReunidosIIICartilla','ParquesReunidosIIICupon',
+'PartidoCE','PoloDeporteArgentinaComodin','PoloDeporteArgentinaCupon','PoloDeporteEspannaCartilla','PoloDeporteEspannaComodin',
+'PoloDeporteEspannaCupon','PoloDeporteEspannaCuponTend','PoloDeporteInglaterraComodin','PoloDeporteInglaterraCupon','PoloDeporteNuevaZelandaComodin',
+'PoloDeporteNuevaZelandaCupon','PosterFernandoAlonso','PosterRaul2003Cupon','PosterRobertoCarlos2003Cartilla','PosterRobertoCarlos2003Comodin',
+'PosterRobertoCarlos2003Cupon1','PosterRobertoCarlos2003Cupon2','PosterSeleccionBaloncesto2006','PosterSeleccion2002','PreEur00SpaFra',
+'PresenRma','PresentacionBET','PresentacionFigo','PresentacionRonaldo','PresentacionSevNUE','PresentacionZidane',
+'PrevioCopEurRMA','PrevioEspCopEurRMA','PrevioEurocopaSPA2004','PrevioFichejes','PrevioFinalCopEur','PrevioFinalEspGre',
+'PrevioRMABAR','PrevioRmaBym','PrevSpaFra','PrimerPartidoMundial06SpaUcr','PulseraAlonso','PulseraMadrid2012',
+'PulseraMadrid2012ReedicionMedio','PulseraMadrid2012ReedicionNormal','PulseraMadrid2012Reedicion2','RadioMarcaCartilla',
+'RadioMarcaComodin','RadioMarcaCupon','RegaloPadreCartilla','RegaloPadreCupon','RelojOficialRmaCartilla2Cupon2070310',
+'RelojOficialRma2007Cartilla','RelojOficialRma2007Comodin','RelojOficialRma2007Cupon','RelojOficialRma2007Tend','RemontaDortmund',
+'ReproductorMP3AirisCartilla','ReproductorMP3AirisCupon','ReproductorMP3AirisReserva','ReproductorMP3AirisTend','ResacaSevCamUefa',
+'RmaCamBal','RmaCamCop','RmaCamLig','RmaCampACB','RmaCampULEB','RmaCamSCE','RmaCamSupCop','RmaClas2CopEurFinal',
+'RmaClas2SemChampions','RmaGanZar2007','RmaLider2007','RmaValPenalty','RmaVer','RmaVerEsp','Salvajada20060126','SancionEscandalo',
+'SancionJuventus','SegundoPartidoMundial06SpaTun','SevCamSupercopaEuropa','SevCamUefa06','SevCamUefa07','SevCel','SevClasFinalUefa',
+'SevGanUefa','SkateSpidermanCartilla','SkateSpidermanComodin','SkateSpidermanCupon','SorChampLig','SorteoBalonRMABARVSD',
+'SorteoCalendarioLiga200506','SorteoHipoteca','SorteoMundial2002','SorteoNumeroFantasticoIBase','SorteoNumeroFantasticoIni',
+'SorteoNumeroFantasticoITend','SpanitoonsEntrega','SrFinalMundial','SrHumanitarioBadajoz','SrHumanitarioElSalvador',
+'SrHumanitarioEtiopia','SrHumanitarioGalicia','SrMundial','SudaderaCapuchaATMCartilla','SudaderaCapuchaATMTend',
+'SudaderaEspannaCartilla','SudaderaEspannaComodin','SudaderaEspannaCuponIncrem','SudaderaEspannaReserva','SudaderaEspannaTend',
+'SudaderaFranciaCupon','SudaderaFranciaTend','SudaderaInglaterraComodin','SudaderaInglaterraCupon','SudaderaItaliaCupon',
+'SudaderaItaliaCupon','SupRmaBar2005','SupRMA20032004','TDTAirisCartilla','TDTAirisCuponLV','TDTAirisCuponSab','TDTAirisCupon2LV',
+'TDTAirisCupon2Sab','TDTAirisReserva','TelefonoHPiPAQCartilla','TelefonoHPiPAQCupon','TelefonoSiemensCartilla','TelefonoSiemensCupon',
+'TenisFinalista','TenisSemifinal','TercerPartidoMundial06SpaAra','TerrorismoLondres','TFTSamsung17Cartilla','TFTSamsung17Tend',
+'TiraMillasCatalogo','ToallaOficialRealMadridCartilla','ToallaOficialRealMadridCartilla','ToallaOficialRealMadridComodin',
+'ToallaOficialRealMadridCupon','ToallaOficialRealMadridCupon','ToallaOficialRealMadridCuponV'',Tour','TrolleyFormulaCartilla',
+'TrolleyFormulaCupon','TrolleyFormulaCuponTend','TvLCDViewsonic32Cupon','ValCamLiga','VeranitoMarcaBalonCartilla','VeranitoMarcaBalonCupon',
+'VeranitoMarcaCometaCartilla','VeranitoMarcaCometaCupon','VeranitoMarcaParchisCartilla','VeranitoMarcaParchisCupon',
+'ViaDigital','VictoriaNunnez1998','VideoCentenarioRMACupon','VideoCentenarioRMACuponII','VideoCentenarioRMAI',
+'VideoCentenarioRMAIIDom','ViernesLiga','ZarRecopaFinal')
+and output||input
+not in
+(select output||input
+from fn3outputinputinformation
+where type='E' --AND active='Y'
+)
+
+
+--delete fn3outputinputinformation
+--where type='E' AND active='N'

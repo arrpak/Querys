@@ -1,0 +1,46 @@
+select dateprint AS FECHA,
+       cod.delegate AS DELEGACION,
+       count(*) as NUMPV,
+         SUM(case when (decision + increaseDec) <= 50
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'EXPANSION'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = cod.newsstand and
+      pri.orderf =1               and
+      pri.dateprint = to_date('20050203', 'YYYYMMDD')
+group by dateprint, cod.delegate;
+
+--------------------------------
+--------------------------------
+
+select dateprint AS FECHA,
+       nod.fathernode,
+       count(*) as NUMPV,
+         SUM(case when (decision + increaseDec) <= 50
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   
+       from fn3printingdetail pri, fn3node nod
+where pri.header    = 'EXPANSION'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = nod.newsstand and
+      pri.orderf =1               and
+      pri.dateprint = to_date('20050203', 'YYYYMMDD') and
+      nod.header=pri.header and
+      nod.product=pri.product     
+group by dateprint, nod.fathernode;
+
+
+update fn3printingdetail
+set decision=0 
+where 
+header='EXPANSION' and 
+node='CAM' and decision is null and
+dateprint = to_date('20050203', 'YYYYMMDD');
+
+
+
+

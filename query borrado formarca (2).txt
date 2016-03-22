@@ -1,0 +1,22 @@
+sqlplus formarca/formarca
+select * from kiosco where ruta='1000006' and punto='24041';
+select * from opemarca where ruta='1000006' and punto='24041';
+select * from expoperation where ruta='1000006' and punto='24041';
+select * from elioperation where ruta='1000006' and punto='24041';
+delete from opemarca where ruta = '1000006' and punto='24041';
+delete from expoperation where ruta = '1000006' and punto='24041';
+delete from elioperation where ruta = '1000006' and punto='24041';
+delete from kiosco where ruta = '1000006' and punto='24041';
+
+OJO¡¡
+delete from rutas where ruta='1000006';
+
+
+
+commit;
+exit;
+
+delete  from kiosco where ruta='1000019' and punto='24011';
+delete  from opemarca where ruta='1000019' and punto='24011';
+delete  from expoperation where ruta='1000019' and punto='24011';
+delete  from elioperation where ruta='1000019' and punto='24011';

@@ -1,0 +1,28 @@
+Define node='CATBARCIN';
+Define estsession='20081101.MG';
+
+insert into fn3outputinputinformation
+select 'VentaMarca&node','Eliminados',DATING,input,
+'E',null,null,null,null,'Y'
+from fn3estimationinput
+where
+estsession='&estsession' and
+output='VentaMarca&node' and
+(input like 'Int2%' or input like 'IntAND%' )
+and abs(value)<0.05;
+
+
+
+insert into fn3input
+select 'Intervencion&node','Diario',
+'Int'||to_char(valuedate,'YYYY')||to_char(valuedate,'mm')||
+to_char(valuedate,'dd'),
+'Pulse(y'||to_char(valuedate,'YYYY')||'m'||to_char(valuedate,'mm')||'d'||
+to_char(valuedate,'dd')||',Diario)',
+to_number(0),null,null,null,'Y',null
+from fn3estimationseries
+where
+output='VentaMarca&node' and
+estsession='&estsession' and
+dating='Diario' and
+abs(standarizedresiduals)>3.5;

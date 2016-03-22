@@ -1,0 +1,76 @@
+--SELECT P1.NEWSSTAND
+SELECT P1.NEWSSTAND
+,Round(p1.decision+p1.increasedec),Round(p2.decision+p2.increasedec)
+fROM fn3printingdetail p1,fn3printingdetail p2
+WHERE 
+p1.header='MARCA' AND p2.header='MARCA' AND
+p1.product='DIARIO' AND p2.product='DIARIO' and
+p1.orderf=1 AND p2.orderf=2 AND
+p1.node='CAM' AND p2.node='CAM' AND 
+p1.dateprint=To_Date('20051120','yyyymmdd') AND 
+p2.dateprint=To_Date('20051120','yyyymmdd') AND 
+p1.newsstand=p2.newsstand AND
+ROUND(p1.decision+p1.increasedec)>0 AND
+ROUND(p1.decision+p1.increasedec)>ROUND(p2.decision+p2.increasedec) 
+
+
+
+
+DELETE
+FN3SERVICEMODIFIED
+WHERE 
+MODIFIEDDATE=To_Date('20051120','yyyymmdd')
+AND NEWSSTAND IN
+(
+SELECT P1.NEWSSTAND
+fROM fn3printingdetail p1,fn3printingdetail p2
+WHERE 
+p1.header='MARCA' AND p2.header='MARCA' AND
+p1.product='DIARIO' AND p2.product='DIARIO' and
+p1.orderf=1 AND p2.orderf=2 AND
+p1.node='CAM' AND p2.node='CAM' AND 
+p1.dateprint=To_Date('20051120','yyyymmdd') AND 
+p2.dateprint=To_Date('20051120','yyyymmdd') AND 
+p1.newsstand=p2.newsstand AND
+ROUND(p1.decision+p1.increasedec)>0 AND
+ROUND(p1.decision+p1.increasedec)>ROUND(p2.decision+p2.increasedec))
+
+
+
+
+
+
+INSERT INTO FN3SERVICEMODIFIED
+SELECT 'MARCA','DIARIO',P1.NEWSSTAND,To_Date('20051120','yyyymmdd'),
+ROUND(1.15*GREATEST(Round(p1.decision+p1.increasedec),Round(p2.decision+p2.increasedec)))
+fROM fn3printingdetail p1,fn3printingdetail p2
+WHERE 
+p1.header='MARCA' AND p2.header='MARCA' AND
+p1.product='DIARIO' AND p2.product='DIARIO' and
+p1.orderf=1 AND p2.orderf=2 AND
+p1.node='CAM' AND p2.node='CAM' AND 
+p1.dateprint=To_Date('20051120','yyyymmdd') AND 
+p2.dateprint=To_Date('20051120','yyyymmdd') AND 
+p1.newsstand=p2.newsstand AND
+ROUND(p1.decision+p1.increasedec)>0 AND
+ROUND(p1.decision+p1.increasedec)>ROUND(p2.decision+p2.increasedec);
+
+
+
+
+
+PARA 3 TIRADAS
+
+SELECT P1.NEWSSTAND,Round(p1.decision+p1.increasedec),Round(p2.decision+p2.increasedec),Round(p3.decision+p3.increasedec)
+fROM fn3printingdetail p1,fn3printingdetail p2,fn3printingdetail p3
+WHERE 
+p1.header='MARCA' AND p2.header='MARCA' AND p3.header='MARCA' AND
+p1.product='DIARIO' AND p2.product='DIARIO' AND p3.product='DIARIO' AND
+p1.orderf=1 AND p2.orderf=2 AND p3.orderf=3 AND
+p1.node='AND' AND p2.node='AND' AND  p3.node='AND' AND 
+p1.dateprint=To_Date('20051120','yyyymmdd') AND 
+p2.dateprint=To_Date('20051120','yyyymmdd') AND 
+p3.dateprint=To_Date('20051120','yyyymmdd') AND 
+p1.newsstand=p2.newsstand AND
+ROUND(p3.decision+p3.increasedec)<ROUND(p2.decision+p2.increasedec) AND
+p3.newsstand=p2.newsstand 

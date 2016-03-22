@@ -1,0 +1,79 @@
+set pagesize 3000;
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',pri.newsstand,dateprint,
+Greatest(tirada,(greatest(round(venta*1.15),venta+4)))
+from
+(select newsstand,operationdate,(service+incidence-return) as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand like '028%'
+and operationdate=to_date('20021109','yyyymmdd')) ope,
+(select newsstand,dateprint,round(decision+increasedec) as tirada
+from fn3printingdetail
+where  header='MARCA' and product='DIARIO' and
+node='CAM' and
+dateprint=to_date('20030909','yyyymmdd')) pri
+where pri.newsstand=ope.newsstand and
+ope.venta>=pri.tirada
+and pri.tirada>0;
+
+
+and 
+'MARCA'||'DIARIO'||OPE.NEWSSTAND||DATEPRINT NOT IN
+(select 'MARCA'||'DIARIO'||NEWSSTAND||DATEPRINT FROM FN3SERViCEMODIFIED
+WHERE MODIFIEDDATE=to_date('20030909','yyyymmdd'))
+;
+
+
+
+
+--select 'MARCA','DIARIO',pri.newsstand,dateprint,tirada,venta
+insert into fn3servicemodified
+select 'MARCA','DIARIO',pri.newsstand,dateprint,venta+10
+from
+(select newsstand,operationdate,(service+incidence-return) as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and operationdate=to_date('20030804','yyyymmdd')) ope,
+(select newsstand,dateprint,round(decision+increasedec) as tirada
+from fn3printingdetail
+where  header='MARCA' and product='DIARIO' and
+node='AND' and
+dateprint=to_date('20030812','yyyymmdd')) pri
+where pri.newsstand=ope.newsstand
+and ((ope.venta*2<=pri.tirada) or (pri.tirada-ope.venta>30))
+and ope.venta>10
+and pri.tirada>0;
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------
+-----------------------------
+
+set pagesize 3000;
+select pri.newsstand,decode(tirada-venta,tirada,
+from
+(select newsstand,operationdate,(service+incidence-return) as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and operationdate=to_date('20030804','yyyymmdd')) ope,
+(select newsstand,dateprint,round(decision+increasedec) as tirada
+from fn3printingdetail
+where  header='MARCA' and product='DIARIO' and
+node='AND' and
+dateprint=to_date('20030812','yyyymmdd')) pri
+where pri.newsstand=ope.newsstand
+and ope.venta>=pri.tirada
+and pri.tirada>0;

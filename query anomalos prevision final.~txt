@@ -1,0 +1,81 @@
+
+
+SELECT t1.output,t1.diasem,t2.valuedate,t1.media,t2.forecast,(t1.media-t2.forecast) AS dif
+FROM
+(
+SELECT 'B'||node AS output,To_Char(infodate,'dy') AS diasem ,Avg(packages) AS media
+FROM seunodeinformation
+WHERE
+--node='1'
+--AND
+infodate >SYSDATE-90
+GROUP BY 'B'||node,To_Char(infodate,'dy')
+) t1,
+(
+SELECT output,valuedate,forecast
+FROM seuforecastseries
+WHERE
+output LIKE 'B%'
+AND forsession='&forsession'
+) t2
+WHERE
+t1.output=t2.output
+AND t1.diasem=To_Char(valuedate,'dy')
+AND t2.forecast>0
+AND diasem<>'sáb'
+AND Abs((t1.media-t2.forecast)/t1.media)>0.7
+--ORDER BY valuedate ASC,dif DESC
+UNION
+SELECT t1.output,t1.diasem,t2.valuedate,t1.media,t2.forecast,(t1.media-t2.forecast) AS dif
+FROM
+(
+SELECT 'E'||node AS output,To_Char(infodate,'dy') AS diasem ,Avg(expeditions) AS media
+FROM seunodeinformation
+WHERE
+--node='1'
+--AND
+infodate >SYSDATE-90
+GROUP BY 'E'||node,To_Char(infodate,'dy')
+) t1,
+(
+SELECT output,valuedate,forecast
+FROM seuforecastseries
+WHERE
+output LIKE 'E%'
+AND forsession='&forsession'
+) t2
+WHERE
+t1.output=t2.output
+AND t1.diasem=To_Char(valuedate,'dy')
+AND t2.forecast>0
+AND diasem<>'sáb'
+AND Abs((t1.media-t2.forecast)/t1.media)>0.7
+UNION
+SELECT t1.output,t1.diasem,t2.valuedate,t1.media,t2.forecast,(t1.media-t2.forecast) AS dif
+FROM
+(
+SELECT 'P'||node AS output,To_Char(infodate,'dy') AS diasem ,Avg(weight) AS media
+FROM seunodeinformation
+WHERE
+--node='1'
+--AND
+infodate >SYSDATE-90
+GROUP BY 'P'||node,To_Char(infodate,'dy')
+) t1,
+(
+SELECT output,valuedate,forecast
+FROM seuforecastseries
+WHERE
+output LIKE 'P%'
+AND forsession='&forsession'
+) t2
+WHERE
+t1.output=t2.output
+AND t1.diasem=To_Char(valuedate,'dy')
+AND t2.forecast>0
+AND diasem<>'sáb'
+AND Abs((t1.media-t2.forecast)/t1.media)>0.7
+ORDER BY valuedate ASC,dif DESC
+
+;
+

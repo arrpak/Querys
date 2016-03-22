@@ -1,0 +1,15 @@
+select count (*) from fn2seriestmp
+where nombre like 'VentaMarca%' and
+fecha >to_date('2001/02/28','yyyy/mm/dd') and
+nombre not like 'VentaMarcaCAM%';
+
+select *  from fn2seriestmp
+where nombre like 'VentaMarca%' and
+fecha >to_date('2001/02/28','yyyy/mm/dd') and
+nombre not like 'VentaMarcaCAM%';
+
+delete
+from fn2seriestmp
+where nombre like 'VentaMarca%' and
+fecha >to_date('2001/02/28','yyyy/mm/dd') and
+nombre not like 'VentaMarcaCAM%';

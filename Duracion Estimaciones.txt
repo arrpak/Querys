@@ -1,0 +1,14 @@
+ select output,(estdate-iniestdate)*24*60,to_char(iniestdate,'YYYYMMDD HH24:Mi:SS'),
+ to_char(estdate,'YYYYMMDD HH24:Mi:SS')
+ from fn3estimation
+ where estsession='20030204_CAM.PV'
+AND OUTPUT='VentaMarca028000100002';
+
+
+
+
+ select substr(output,0,40),(estdate-iniestdate)*24*60
+ from fn3estimation
+ where estsession='20030204_CAM.PV'
+order by (estdate-iniestdate)*24*60
+;

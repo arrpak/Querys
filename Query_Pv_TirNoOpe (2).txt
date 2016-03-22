@@ -1,0 +1,113 @@
+-- Maxima fecha de Tirada
+select pd.newsstand, max(pd.dateprint) fechaTir
+from fn3printing p, fn3printingdetail pd
+where p.header = 'MARCA' and
+      p.product = 'DIARIO' and
+      p.node = 'AND' and
+--      p.dateprint = to_date('200 and
+      p.used = 'Y' and
+      p.header = pd.header and
+      p.product = pd.product and
+      p.node = pd.node and
+      p.dateprint = pd.dateprint and
+      p.orderf = pd.orderf
+group by pd.newsstand
+order by pd.newsstand
+
+-- Maxima fecha de Operaciones
+select o.newsstand, max(o.operationdate) fechaOpe
+from fn3node n, fn3operation o
+where n.header = 'MARCA' and
+      n.product = 'DIARIO' and
+      substr(n.fathernode, 1, 3) = 'AND' and
+      n.header = o.header and
+      n.product = o.product and
+      n.newsstand = o.newsstand
+group by o.newsstand
+order by o.newsstand;
+
+-- Puntos con tirada en octubre y maxima fecha de operaciones anterior a octubre
+select tTir.newsstand, tTir.fechaTir, tOpe.fechaOpe
+from
+(
+  select pd.newsstand, max(pd.dateprint) fechaTir
+  from fn3printing p, fn3printingdetail pd
+  where p.header = 'MARCA' and
+        p.product = 'DIARIO' and
+        p.node = 'AND' and
+--        p.dateprint = to_date('20030920', 'yyyymmdd') and
+        p.used = 'Y' and
+        p.header = pd.header and
+        p.product = pd.product and
+        p.node = pd.node and
+        p.dateprint = pd.dateprint and
+        p.orderf = pd.orderf
+  group by pd.newsstand
+) tTir,
+(
+  select o.newsstand, max(o.operationdate) fechaOpe
+  from fn3node n, fn3operation o
+  where n.header = 'MARCA' and
+        n.product = 'DIARIO' and
+        substr(n.fathernode, 1, 3) = 'AND' and
+        n.header = o.header and
+        n.product = o.product and
+        n.newsstand = o.newsstand
+  group by o.newsstand
+) tOpe
+where tTir.newsstand = tOpe.newsstand and
+      tOpe.fechaOpe < to_date('20031001', 'yyyymmdd') and
+      tTir.fechaTir >= to_date('20031001', 'yyyymmdd') and
+      tTir.fechaTir > tOpe.fechaOpe
+order by tTir.newsstand;
+
+-- Puntos con tirada en octubre y maxima fecha de operaciones (controladas y no controladas) anterior a octubre
+select tTir.newsstand, tTir.fechaTir, tOpe.fechaOpe
+from
+(
+  select pd.newsstand, max(pd.dateprint) fechaTir
+  from fn3printing p, fn3printingdetail pd
+  where p.header = 'MARCA' and
+        p.product = 'DIARIO' and
+        p.node = 'AND' and
+--        p.dateprint = to_date('20030920', 'yyyymmdd') and
+        p.used = 'Y' and
+        p.header = pd.header and
+        p.product = pd.product and
+        p.node = pd.node and
+        p.dateprint = pd.dateprint and
+        p.orderf = pd.orderf
+  group by pd.newsstand
+) tTir,
+(
+ select newsstand, max(fechaOpe) fechaOpe
+ from
+ (
+  select o.newsstand, max(o.operationdate) fechaOpe
+  from fn3node n, fn3operation o
+  where n.header = 'MARCA' and
+        n.product = 'DIARIO' and
+        substr(n.fathernode, 1, 3) = 'AND' and
+        n.header = o.header and
+        n.product = o.product and
+        n.newsstand = o.newsstand
+  group by o.newsstand
+  union all
+  select o.newsstand, max(o.operationdate) fechaOpe
+  from fn3node n, fn3operationNotControlled o
+  where n.header = 'MARCA' and
+        n.product = 'DIARIO' and
+        substr(n.fathernode, 1, 3) = 'AND' and
+        n.header = o.header and
+        n.product = o.product and
+        n.newsstand = o.newsstand
+  group by o.newsstand
+ )
+ group by newsstand
+) tOpe
+where tTir.newsstand = tOpe.newsstand and
+      tOpe.fechaOpe < to_date('20031001', 'yyyymmdd') and
+      tTir.fechaTir >= to_date('20031001', 'yyyymmdd') and
+      tTir.fechaTir > tOpe.fechaOpe
+order by tTir.newsstand;
+

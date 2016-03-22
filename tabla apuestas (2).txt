@@ -1,0 +1,9 @@
+SELECT * FROM apuestas
+
+--TRUNCATE table apuestas;
+
+
+ALTER TABLE apuestas modify HTR VARCHAR2(3); id BIGINT( 11 ) NOT NULL DEFAULT 0
+
+ALTER TABLE apuestas modify
+n

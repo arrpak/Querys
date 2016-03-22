@@ -1,0 +1,34 @@
+define nodo='CAM';
+define dateprint='20080701';
+
+--DROP table fn3comparatiradaimpuesta;
+
+--ALTER table fn3comparatiradaimpuesta MODIFY (NODO CHAR(12));
+
+--CREATE TABLE fn3comparatiradaimpuesta AS
+--INSERT INTO fn3comparatiradaimpuesta
+ SELECT dateprint,'&nodo' AS nodo ,Sum(servicio) AS Servicio,Sum(decision) AS DecBayes,Sum(devolucionreal) AS DevReal,
+        Sum(venta) AS VentaReal,Sum(devolucionbayes) AS devolucionbayes ,Sum(decision)-Sum(devolucionbayes) AS VentaBayes,
+        Sum(Venta)-(Sum(decision)-Sum(devolucionbayes)) AS VentaPerdida
+        FROM
+ (
+(SELECT t1.dateprint,t1.newsstand,(
+Ceil((((case when (t1.decision + t1.increaseDec) <= 15
+              then  ceil(t1.decision + t1.increaseDec)
+              else  ROUND(t1.decision + t1.increaseDec) end))))) AS decision,t2.service AS servicio,RETURN AS devolucionreal,
+              t2.service+t2.incidence-t2.RETURN AS venta,
+              Greatest(Ceil((((case when (t1.decision + t1.increaseDec) <= 15
+              then  ceil(t1.decision + t1.increaseDec)
+              else  ROUND(t1.decision + t1.increaseDec) end))))-( t2.service+t2.incidence-t2.RETURN),0) AS devolucionbayes
+
+FROM fn3printingdetail t1,fn3operation t2
+WHERE
+t1.header='MARCA' AND t1.product='DIARIO'
+AND t1.dateprint=dat('&dateprint')
+AND t1.node='&nodo'
+AND t1.orderf=20
+AND t1.header=t2.header
+AND t1.product=t2.product
+AND t1.newsstand=t2.newsstand
+AND t1.dateprint=t2.operationdate
+))GROUP BY dateprint,'&nodo'

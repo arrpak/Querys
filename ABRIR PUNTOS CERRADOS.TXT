@@ -1,0 +1,28 @@
+UPDATE fn3printingdetail
+SET decision=1,increasedec=0
+WHERE dateprint=dat('20090106')  AND NODE='CAVCMU'
+--AND decision>0
+AND newsstand IN
+((SELECT DISTINCT(newsstand)
+FROM fn3operation
+WHERE
+(operationdate=dat('20081208') OR operationdate=dat('20081206'))
+AND service>0
+AND (newsstand like '003%' OR newsstand like '046%' OR newsstand like '012%' OR newsstand like '030%')
+UNION
+SELECT DISTINCT(newsstand)
+FROM fn3operationnotcontrolled
+WHERE
+(operationdate=dat('20081208') OR operationdate=dat('20081206'))
+AND service>0
+AND (newsstand like '003%' OR newsstand like '046%' OR newsstand like '012%' OR newsstand like '030%')  )
+MINUS
+(SELECT newsstand
+FROM fn3printingdetail
+WHERE dateprint=dat('20090106')
+AND decision>0)
+);
+
+
+
+

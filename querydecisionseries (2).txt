@@ -1,0 +1,25 @@
+--insert into fn3DecisionSeries
+ select dec.decsession, f.output, f.dating, fs.valuedate,
+   fs.forecast, fs.variance, dec.probnotoutof,
+   decode(e.transformation,
+     'Logaritmica',  greatest(least(Exp(ni.normalinv*sqrt(Variance))
+ * Forecast, Forecast*1.3), Forecast +1.5 ),
+      'Identidad', Forecast + ni.normalinv*sqrt(Variance),
+      0) as decision,
+   'N' as used
+ from fn3Decision dec, fn5ForecastSeries fs,
+      fn5Forecast f, fn5Estimation e,
+      fn3NormalInv ni
+ where dec.forsession = f.forsession
+   and fs.forsession  = f.forsession
+   and fs.output      = f.output
+   and fs.dating      = f.dating
+   and e.estsession   = f.estsession
+   and e.output       = f.output
+   and e.dating       = f.dating
+   and dec.probnotoutof = ni.prob
+   and fs.valuedate  between  to_date('20080110', 'yyyymmdd')
+      and  to_date('20080110', 'yyyymmdd')
+   and ni.prob != 0
+   and ( prob = 0.78)
+   and f.forsession   = '2008011017_PAPIRO.PV'

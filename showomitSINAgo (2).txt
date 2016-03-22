@@ -1,0 +1,48 @@
+set linesize 200
+set pagesize 2000
+spool c:\showomit20020916.txt
+select 
+--    tirada.header, 
+--    substr(tirada.product,1,12), 
+    tirada.newsStand, 
+    tirada.datePrint, 
+    substr(tirada.forsession,1,30),
+    round(tabMedDes.media, 4)                    as media, 
+    round(tabMedDes.desviacion, 4)               as desviacion, 
+    round(tirada.decision+tirada.increaseDec, 4) as decision, 
+    round((tabMedDes.media * (1 + 0.24)), 0) as propuesta 
+ from FN3PRINTINGDETAIL tirada, 
+ ( 
+ select header, 
+        product, 
+        newsStand, 
+        avg(service + incidence - return)            as media, 
+       greatest(stddev(service+incidence-return), 2) as desviacion 
+ from FN3OPERATION
+ where  header         = 'MARCA'              and 
+        product        = 'DIARIO'              and 
+        operationDate <  to_date('20020916', 'yyyymmdd')  and 
+        operationDate >=  to_date('20020916', 'yyyymmdd')  - (7*(8)) and 
+        operationDate !=  to_date('20020804', 'yyyymmdd')  and   
+        operationDate !=  to_date('20020811', 'yyyymmdd')  and 
+        operationDate !=  to_date('20020818', 'yyyymmdd')  and 
+        operationDate !=  to_date('20020825', 'yyyymmdd')  and 
+      to_char(operationDate, 'DY') = to_char( to_date('20020916', 'yyyymmdd') ,'DY') and 
+        service + incidence - return > 0 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+ where tirada.header    = tabMedDes.header           and 
+       tirada.product   = tabMedDes.product          and 
+--       tirada.newsstand='028109802058' and
+       tirada.node      = 'CAM'              and 
+       tirada.datePrint =  to_date('20020916', 'yyyymmdd')               and 
+       tirada.orderF    = '1' and 
+       tirada.newsStand = tabMedDes.newsStand        and 
+       tirada.decision   != 0                  
+      and 
+       (tirada.decision   < 0                              or 
+        tirada.decision > tabMedDes.media * (1 + 0.40) + 2 * tabMedDes.desviacion or
+        tirada.decision < tabMedDes.media * (1 + 0.40) - 2 * tabMedDes.desviacion or
+        abs(round(tirada.decision+tirada.increaseDec, 4)-round((tabMedDes.media * (1 + 0.24)), 4))>40)
+ order by decision - propuesta asc;
+spool off;

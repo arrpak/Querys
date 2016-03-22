@@ -1,0 +1,196 @@
+ABRIR EL FICHERO EN EXCEL
+
+CAMBIAR EL FORMATO DE FECHA A AAAA/MM/DD
+
+GUARDAR COMO CSV Y BORRAR CABECERAS
+
+/*
+insert into fn3productpromotion values ('30 Ligas 30 monedas','MonedasRMA30Ligas');
+insert into fn3productpromotion values ('Bond James Bond','DVDBond007');
+insert into fn3productpromotion values ('Bond, James Bond','DVDBond007');
+insert into fn3productpromotion values ('Cine del Oeste','DVDCineDelOeste');
+insert into fn3productpromotion values ('Clásicos de Artes Marciales','DVDArtesMarciales');
+insert into fn3productpromotion values ('DVD Duelos de Oro','DvdDuelosOro');
+insert into fn3productpromotion values ('DVD Los Serrano','LosSerrano');
+insert into fn3productpromotion values ('Dvd Los Serrano II','LosSerrano');
+insert into fn3productpromotion values ('Finales de Infarto','DVDGrandesFinalesTenis');
+insert into fn3productpromotion values ('Juegos EA Sport','CDJuegoEASport');
+insert into fn3productpromotion values ('Juegos EA Sport II','CDJuegoEASport');
+insert into fn3productpromotion values ('Juegos EA Sport III','CDJuegoEASport');
+insert into fn3productpromotion values ('La Conquista de Europa','ConquistaEuropa');
+insert into fn3productpromotion values ('La Guerra Interminable','DVDGuerraInterminable');
+insert into fn3productpromotion values ('La gran aventura de la Formula 1','DVDAventuraF1');
+insert into fn3productpromotion values ('Pack Baloncesto','PackBaloncesto');
+insert into fn3productpromotion values ('Pack Baloncesto en Catalán','PackBaloncestoEnCatalan');
+*/
+DELETE
+--SELECT count(*)
+FROM fn3productnodetmp;
+
+/*SELECT *
+FROM fn3productnodehistorical
+WHERE (promocion ='Juegos EA Sport' OR promocion='Juegos EA Sport II') ORDER BY fechaportada;
+
+SELECT DISTINCT(promocion)
+FROM fn3productnodehistorical;
+
+SELECT *
+FROM fn3productnode;
+SELECT *
+FROM fn3coleccionable;
+*/
+SELECT delegado,comunidad,n,fechaportada,coddist,
+distribuidora,provincia,promocion,entrega,tirada,
+servicio,entr,dev,venta,porcdevol,devolest,ventaest,
+porccontr,pv,pvcont,porcpvagot,porcpv0,devmedxpv,pvagot,
+ejspvagot,pv0,ejspv0,zona,precio,observaciones,To_Date('20070709','yyyymmdd')
+FROM fn3productnodetmp
+
+
+--Cojo solo los datos anteriores a sysdate
+
+INSERT INTO fn3productnodehistorical
+SELECT delegado,comunidad,n,fechaportada,coddist,
+distribuidora,provincia,promocion,entrega,tirada,
+servicio,entr,dev,venta,porcdevol,devolest,ventaest,
+porccontr,pv,pvcont,porcpvagot,porcpv0,devmedxpv,pvagot,
+ejspvagot,pv0,ejspv0,zona,precio,observaciones,To_Date('20070709','yyyymmdd')
+FROM fn3productnodetmp
+WHERE fechaportada<sysdate AND entr IS NOT null
+ORDER BY delegado,comunidad,n
+
+
+SELECT Count(*) FROM fn3productnodehistorical
+--DELETE fn3productnodehistorical
+WHERE comunicationdate=dat('20070709');
+
+------------------------------------
+--ESTA COMPRUEBA QUE LO QUE COJO MEZCLANDO LAS TABLAS ES LO MISMO QUE LO ANTERIOR
+------------------------------------
+SELECT fpp.promotion,fcn.nodozona,fcn.node,pntmp.fechaportada,pntmp.entr,
+       pntmp.dev,pntmp.venta
+FROM FN3COLECCIONABLENODE fcn,FN3PRODUCTNODEHISTORICAL pntmp,FN3PRODUCTPROMOTION fpp
+WHERE
+pntmp.comunicationdate=dat('20070709')
+AND pntmp.fechaportada<comunicationdate
+AND pntmp.comunidad=fcn.comunidad
+AND pntmp.distribuidora=fcn.distribuidora
+AND pntmp.provincia=fcn.provincia
+AND pntmp.promocion=fpp.product
+AND pntmp.entr IS NOT NULL
+--AND node='CYLSOR'
+ORDER BY pntmp.delegado,pntmp.comunidad,pntmp.n
+;
+------------------------------------
+------------------------------------
+------------------------------------
+--ESTA COMPRUEBA LAS PROVINCIAS CON VARIAS DELEGACIONES
+------------------------------------
+
+select fpp.promotion,fcn.nodozona,fcn.node,pntmp.fechaportada,Count(*),
+Sum(pntmp.entr),Sum(pntmp.dev),Sum(pntmp.venta)
+FROM FN3COLECCIONABLENODE fcn,FN3PRODUCTNODEHISTORICAL pntmp,FN3PRODUCTPROMOTION fpp
+WHERE
+pntmp.comunicationdate=dat('20070709')
+AND pntmp.fechaportada<comunicationdate
+AND pntmp.comunidad=fcn.comunidad
+AND pntmp.distribuidora=fcn.distribuidora
+AND pntmp.provincia=fcn.provincia
+AND pntmp.promocion=fpp.product
+AND pntmp.entr IS NOT NULL
+--AND node='CYLSOR'
+GROUP BY fpp.promotion,fcn.nodozona,fcn.node,pntmp.fechaportada
+HAVING Count(*)>1
+--ORDER BY pntmp.delegado,pntmp.comunidad,pntmp.n
+;
+
+------------------------------------
+--ESTA INSERTA
+------------------------------------
+
+--insert into fn3productnode
+SELECT fpp.promotion,fcn.nodozona,fcn.node,pntmp.fechaportada,
+       Sum(pntmp.entr),Sum(pntmp.dev),Sum(pntmp.venta)
+FROM FN3COLECCIONABLENODE fcn,FN3PRODUCTNODEHISTORICAL pntmp,FN3PRODUCTPROMOTION fpp
+WHERE
+pntmp.comunicationdate=dat('20070709')
+AND pntmp.fechaportada<comunicationdate
+AND pntmp.comunidad=fcn.comunidad
+AND pntmp.distribuidora=fcn.distribuidora
+AND pntmp.provincia=fcn.provincia
+AND pntmp.promocion=fpp.product
+AND pntmp.entr IS NOT NULL
+--AND node='CYLSOR'
+group BY fpp.promotion,fcn.nodozona,fcn.node,pntmp.fechaportada
+;
+
+
+SELECT * FROM fn3productnode2;
+
+
+
+
+
+/*
+
+
+
+
+
+SELECT Count(*)
+FROM FN3PRODUCTNODEHISTORICAL t1,FN3COLECCIONABLENODE t2
+WHERE comunicationdate = dat('20070709')
+AND t1.provincia=t2.provincia
+--AND t1.distribuidora=t2.distribuidora
+AND t1.comunidad=t2.comunidad
+;
+
+SELECT Count(*) FROM fn3COLECCIONABLENODE WHERE nodozona IS null
+
+
+
+SELECT distribuidora
+FROM FN3PRODUCTNODEHISTORICAL
+MINUS
+SELECT distribuidora
+FROM FN3COLECCIONABLENODE
+MINUS
+SELECT distribuidora
+FROM FN3PRODUCTNODEHISTORICAl
+
+SELECT Count(DISTINCT(distribuidora))
+FROM FN3PRODUCTNODEHISTORICAL;
+
+SELECT Count(DISTINCT(distribuidora))
+FROM FN3COLECCIONABLENODE;
+
+
+
+
+SELECT *
+FROM fn3productnode
+
+
+SELECT Count(*)
+FROM FN3PRODUCTNODETMP pntmp
+
+insert INTO FN3COLECCIONABLENODE
+SELECT 'WW',distribuidora,'www',NULL,NULL,null
+FROM
+(
+SELECT pntmp.distribuidora
+FROM FN3PRODUCTNODETMP pntmp
+MINUS
+SELECT fcn.distribuidora
+FROM FN3COLECCIONABLENODE fcn
+)
+
+
+UPDATE FN3COLECCIONABLENODE
+SET NODOZONA='CEN' WHERE PROVINCE='SORIA'
+
+SELECT *
+FROM FN3COLECCIONABLENODE
+ORDER BY DISTRIBUIDORA;
+
+*/

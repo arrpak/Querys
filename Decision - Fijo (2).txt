@@ -1,0 +1,15 @@
+---------------------------------------------------
+--Saca Decision de Forecastseries y de ServiceFixed
+---------------------------------------------------
+select substr(output,11,12),decision,service
+from fn3forecastseries,fn3servicefixed
+where forsession='2003051421_CAM.PV' and
+      valuedate=to_date('20030514','yyyymmdd') and
+      newsstand=substr(output,11,12) and
+--      forsession='ServicioFijo' and
+      header='MARCA' and product='DIARIO' and
+      decision>service and 
+      datefrom  <=to_date('20030514','yyyymmdd') and
+      dateuntil >to_date('20030514','yyyymmdd') and
+      weekday='WED';
+

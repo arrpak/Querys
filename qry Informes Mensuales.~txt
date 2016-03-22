@@ -1,0 +1,14 @@
+select ei.valuedate as fecha,
+          ei.originalvalue NumEjemplares
+      from EzcEstimationSeries ei
+    where ei.estsession = 'e20140316ComMMS.01'
+     and  ei.output     = 'ComMMSABCCAM'
+     and  ei.dating     = 'Diario'
+        UNION
+     (  select fs.valuedate fecha,
+          fs.forecast AS  NumEjemplares
+      from EzcforecastSeries fs
+    where fs.forsession = 'F20140317_0630ComMMS.01'
+     and  fs.output     = 'ComMMSABCCAM'
+     and  fs.dating     = 'Diario'
+    ) order by fecha

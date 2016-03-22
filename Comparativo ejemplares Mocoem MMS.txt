@@ -1,0 +1,71 @@
+--Solo poner la sesión actual y la anterior y la ultima fecha de la sesion antigua, para comparar las mismas fechas
+
+Define newfs ='e20141019ComMMS.03';
+Define oldfs ='e20141012ComMMS.02';
+define lastdate='20141012';
+
+
+SELECT t1.cabecera,t1.promocion,t1.ejemnuevo,t2.ejemantiguo,round(ejemnuevomed,0),round(ejemantiguomed,0),
+round(ejemnuevomed-ejemantiguomed,0) as difmed,round(t1.ejemnuevo-t2.ejemantiguo,0) as difabs
+
+FROM
+(select cabecera,promocion,sum(numejemplares) AS ejemnuevo,avg(numejemplares) AS ejemnuevomed
+from (select Replace(Replace(ei.output, 'ComMMS'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20120901','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion) t1,
+(select cabecera,promocion,sum(numejemplares) AS ejemantiguo,avg(numejemplares) AS ejemantiguomed
+from (select Replace(Replace(ei.output, 'ComMMS'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20120901','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion
+) t2
+WHERE t1.cabecera=t2.cabecera AND
+t1.promocion=t2.promocion
+order by 8 desc
+;
+
+
+
+/*
+
+SELECT *
+FROM  EzcEstimationIssue ei
+where
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and input  like '%DVDCine%'
+order by valuedate
+
+*/
+
+
+
+/*
+
+SELECT ESTSESSION,input,avg(issue)
+FROM  EzcEstimationIssue
+WHERE
+input  ='CarroDeLasMarcas2013.iv' and
+estsession >='e20130915Com.01'
+group by ESTSESSION,input
+
+*/

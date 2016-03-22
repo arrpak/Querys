@@ -1,0 +1,130 @@
+//Actuamos sobre la tabla Fn2EstSession
+
+--borramos la tabla tabla
+drop table Fn2EstSession;
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2EstSession
+--
+-- PURPOSE: Definicion de la tabla de estimaciones por sesión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  sessionIni           char(80),
+  estSessionNodoPadre  char(80),
+  fechaIni             date,
+  fechaFin             date,
+  descripcion          char(80), 
+  foreign key (sessionIni) references Fn2estSession(codigo),
+  foreign key (estSessionNodoPadre) references Fn2estSession(codigo),
+  CONSTRAINT pk_EstSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX
+ )  
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+//modificacion sobre Fn2EstSession
+ALTER TABLE "FORMARCA"."FN2ESTFORSESSION" ADD(CONSTRAINT "FK_SESSIONINI_ESTSESSION"
+FOREIGN KEY("SESSIONINI") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+ALTER TABLE "FORMARCA"."FN2ESTFORSESSION" ADD(CONSTRAINT "FK_ESTSESSIONNODOPADRE_ESTSESSION"
+FOREIGN KEY("ESTSESSIONNODOPADRE") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+
+--cargamos datos
+insert into Fn2EstSession
+select * from Fn2EstSessionkk
+where sessionIni IS NULL and
+      estSessionNodoPadre IS  NULL and
+      sessionIni <> '20001201.Desagreg2';
+commit;
+insert into Fn2EstSession
+select * from Fn2EstSessionkk
+where sessionIni IS not NULL and
+      estSessionNodoPadre IS  NULL and
+      sessionIni <> '20001201.Desagreg2';
+commit;
+
+--actuamos sobre la tabla Fn2ForSession
+--borramos la tabla
+drop table fn2forsession;
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2ForSession 
+--
+-- PURPOSE: Definicion de la tabla de sesión de previsión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  estSession           char(80),
+  forSessionNodoPadre  char(80),
+  fechaIni             date        not Null,
+  fechaFin             date        not Null,
+  descripcion          char(80),
+  foreign key        (estSession) references Fn2EstSession(codigo),
+  foreign key (forSessionNodoPadre) references Fn2ForSession(codigo),
+  CONSTRAINT pk_forSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX 
+ ) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+
+   create table Fn2ForSessionkk 
+--
+-- PURPOSE: Definicion de la tabla de sesión de previsión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  estSession           char(80),
+  forSessionNodoPadre  char(80),
+  fechaIni             date        not Null,
+  fechaFin             date        not Null,
+  descripcion          char(80),
+  foreign key        (estSession) references Fn2EstSession(codigo),
+  foreign key (forSessionNodoPadre) references Fn2ForSession(codigo),
+  CONSTRAINT pk_forSessionkk PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX 
+ ) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+//modificacion sobre Fn2ForSession
+ALTER TABLE "FORMARCA"."FN2FORSESSION" ADD(CONSTRAINT "FK_ESTSESSION_FORSESSION"
+FOREIGN KEY("ESTSESSION") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+ALTER TABLE "FORMARCA"."FN2FORSESSION" ADD(CONSTRAINT "FK_FORSESSIONNODOPADRE_FORSESSION"
+FOREIGN KEY("FORSESSIONNODOPADRE") REFERENCES
+"FORMARCA"."FN2FORSESSION"("CODIGO"));
+
+
+
+--insertamos datos
+insert into fn2forsessionkk
+select * 
+from fn2forsession;
+
+drop table  fn2forsessionKK

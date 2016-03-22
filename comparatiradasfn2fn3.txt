@@ -1,0 +1,91 @@
+select fn2detalletirada.fecha,
+	puntoventa,
+	fn2detalletirada.decision+increndecision as FN2,
+                fn3printingdetail.decision+increasedec as FN3
+from fn2detalletirada,fn3printingdetail
+where	cabecera =  'MARCA' and
+            	producto = 'DIARIO' and
+            	fecha      =  to_date('20011115','yyyymmdd') and
+                orden = 2 and
+	fecha = dateprint and
+	producto=product and
+                cabecera=header and
+	puntoventa = newsstand;
+
+	
+select fn2detalletirada.fecha,
+	puntoventa,
+	fn2detalletirada.decision+increndecision as FN2,
+	fn3printingdetail.decision+increasedec as FN3,
+	fn2detalletirada.decision+increndecision-fn3printingdetail.decision+increasedec as dif
+from fn2detalletirada,fn3printingdetail
+where	cabecera =  'MARCA' and
+            	producto = 'DIARIO' and
+            	fecha      =  to_date('20011208','yyyymmdd') and
+                orden = 2 and
+	orderf =1 and
+	fecha = dateprint and
+                puntoventa=substr(newsstand,4,1)||'000'||substr(newsstand,5,8) and
+                cabecera=header and
+                producto=product
+  order by abs(dif);
+--------------------------------------------------------------------------------------------------------------------------
+--Puntos que tienen tirada en FN2 y no en FN3
+
+select distinct puntoventa
+from fn2detalletirada
+where	cabecera =  'MARCA' and
+            	producto = 'DIARIO' and
+            	fecha      =  to_date('20011115','yyyymmdd') and
+                orden = 1 
+minus
+(select substr(newsstand,4,1)||'000'||substr(newsstand,5,8) 
+from fn3printingdetail
+where	 header='MARCA' and
+	product='DIARIO' and
+                orderf='1' and
+	dateprint=to_date('20011115','yyyymmdd') );	
+------------------------------------------------------------------------
+--Puntos que tienen tirada en FN3 y no en FN2
+
+ select substr(newsstand,4,1)||'000'||substr(newsstand,5,8) 
+ from fn3printingdetail
+ where  header='MARCA' and
+  product='DIARIO' and
+                 orderf='1' and
+  dateprint=to_date('20011115','yyyymmdd') 
+ minus
+ (select distinct puntoventa
+ from fn2detalletirada
+ where cabecera =  'MARCA' and
+              producto = 'DIARIO' and
+              fecha      =  to_date('20011115','yyyymmdd') and
+                 orden = 1 );
+-------------------------------------------------------------------------
+
+
+
+SQL> desc fn2detalletirada
+ Name                            Null?    Type
+ ------------------------------- -------- ----
+ FECHA                           NOT NULL DATE
+ ORDEN                           NOT NULL NUMBER(38)
+ CABECERA                        NOT NULL CHAR(12)
+ PRODUCTO                        NOT NULL CHAR(12)
+ PUNTOVENTA                      NOT NULL CHAR(12)
+ FORSESSION                      NOT NULL CHAR(80)
+ DECISION                                 FLOAT(126)
+ INCRENDECISION                           FLOAT(126)
+
+SQL> desc fn3printingdetail
+ Name                            Null?    Type
+ ------------------------------- -------- ----
+ HEADER                          NOT NULL CHAR(12)
+ PRODUCT                         NOT NULL CHAR(12)
+ NODE                            NOT NULL CHAR(12)
+ DATEPRINT                       NOT NULL DATE
+ ORDERF                          NOT NULL NUMBER(38)
+ NEWSSTAND                       NOT NULL CHAR(12)
+ FORSESSION                      NOT NULL CHAR(80)
+ DECISION                                 FLOAT(126)
+ INCREASEDEC                              FLOAT(126)

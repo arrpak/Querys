@@ -1,0 +1,277 @@
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20060909','yyyymmdd'),
+Greatest(round(maxven*1.1,dec+2))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20050910','yyyymmdd') OR
+operationdate=to_date('20050917','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20050910','yyyymmdd') OR
+operationdate=to_date('20050917','yyyymmdd') ))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='AND' and dateprint=to_date('20060909','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20060909','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+--AND pri.newsstand like '029%'
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1;
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+QUERY PARA QUE A LOS AGOTADOS DE UN DIA CONCRETO LE META LA VENTA+ALGO
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20040906','yyyymmdd'),
+--Greatest(round(maxven*1.20,dec+4))
+round(greatest(maxven*1.20,dec+4))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and return=0 and
+(
+operationdate=to_date('20040817','yyyymmdd') OR
+operationdate=to_date('20040817','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where
+header='MARCA' and product='DIARIO' and return=0 and
+(
+operationdate=to_date('20040817','yyyymmdd') OR
+operationdate=to_date('20040817','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+forsession!='ServicioFijo' and
+node='EXT' and dateprint=to_date('20040906','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20040906','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+--and ope.newsstand NOT like '029%'
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1;
+
+
+
+//SOLO PARA LOS NODOS DE CAPITAL Y PERIFERIA
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20060530','yyyymmdd'),
+Greatest(round(maxven*1.10,dec+3))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040825','yyyymmdd') OR
+operationdate=to_date('20040825','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040906','yyyymmdd') OR
+operationdate=to_date('20040906','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+forsession!='ServicioFijo' and
+node='EXT' and dateprint=to_date('20060530','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20060530','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+--and ope.newsstand NOT like '029%'
+AND PRI.NEWSSTAND in
+(select newsstand
+from fn3node
+where fathernode like '%CAP%' or
+      fathernode like '%PER%')
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1;
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',to_date('20060530','yyyymmdd'), sum(ope.maxven), sum(dec),
+sum(Greatest(round(maxven*1.10,dec+3)))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040825','yyyymmdd') OR
+operationdate=to_date('20040825','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040825','yyyymmdd') OR
+operationdate=to_date('20040825','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+forsession!='ServicioFijo' and
+node='AND' and dateprint=to_date('20060530','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20060530','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+--and ope.newsstand NOT like '029%'
+AND PRI.NEWSSTAND in
+(select newsstand
+from fn3node
+where fathernode = 'ANDMGAPLA')
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1
+group by 'MARCA','DIARIO',to_date('20060530','yyyymmdd');
+
+
+
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20060530','yyyymmdd'),
+Greatest(round(maxven*1.20,dec+3))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20060501','yyyymmdd') OR
+operationdate=to_date('20060413','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040825','yyyymmdd') OR
+operationdate=to_date('20040825','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+forsession!='ServicioFijo' and
+node='AND' and dateprint=to_date('20060530','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20060530','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+--and ope.newsstand NOT like '029%'
+AND PRI.NEWSSTAND in
+(select newsstand
+from fn3node
+where fathernode = 'ANDHUEPLA')
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1;

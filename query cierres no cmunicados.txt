@@ -1,0 +1,54 @@
+select fn2operacion.puntoventa
+--,servicio,incidencia,devolucion,decision
+from fn2operacion,fn2detalletirada
+where servicio>0 and
+      fn2operacion.fecha=to_date('20011012','yyyymmdd')
+minus
+(
+select fn2detalletirada.puntoventa
+--,fn2detalletirada.orden,
+--       fn2detalletirada.fecha,
+--       fn2detalletirada.decision
+--       fn2detalletirada.cabecera
+--       fn2detalletirada.producto
+from fn2detalletirada,fn2tirada
+where  
+       fn2detalletirada.decision=0                           and
+       fn2detalletirada.cabecera='MARCA'                     and  
+       fn2detalletirada.producto='DIARIO'                    and
+       fn2detalletirada.fecha=to_date('20011012','yyyymmdd') and
+       fn2tirada.fecha=fn2detalletirada.fecha                and
+       fn2tirada.utilizada='S' 				     and
+       fn2tirada.orden=fn2detalletirada.orden                and
+       fn2detalletirada.orden=fn2tirada.orden                )
+order by puntoventa;
+
+
+
+
+
+
+
+
+select puntoventa,servicio,incidencia,devolucion
+from fn2operacion
+where servicio>0 and
+      fecha=to_date('20011012','yyyymmdd')
+minus
+(
+select fn2detalletirada.puntoventa,fn2detalletirada.orden,
+       fn2detalletirada.fecha,
+       fn2detalletirada.decision
+--       fn2detalletirada.cabecera
+--       fn2detalletirada.producto
+from fn2detalletirada,fn2tirada
+where  
+       fn2detalletirada.decision=0                           and
+       fn2detalletirada.cabecera='MARCA'                     and  
+       fn2detalletirada.producto='DIARIO'                    and
+       fn2detalletirada.fecha=to_date('20011011','yyyymmdd') and
+       fn2tirada.fecha=fn2detalletirada.fecha                and
+       fn2tirada.utilizada='S' 				     and
+       fn2tirada.orden=fn2detalletirada.orden                and
+       fn2detalletirada.orden=fn2tirada.orden                )
+order by puntoventa;

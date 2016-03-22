@@ -1,0 +1,118 @@
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20050911','yyyymmdd'),
+decode(rt,0,Greatest(round(maxven*1.15,dec+2)),Greatest(round(maxven*1,dec+1)))
+from
+(
+select newsstand,max(ven) as maxven,min(return) as rt
+from
+(select newsstand,(service+incidence-return) as ven,return
+from fn3operation
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20050904','yyyymmdd') OR 
+operationdate=to_date('20050904','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven,return
+from fn3operationnotcontrolled
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20050930','yyyymmdd') OR 
+operationdate=to_date('20051031','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='EXT' and dateprint=to_date('20050911','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20050911','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+--AND pri.newsstand like '0110006%'
+--AND pri.newsstand like '010%'
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1;
+
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+PARA NODOS DE PLAYA
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20050817','yyyymmdd'),
+decode(rt,0,Greatest(round(maxven*1.2,dec+2)),Greatest(round(maxven*1.1,dec+2)))
+from
+(
+select newsstand,max(ven) as maxven,min(return) as rt
+from
+(select newsstand,(service+incidence-return) as ven,return
+from fn3operation
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040809','yyyymmdd') OR 
+operationdate=to_date('20040809','yyyymmdd') )
+union
+select newsstand,(service+incidence-return) as ven,return
+from fn3operationnotcontrolled
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040809','yyyymmdd') OR 
+operationdate=to_date('20040809','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='AND' and dateprint=to_date('20050817','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20050817','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+and pri.newsstand!='011000606280'
+--AND pri.newsstand like '0110006%'
+--AND pri.newsstand like '021%'
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1
+AND PRI.NEWSSTAND IN
+(SELECT NEWSSTAND
+FROM FN3NODE
+WHERE HEADER='MARCA' AND PRODUCT='DIARIO'
+AND (FATHERNODE LIKE '%PLA%' OR FATHERNODE LIKE '%PER%')
+);

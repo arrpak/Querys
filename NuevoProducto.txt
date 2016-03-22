@@ -1,0 +1,99 @@
+--Creamos el producto
+insert into fn3product values ('MARCA','CD','CDS VARIOS');
+--Creamos en primer lugar el nodo
+
+insert into fn3node values ('MARCA','CD','ESP','ESPANNA','','');
+insert into fn3node values ('MARCA','CD','CAM','COMUNIDAD DE MADRID','','ESP');
+insert into fn3node values ('MARCA','CD','CAMCAP','MADRID CAPITAL','','CAM');
+insert into fn3node values ('MARCA','CD','CAMAER','AEROPUERTO DE BARAJAS','','CAM');
+insert into fn3node values ('MARCA','CD','CAMATI','ATIPICOS DE MADRID','','CAM');
+insert into fn3node values ('MARCA','CD','CAMGAS','GASOLINERAS','','CAM');
+insert into fn3node values ('MARCA','CD','CAMPER','PERIFERIA DE MADRID','','CAM');
+insert into fn3node values ('MARCA','CD','CAMSIE','SIERRA DE MADRID','','CAM');
+insert into fn3node values ('MARCA','CD','CAMVIA','METRO Y CERCANIAS','','CAM');
+insert into fn3node values ('MARCA','CD','CAMVLR','VIAJEROS DE LARGO RECORRIDO','','CAM');
+insert into fn3node values ('MARCA','CD','CAMVIP','VIPS','','CAM');
+
+insert into fn3node
+select header,'CD',code,description,newsstand,fathernode
+from fn3node
+where header='MARCA' and
+      product='DIARIO'and
+      code like '028%';
+
+--Creamos los output
+Insert into fn3output
+select 'VentaMarcaCD'||node,header,'CD',node
+from fn3output
+where header='MARCA' and
+      product='DIARIO'and
+      node like '028%';
+
+--Creamos los fechados
+insert into fn3outputdating
+select substr(output,1,10)||'CD'||substr(output,11,15),dating,
+       orderf,iniest,endest,arima,power,translation,timesetomit
+from fn3outputdating
+where output like 'VentaMarca028%';
+
+--Creamos las sesiones de estimacion de DT
+
+
+insert into fn3estimation
+select 'DiasTipicos',substr(output,1,10)||'CD'||substr(output,11,15),dating,
+       arima,inidate,enddate,iniestdate,estdate,estpower,esttranslation,
+       estregar,estseaar,estregma,estseama,datacount,varcount,const,
+       stddeviation,percerror,schwarz,grouped,state,stateinfo
+from fn3estimation
+where output like 'VentaMarca028%' and
+      estsession='DiasTipicos';
+
+-- Copia de operaciones de diario para hacer prev dt
+
+insert into fn3operation
+select header,'CD',newsstand,operationdate,service,
+incidence,return
+from fn3operation
+where header='MARCA' and
+product='DIARIO' and
+operationdate=to_date('20020203','yyyymmdd') and
+newsstand like '028%';
+
+--Copiamos de Forecast con producto nuevo
+insert into fn3forecast
+select forsession,'VentaMarca'||'CD'||substr(output,11,15),dating,inidate,
+enddate,inifordate,fordate,origdate,'DiasTipicos',state,stateinfo,
+error,description
+from fn3forecast
+where forsession='2002030613_CAM.PV';
+
+--Copiamos de Forecastseries con producto nuevo
+insert into fn3forecastseries
+select forsession,'VentaMarca'||'CD'||substr(output,11,15),dating,
+VALUEDATE,FORECAST,VARIANCE,DECISION,FILTER,NOISE,FORCENS,used
+from fn3forecastseries
+where forsession='2002030613_CAM.PV';
+
+
+
+--Hacemos tirada en diario y luego la copiamos al nuevo producto
+
+
+insert into fn3printing
+select header,'CD',node,dateprint,orderf,used,comunicationdate,origdate,description
+from fn3printing
+where header='MARCA' and
+product='DIARIO' and
+node='CAM'
+and dateprint=to_date('20020310','yyyymmdd');
+
+
+insert into fn3printingdetail
+select header,'CD',node,dateprint,orderf,newsstand,forsession,decision,increasedec
+from fn3printingdetail
+where header='MARCA' and
+product='DIARIO' and
+newsstand like '028%'and 
+dateprint=to_date('20020310','yyyymmdd');
+
+

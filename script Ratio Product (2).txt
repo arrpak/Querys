@@ -1,0 +1,86 @@
+
+UPDATE fn3input
+SET active='N'
+WHERE
+code IN(
+'DVDGuerraInterminable','ConquistaEuropa.esc',
+'DVDBond007','DVDBond007Resto','DVDArtesMarcialesResto',
+'DVDCineDelOesteResto','DvdDuelosOroResto','DvdDuelosOroRestoTend','DvdDuelosOro2')
+
+
+
+SELECT *
+FROM fn3input
+WHERE
+code LIKE '%.rp%'
+
+UPDATE fn3input
+SET active='Y'
+WHERE
+code in
+(
+'LaGuerraInterminable.rp'                  ,
+--'ConquistaEuropa.rp'                     ,
+--'DVDGrandesFinalesTenis.rp'              ,
+'DVDBond007.rp'                            ,
+'DVDGuerraInterminable.rp'                 ,
+'DVDGuerraInterminable.rp'                 ,
+'DVDCineDelOeste.rp'                       ,
+'DVDArtesMarcialesResto.rp'                ,
+'DvdDuelosDeOro.rp'                        ,
+'DVDGuerraInterminable.rp'                 )
+
+
+
+
+
+
+
+UPDATE fn3input
+SET active='Y'
+WHERE
+code IN('DVDGrandesFinalesTenis')
+
+
+
+--VOLVER AL ESTADO INICIAL
+
+UPDATE fn3input
+SET active='N'
+WHERE
+code LIKE '%.rp%'
+
+
+code in
+(
+'LaGuerraInterminable.rp'                  ,
+--'ConquistaEuropa.rp'                     ,
+--'DVDGrandesFinalesTenis.rp'              ,
+--'DVDBond007.rp'                            ,
+'DVDGuerraInterminable.rp'                 ,
+--'ConquistaEuropaDVDGrandesFinalesTenis.rp' ,
+'DVDGuerraInterminable.rp'                 ,
+'DVDCineDelOeste.rp'                       ,
+'DVDArtesMarcialesResto.rp'                ,
+'DvdDuelosDeOro.rp'                        ,
+'DVDGuerraInterminable.rp'                 )
+
+
+UPDATE fn3input
+SET active='Y'
+WHERE
+code IN(
+'DVDGuerraInterminable','ConquistaEuropa.esc',
+'DVDBond007','DVDBond007Resto','DVDArtesMarcialesResto',
+'DVDCineDelOesteResto','DvdDuelosOroResto','DvdDuelosOroRestoTend','DvdDuelosOro2')
+
+
+select *
+from fn3input
+where
+code IN(
+'DVDGuerraInterminable','ConquistaEuropa.esc',
+'DVDBond007','DVDBond007Resto','DVDArtesMarcialesResto',
+'DVDCineDelOesteResto','DvdDuelosOroResto','DvdDuelosOroRestoTend','DvdDuelosOro2')
+
+

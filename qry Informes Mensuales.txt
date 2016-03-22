@@ -1,0 +1,83 @@
+select ei.valuedate as fecha,
+          ei.originalvalue NumEjemplares
+      from EzcEstimationSeries ei
+    where ei.estsession = 'e20140316ComMMS.01'
+     and  ei.output     = 'ComMMSElPaisCAM'
+     and  ei.dating     = 'Diario'
+        UNION
+     (  select fs.valuedate fecha,
+          fs.forecast AS  NumEjemplares
+      from EzcforecastSeries fs
+    where fs.forsession = 'F20140317_0630ComMMS.01'
+     and  fs.output     = 'ComMMSElPaisCAM'
+     and  fs.dating     = 'Diario'
+    ) order by fecha
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///    METER EN  bsr_d_parameter
+
+--     INSERT INTO bsr_d_parameter
+SELECT co_model, 'DestornilladorElectrico2014.com', co_node, id_level, 'Y', 'N',
+       0.02, 0, vl_max, null, null, vl_sigmapriorweight, ds_parameter
+FROM bsr_d_parameter
+WHERE
+co_model LIKE 'InformeMarketingComMMSElPaisCAM' AND
+co_parameter='AbsolucionCamps' AND
+CO_NODE LIKE '%MMS%'
+
+
+--    INSERT INTO bsr_d_parameter
+SELECT co_model, 'Noticia.20140427', co_node, id_level, 'Y', 'N',
+       0.02, 0, vl_max, null, null, vl_sigmapriorweight, ds_parameter
+FROM bsr_d_parameter
+WHERE
+co_model LIKE 'InformeMarketingComMMSLaRazonCAM' AND
+co_parameter='AbsolucionCamps' AND
+CO_NODE LIKE '%MMS%'
+
+
+
+-- update bsr_d_parameter set co_active='Y',co_fixed='N' where co_parameter='Noticia.20131221'
+
+
+
+SELECT *
+FROM bsr_d_parameter
+WHERE
+co_parameter='Noticia.20140325'
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// VENTA FILTRADA Y TOTAL
+SELECT t1.fecha,t1.NumEjemplares AS vfil,t2.NumEjemplares AS vtot
+  from          (select ei.valuedate fecha,
+                 Sum(Round(ei.issue, 0)) NumEjemplares
+            from EzcEstimationIssue ei
+          where ei.estsession = 'e20140518ComMMS.01'
+           and  ei.output     = 'ComMMSElPaisCAM'
+           and  ei.dating     = 'Diario'
+           and  ei.input      = 'noise'
+           group by ei.valuedate) t1,
+           (
+           SELECT ei.valuedate fecha,
+                 Sum(Round(ei.issue, 0)) NumEjemplares
+            from EzcEstimationIssue ei
+          where ei.estsession = 'e20140518ComMMS.01'
+           and  ei.output     = 'ComMMSElPaisCAM'
+           and  ei.dating     = 'Diario'
+           group by ei.valuedate
+           ORDER BY fecha
+           ) t2
+           WHERE
+           t1.fecha=t2.fecha
+           ORDER BY t1.fecha asc
+
+
+
+
+
+
+
+

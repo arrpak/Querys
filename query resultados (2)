@@ -1,0 +1,29 @@
+SELECT zona,To_Char(fecha,'mm'),Round(Avg(servicio)),Round(Avg(devolucion)),Round(Avg(venta)),
+                                Round(Avg(puntosservicio)),Round(Avg(puntosagotado))
+FROM fn3objetivos
+WHERE
+producto='EXPANSION'
+AND servicio>0
+AND fecha>=To_Date('20061201','yyyymmdd')
+AND fecha<=To_Date('20071130','yyyymmdd')
+AND (To_Char(fecha,'dy')='sáb')
+GROUP BY zona,To_Char(fecha,'mm')
+ORDER BY To_Char(fecha,'mm'),zona
+
+
+
+SELECT zona,To_Char(fecha,'mm'),Round(Avg(servicio)),Round(Avg(devolucion)),Round(Avg(venta)),
+                                Round(Avg(puntosservicio)),Round(Avg(puntosagotado))
+FROM fn3objetivos
+WHERE
+producto='EXPANSION'
+AND fecha>=To_Date('20061201','yyyymmdd')
+AND fecha<=To_Date('20071130','yyyymmdd')
+and
+(
+To_Char(fecha,'dy')='lun' or
+To_Char(fecha,'dy')='mar' or
+To_Char(fecha,'dy')='mié' or
+To_Char(fecha,'dy')='jue' or
+To_Char(fecha,'dy')='vie' )
+GROUP BY zona,To_Char(fecha,'mm')

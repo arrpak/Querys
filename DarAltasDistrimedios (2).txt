@@ -1,0 +1,44 @@
+
+
+
+select '023001010910'||'|'||'2000/01/02'||'|'||company||' |'||name||' |'||surname1||' |'
+||surname2||' |'||way||' '||num||'|'||postcode||'|'||town||'|'||upper(province)||'|'||'1'||'|'||'*******'||'|'||'N'||'|ANDJAEPER'
+from fn3newsstand
+where code='023001010815';
+
+
+
+
+update fn3operation
+set newsstand='023001010910' WHERE NEWSSTAND='023001010815';
+
+
+
+DELETE fn3newsstandon
+where newsstand='023001010815';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+update fn3servicefixed
+set datefrom=to_date('20060111','yyyymmdd'),dateuntil=to_date('20060211','yyyymmdd')
+where
+datefrom=to_date('20000102','yyyymmdd')
+and 
+dateuntil=to_date('20000201','yyyymmdd');

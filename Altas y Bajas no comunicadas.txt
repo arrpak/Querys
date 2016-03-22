@@ -1,0 +1,63 @@
+select company,name
+from fn3newsstand
+where code in
+(
+select newsstand
+from fn3newsstandon
+where
+substr(newsstand,1,3)='028' and
+(dateoff is null or dateoff >sysdate)
+minus
+(
+select newsstand
+from fn3operation
+where
+substr(newsstand,1,3)='028' and
+operationdate=to_date('20030520','yyyymmdd')));
+
+
+
+--------------------------------------------------------
+--------------------------------------------------------
+--Puntos que estan de alta y no recibimos datos de ello.
+--------------------------------------------------------
+--------------------------------------------------------
+
+select newsstand
+from fn3newsstandon
+where
+substr(newsstand,1,3)='028' and
+(dateoff is null or dateoff >sysdate)
+minus
+(
+select newsstand
+from fn3operation
+where
+substr(newsstand,1,3)='028' and
+operationdate=to_date('20030520','yyyymmdd'));
+
+--------------------------------------------------------
+--------------------------------------------------------
+--Puntos de los que recibimos datos y no están de alta.
+--------------------------------------------------------
+--------------------------------------------------------
+select code,company,name
+from fn3newsstand
+where code in
+(
+select newsstand
+from fn3operation
+where
+substr(newsstand,1,3)='028' and
+operationdate=to_date('20030520','yyyymmdd')
+minus
+(
+select newsstand
+from fn3newsstandon
+where
+substr(newsstand,1,3)='028' and
+(dateoff is null or dateoff >sysdate)
+)
+);
+
+

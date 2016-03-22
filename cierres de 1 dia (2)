@@ -1,0 +1,24 @@
+SELECT Count(*)
+FROM fn3closingfixed
+WHERE
+datefrom<=To_Date('20060826','yyyymmdd')
+AND dateuntil>=To_Date('20060826','yyyymmdd')
+AND newsstand LIKE '028%'
+AND newsstand IN
+(
+SELECT newsstand
+FROM fn3newsstandon
+WHERE dateoff IS NULL)
+
+
+SELECT Count(*)
+FROM fn3closingfixed
+WHERE
+datefrom<=To_Date('20050827','yyyymmdd')
+AND dateuntil>=To_Date('20050827','yyyymmdd')
+AND newsstand LIKE '028%'
+AND newsstand IN
+(
+SELECT newsstand
+FROM fn3newsstandon
+WHERE dateoff IS NULL)

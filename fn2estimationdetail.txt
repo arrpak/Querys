@@ -1,0 +1,95 @@
+--//////////////////////////////////////////////////////////////////////////
+--// Control de tiempo para una sentencia
+--//////////////////////////////////////////////////////////////////////////
+select to_char(sysdate, 'dd/mm/yyyy hh24 mi ss') from dual;
+--Escribir sentencia
+select to_char(sysdate, 'dd/mm/yyyy hh24 mi ss') from dual;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Espacio libre en cada tablespace
+--//////////////////////////////////////////////////////////////////////////
+--MB
+select tablespace_name, sum(bytes)/(1024*1024) AS LibreMB
+from dba_free_space 
+group by tablespace_name;
+--GB
+select tablespace_name, sum(bytes)/(1024*1024*1024) AS LibreGB
+from dba_free_space 
+group by tablespace_name;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Registros de fn2estimationdetail24
+--//////////////////////////////////////////////////////////////////////////
+select to_char(sysdate, 'dd/mm/yyyy hh24 mi ss') from dual;
+select substr(estsession,1,30), count (estsession)
+from fn2estimationdetail24
+group by estsession;
+select to_char(sysdate, 'dd/mm/yyyy hh24 mi ss') from dual; 
+
+
+--//////////////////////////////////////////////////////////////////////////
+--// Control de tamaño de las tablas e índices
+--//////////////////////////////////////////////////////////////////////////
+
+--//Tablas
+Select segment_type, substr(segment_name,1,30), 
+       bytes/(1024*1024*1024) as GB, user_segments.PCT_INCREASE   
+From user_segments, all_tables
+where user_segments.segment_name = all_tables.table_name and
+      all_tables.owner = 'FORMARCA'
+order by segment_type, bytes desc;
+
+--//Indices
+Select segment_type, substr(segment_name,1,30), 
+       bytes/(1024*1024*1024) as GB, user_segments.PCT_INCREASE
+From user_segments, all_indexes
+where user_segments.segment_name = all_indexes.index_name and
+      all_indexes.owner = 'FORMARCA'
+order by segment_type, bytes desc;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Control de tamaño de las tablas
+--//////////////////////////////////////////////////////////////////////////
+
+Select *
+From user_segments
+Where segment_type = 'TABLE'
+order by bytes desc
+
+Select substr(segment_name,1,20), substr(tablespace_name,1,20), bytes,
+       next_extent, pct_increase
+From user_segments
+Where segment_type = 'TABLE'
+order by bytes desc;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Control de tamaño de los índices
+--//////////////////////////////////////////////////////////////////////////
+
+Select substr(segment_name,1,20), substr(tablespace_name,1,20), bytes,
+       next_extent, pct_increase
+From user_segments
+Where segment_type = 'INDEX'
+order by bytes desc;
+--order by segment_name;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Información de los segmentos de rollback
+--//////////////////////////////////////////////////////////////////////////
+
+Select *
+From dba_rollback_segs;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Cambio de Tablespace para un indice
+--//////////////////////////////////////////////////////////////////////////
+
+--Alter Index rebuilt (...) tablespace MARCA_IDX;
+
+--//////////////////////////////////////////////////////////////////////////
+--// Añadir una foreign jey a una tabla que ya existe
+--//////////////////////////////////////////////////////////////////////////
+
+ALTER TABLE "FORMARCA"."FN2FORECAST" ADD(CONSTRAINT "FK_FORSESION"
+FOREIGN KEY("FORSESSION") REFERENCES
+"FORMARCA"."FN2FORSESSION"("CODIGO"))

@@ -1,0 +1,247 @@
+-------------------------------------------
+--SACA LOS PUNTOS QUE CAMBIARIAN DE NODO---
+-------------------------------------------
+
+spool c:\nuevonodopadre.txt
+select 'Update fn3node set fathernode="'||nodonuevo||'" where newsstand="'||newsstand||'";'
+-- newsstand,nodonuevo
+from
+(
+select news.newsstand as newsstand,stddev(sie.venta/news.venta) AS SIE,
+stddev(peri.venta/news.venta) AS PERI,stddev(pla.venta/news.venta) AS PLA,
+fnode.fathernode as NodoViejo,
+case when stddev(sie.venta/news.venta)<stddev(peri.venta/news.venta)
+      AND stddev(sie.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRASIE'
+      else case when stddev(peri.venta/news.venta) <stddev(sie.venta/news.venta) AND      
+ stddev(peri.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRAPER'
+      else 'ANDGRAPLA' end end AS NodoNuevo
+from
+(
+select operationdate,newsstand,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand like '018%'
+and service+incidence-return>0) news,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPER') Peri,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRASIE') Sie,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPLA') Pla,
+(select newsstand,fathernode
+from fn3node
+where header='MARCA' and product='DIARIO'
+and (fathernode='ANDGRAPER' or fathernode='ANDGRASIE' or fathernode='ANDGRAPLA'))  fnode,
+(select newsstand
+from fn3newsstandon
+where dateoff is null) operativo
+where
+sie.infodate=operationdate and
+peri.infodate=operationdate and
+pla.infodate=operationdate and
+fnode.newsstand=news.newsstand and
+operativo.newsstand=news.newsstand 
+group by news.newsstand,fnode.fathernode)
+where nodonuevo<>nodoviejo;
+spool off
+
+-------------------------------------------
+--SACA LOS PUNTOS COMO ESTAN ANTES DEL CAMBIO
+------------------------------------------
+
+
+
+
+spool c:\nuevonodoviejo.txt
+select 'Update fn3node set fathernode="'||nodoviejo||'" where newsstand="'||newsstand||'";'
+-- newsstand,nodonuevo
+from
+(
+select news.newsstand as newsstand,stddev(sie.venta/news.venta) AS SIE,
+stddev(peri.venta/news.venta) AS PERI,stddev(pla.venta/news.venta) AS PLA,
+fnode.fathernode as NodoViejo,
+case when stddev(sie.venta/news.venta)<stddev(peri.venta/news.venta)
+      AND stddev(sie.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRASIE'
+      else case when stddev(peri.venta/news.venta) <stddev(sie.venta/news.venta) AND   
+    stddev(peri.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRAPER'
+      else 'ANDGRAPLA' end end AS NodoNuevo
+from
+(
+select operationdate,newsstand,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand like '018%'
+and service+incidence-return>0) news,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPER') Peri,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRASIE') Sie,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPLA') Pla,
+(select newsstand,fathernode
+from fn3node
+where header='MARCA' and product='DIARIO'
+and (fathernode='ANDGRAPER' or fathernode='ANDGRASIE' or fathernode='ANDGRAPLA'))  fnode,
+(select newsstand
+from fn3newsstandon
+where dateoff is null) operativo
+where
+sie.infodate=operationdate and
+peri.infodate=operationdate and
+pla.infodate=operationdate and
+fnode.newsstand=news.newsstand and
+operativo.newsstand=news.newsstand 
+group by news.newsstand,fnode.fathernode)
+where nodonuevo<>nodoviejo
+;
+spool off
+
+-----------------------------
+SELECCIONA LOS PUNTOS QUE HE CAMBIADO PARA ESTIMARLOS CON EL INTERFAZ
+------------------------------
+
+
+select 'VentaMarca'||newsstand
+from
+(
+select news.newsstand as newsstand,stddev(sie.venta/news.venta) AS SIE,
+stddev(peri.venta/news.venta) AS PERI,stddev(pla.venta/news.venta) AS PLA,
+fnode.fathernode as NodoViejo,
+case when stddev(sie.venta/news.venta)<stddev(peri.venta/news.venta)
+      AND stddev(sie.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRASIE'
+      else case when stddev(peri.venta/news.venta) <stddev(sie.venta/news.venta) AND      
+ stddev(peri.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRAPER'
+      else 'ANDGRAPLA' end end AS NodoNuevo
+from
+(
+select operationdate,newsstand,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand like '018%'
+and service+incidence-return>0) news,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPER') Peri,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRASIE') Sie,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPLA') Pla,
+(select newsstand,fathernode
+from fn3node
+where header='MARCA' and product='DIARIO'
+and (fathernode='ANDGRAPER' or fathernode='ANDGRASIE' or fathernode='ANDGRAPLA'))  fnode,
+(select newsstand
+from fn3newsstandon
+where dateoff is null) operativo
+where
+sie.infodate=operationdate and
+peri.infodate=operationdate and
+pla.infodate=operationdate and
+fnode.newsstand=news.newsstand and
+operativo.newsstand=news.newsstand 
+group by news.newsstand,fnode.fathernode)
+where nodonuevo<>nodoviejo;
+spool off
+
+
+
+
+spool c:\nuevonodopadre.txt
+select 'Update fn3node set fathernode="'||nodonuevo||'" where newsstand="'||newsstand||'";'
+-- 
+from
+(
+select news.newsstand as newsstand,stddev(sie.venta/news.venta) AS SIE,
+stddev(peri.venta/news.venta) AS PERI,stddev(pla.venta/news.venta) AS PLA,
+fnode.fathernode as NodoViejo,
+case when stddev(sie.venta/news.venta)<stddev(peri.venta/news.venta)
+      AND stddev(sie.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRASIE'
+      else case when stddev(peri.venta/news.venta) <stddev(sie.venta/news.venta) AND      
+ stddev(peri.venta/news.venta)<stddev(pla.venta/news.venta) then 'ANDGRAPER'
+      else 'ANDGRAPLA' end end AS NodoNuevo
+from
+(
+select operationdate,newsstand,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand like '018%'
+and service+incidence-return>0) news,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPER') Peri,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRASIE') Sie,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='ANDGRAPLA') Pla,
+(select newsstand,fathernode
+from fn3node
+where header='MARCA' and product='DIARIO'
+and (fathernode='ANDGRAPER' or fathernode='ANDGRASIE' or fathernode='ANDGRAPLA'))  fnode,
+(select newsstand
+from fn3newsstandon
+where dateoff is null) operativo,
+(select substr(est22.output,11,12) as output
+from
+(select output,stddeviation
+from fn3estimation
+where estsession='20041122.PV') est22,
+(select output,stddeviation
+from fn3estimation
+where estsession='20041117.PV') est17
+where est22.output=est17.output and
+      est22.stddeviation<est17.stddeviation) est
+where
+sie.infodate=operationdate and
+peri.infodate=operationdate and
+pla.infodate=operationdate and
+fnode.newsstand=news.newsstand and
+est.output=news.newsstand and
+operativo.newsstand=news.newsstand 
+group by news.newsstand,fnode.fathernode)
+--
+where nodonuevo<>nodoviejo;
+spool off
+
+
+
+
+
+
+
+
+,
+(select substr(est22.output,11,12) as output
+from
+(select output,stddeviation
+from fn3estimation
+where estsession='20041122.PV') est22,
+(select output,stddeviation
+from fn3estimation
+where estsession='20041117.PV') est17
+where est22.output=est17.output and
+      est22.stddeviation<est17.stddeviation)
+
+
+

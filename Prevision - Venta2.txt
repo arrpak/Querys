@@ -1,0 +1,53 @@
+select servicio.ou,forecast,service+incidence-return as venta
+from
+
+
+
+
+(select substr(output,11,12)
+dating,valuedate,forecast
+from fn3forecastseries
+where 
+used='Y' and
+substr(output,11,3)='028' and
+valuedate>to_date('20030525','yyyymmdd')) prev,
+
+
+
+
+((select 'VentaMarca'||newsstand as ou,service,incidence,return
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and   operationdate>to_date('20030525','yyyymmdd')
+and   service>0
+and   substr(newsstand,1,3)='028'
+union
+(select newsstand,service,incidence,return
+from fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO'
+and   service>0
+and   operationdate>to_date('20030525','yyyymmdd')
+and   substr(newsstand,1,3)='028'))) servicio,
+fn3outputdating
+where
+servicio.ou=prev.output and
+servicio.ou=fn3outputdating.output and
+prev.dating=fn3outputdating.dating
+;
+
+
+
+
+select output,valuedate,forecast
+from fn3forecastseries
+where used='Y' and
+output>='VentaMarca028' and
+output<='VentaMarca029' and
+valuedate>=to_date('20030501','yyyymmdd');
+
+
+and output||dating
+
+
+
+

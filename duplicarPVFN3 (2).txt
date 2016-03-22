@@ -1,0 +1,138 @@
+Define NewPV='010001504266';
+Define OldPV='010001500914';
+
+
+INSERT INTO fn3newsstand
+SELECT '&NewPV',company,name,surname1,surname2,cif,waytype,way,num,waycomplement,
+       postcode,town,province,phone,fax,email,schedule,newsstandtype
+FROM fn3newsstand
+WHERE code='&OldPV';
+
+INSERT INTO fn3newsstandon
+SELECT '&NewPV',dateon,dateoff
+FROM fn3newsstandon
+WHERE newsstand='&OldPV';
+
+DELETE fn3newsstandon
+WHERE newsstand='&OldPV';
+
+INSERT INTO fn3node
+SELECT header,product,'&NewPV',description,'&NewPV',fathernode
+FROM fn3node
+WHERE newsstand='&OldPV';
+
+INSERT INTO fn3output
+SELECT 'VentaMarca'||'&NewPV',header,product,'&NewPV'
+FROM fn3output
+WHERE node='&OldPV'
+AND header='MARCA' AND product='DIARIO';
+
+INSERT INTO fn3output
+SELECT 'VentaMarcaSegunda'||'&NewPV',header,product,'&NewPV'
+FROM fn3output
+WHERE node='&OldPV'
+AND header='MARCA' AND product='SEGUNDA';
+
+INSERT INTO fn3output
+SELECT 'VentaExpansion'||'&NewPV',header,product,'&NewPV'
+FROM fn3output
+WHERE node='&OldPV'
+AND header='EXPANSION' AND product='DIARIO';
+
+INSERT INTO fn3outputdating
+SELECT 'VentaMarca'||'&NewPV',dating,orderf,iniest,endest,arima,power,translation,timesetomit
+FROM fn3outputdating
+WHERE output='VentaMarca'||'&OldPV';
+
+INSERT INTO fn3outputdating
+SELECT 'VentaMarcaSegunda'||'&NewPV',dating,orderf,iniest,endest,arima,power,translation,timesetomit
+FROM fn3outputdating
+WHERE output='VentaMarcaSegunda'||'&OldPV';
+
+INSERT INTO fn3outputdating
+SELECT 'VentaExpansión'||'&NewPV',dating,orderf,iniest,endest,arima,power,translation,timesetomit
+FROM fn3outputdating
+WHERE output='VentaExpansión'||'&OldPV';
+
+INSERT INTO fn3estimation
+SELECT estsession,'VentaMarca'||'&NewPV',dating,arima,inidate,enddate,iniestdate,estdate,estpower,
+       esttranslation,estregar,estseaar,estregma,estseama,datacount,varcount,const,
+       stddeviation,percerror,schwarz,grouped,state,stateinfo,timesetomit
+FROM fn3estimation
+WHERE output='VentaMarca'||'&OldPV'
+AND (estsession='FICTICIA' OR estsession='DiasTipicos')
+;
+
+INSERT INTO fn3estimation
+SELECT estsession,'VentaMarcaSegunda'||'&NewPV',dating,arima,inidate,enddate,iniestdate,estdate,estpower,
+       esttranslation,estregar,estseaar,estregma,estseama,datacount,varcount,const,
+       stddeviation,percerror,schwarz,grouped,state,stateinfo,timesetomit
+FROM fn3estimation
+WHERE output='VentaMarcaSegunda'||'&OldPV'
+AND (estsession='FICTICIA' OR estsession='DiasTipicos')
+;
+
+
+INSERT INTO fn3estimation
+SELECT estsession,'VentaExpansion'||'&NewPV',dating,arima,inidate,enddate,iniestdate,estdate,estpower,
+       esttranslation,estregar,estseaar,estregma,estseama,datacount,varcount,const,
+       stddeviation,percerror,schwarz,grouped,state,stateinfo,timesetomit
+FROM fn3estimation
+WHERE output='VentaExpansion'||'&OldPV'
+AND (estsession='FICTICIA' OR estsession='DiasTipicos')
+;
+
+INSERT INTO fn3codification
+SELECT '&NewPV',distributor,delegate,distributorcode,distributorroute
+FROM fn3codification
+WHERE newsstand='&OldPV';
+
+
+INSERT INTO fn3probnotoutoff
+SELECT 'VentaMarca'||'&NewPV',sysdate,0.89
+FROM dual;
+
+INSERT INTO fn3operation
+SELECT header,product,'&NewPV',operationdate,service,incidence,return
+FROM fn3operation
+WHERE newsstand='&OldPV';
+
+DELETE
+--SELECT Count(*)
+FROM fn3operation
+WHERE newsstand='&OldPV';
+
+SELECT Count(*)
+FROM fn3operation
+WHERE newsstand='&NewPV';
+
+INSERT INTO fn3forecast
+select
+forsession,'VentaMarca'||'&NewPV',dating,inidate,enddate,
+inifordate,fordate,origdate,estsession,state,stateinfo,error,description
+FROM fn3forecast
+WHERE output='VentaMarca'||'&OldPV'
+
+INSERT INTO fn3forecastseries
+SELECT forsession,'VentaMarca'||'&NewPV',dating,valuedate,forecast,
+       variance,decision,filter,noise,forcens,used,closed
+FROM fn3forecastseries
+WHERE output='VentaMarca'||'&OldPV'
+
+DELETE fn3forecastseries
+WHERE output='VentaMarca'||'&OldPV';
+
+DELETE fn3forecast
+WHERE output='VentaMarca'||'&OldPV';
+
+
+update fn3printingdetail
+set newsstand='&NewPV' where newsstand='&OldPV';
+
+
+insert into fn3operation
+select header,product,newsstand,operationdate,max(service),max(incidence),max(return)
+from fn3operationnewstanotexist
+where newsstand='&NewPV'
+group by header,product,newsstand,operationdate
+

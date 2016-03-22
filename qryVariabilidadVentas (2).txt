@@ -1,0 +1,113 @@
+SELECT t1.newsstand,coef2006,coef2007
+from
+(SELECT newsstand,To_Char(operationdate,'YYYY'), StdDev(service+incidence-RETURN) AS coef2006
+FROM fn3operation
+WHERE newsstand LIKE '008%'
+AND header='MARCA' AND product='DIARIO'
+AND operationdate >To_Date('20060102','yyyymmdd')
+AND operationdate <=To_Date('20061231','yyyymmdd')
+AND To_Char(operationdate,'MM')<=To_Char(sysdate,'MM')
+GROUP BY newsstand,To_Char(operationdate,'YYYY')
+HAVING Avg(service+incidence-RETURN)>0 ) t1,
+(SELECT newsstand,To_Char(operationdate,'YYYY'), StdDev(service+incidence-RETURN) AS coef2007
+FROM fn3operation
+WHERE newsstand LIKE '008%'
+AND header='MARCA' AND product='DIARIO'
+AND operationdate >To_Date('20070102','yyyymmdd')
+AND operationdate <=To_Date('20071231','yyyymmdd')
+AND To_Char(operationdate,'MM')<=To_Char(sysdate,'MM')
+GROUP BY newsstand,To_Char(operationdate,'YYYY')
+HAVING Avg(service+incidence-RETURN)>0) t2
+WHERE t1.newsstand=t2.newsstand
+AND coef2007>coef2006
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT t1.newsstand,coef2006,coef2007
+from
+(SELECT newsstand,To_Char(operationdate,'YYYY'), StdDev(service+incidence-RETURN)/Avg(service+incidence-RETURN) AS coef2006
+FROM fn3operation
+WHERE newsstand LIKE '028%'
+AND header='MARCA' AND product='DIARIO'
+AND operationdate >To_Date('20060102','yyyymmdd')
+AND operationdate <=To_Date('20061231','yyyymmdd')
+AND To_Char(operationdate,'MM')<=To_Char(sysdate,'MM')
+GROUP BY newsstand,To_Char(operationdate,'YYYY')
+HAVING Avg(service+incidence-RETURN)>0 ) t1,
+(SELECT newsstand,To_Char(operationdate,'YYYY'), StdDev(service+incidence-RETURN)/Avg(service+incidence-RETURN) AS coef2007
+FROM fn3operation
+WHERE newsstand LIKE '028%'
+AND header='MARCA' AND product='DIARIO'
+AND operationdate >To_Date('20070102','yyyymmdd')
+AND operationdate <=To_Date('20071231','yyyymmdd')
+AND To_Char(operationdate,'MM')<=To_Char(sysdate,'MM')
+GROUP BY newsstand,To_Char(operationdate,'YYYY')
+HAVING Avg(service+incidence-RETURN)>0) t2
+WHERE t1.newsstand=t2.newsstand
+AND coef2007>coef2006
+
+
+
+
+
+
+SELECT t1.newsstand,coef2006,coef2007
+from
+(SELECT newsstand,To_Char(operationdate,'YYYY'), StdDev(service+incidence-RETURN) AS coef2006
+FROM fn3operation
+WHERE newsstand LIKE '028%'
+AND header='EXPANSION' AND product='DIARIO'
+AND operationdate >To_Date('20060102','yyyymmdd')
+AND operationdate <=To_Date('20061231','yyyymmdd')
+AND To_Char(operationdate,'MM')<=To_Char(sysdate,'MM')
+GROUP BY newsstand,To_Char(operationdate,'YYYY')
+HAVING Avg(service+incidence-RETURN)>0 ) t1,
+(SELECT newsstand,To_Char(operationdate,'YYYY'), StdDev(service+incidence-RETURN) AS coef2007
+FROM fn3operation
+WHERE newsstand LIKE '028%'
+AND header='EXPANSION' AND product='DIARIO'
+AND operationdate >To_Date('20070102','yyyymmdd')
+AND operationdate <=To_Date('20071231','yyyymmdd')
+AND To_Char(operationdate,'MM')<=To_Char(sysdate,'MM')
+GROUP BY newsstand,To_Char(operationdate,'YYYY')
+HAVING Avg(service+incidence-RETURN)>0) t2
+WHERE t1.newsstand=t2.newsstand
+AND coef2007<coef2006
+
+
+
+
+select t1.node,coef2006,coef2007,-100+100*coef2007/coef2006 PorcDifVari
+from
+(SELECT node,StdDev(service+incidence-RETURNcont+estimatedsale)/avg(service+incidence-RETURNcont+estimatedsale)  as coef2006
+FROM fn3nodeinformation
+WHERE
+header='MARCA' AND product='DIARIO' AND
+infodate >To_Date('20060102','yyyymmdd')
+AND infodate <=To_Date('20061231','yyyymmdd')
+and to_char(infodate,'MM')='09'
+GROUP BY node
+HAVING Avg(service+incidence-RETURNcont)>0) t1,
+(SELECT node,StdDev(service+incidence-RETURNcont+estimatedsale)/avg(service+incidence-RETURNcont+estimatedsale) as coef2007
+FROM fn3nodeinformation
+WHERE
+header='MARCA' AND product='DIARIO' AND
+infodate >To_Date('20070102','yyyymmdd')
+AND infodate <=To_Date('20071231','yyyymmdd')
+and to_char(infodate,'MM')='09'
+GROUP BY node
+HAVING Avg(service+incidence-RETURNcont)>0) t2
+where
+t1.node=t2.node

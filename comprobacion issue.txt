@@ -1,0 +1,70 @@
+define forsession='e20140921ComMMS.02';
+
+SELECT t1.valuedate,t1.output,t1.original,t2.efectos,(t1.original-t2.efectos) AS dif
+FROM
+(
+SELECT Valuedate,output,Sum(originalvalue)  AS original
+FROM ezcestimationseries
+where
+estsession='&forsession'
+GROUP BY Valuedate,output
+) t1,
+(
+SELECT valuedate,output,Sum(issue) AS efectos
+FROM ezcestimationissue
+WHERE
+estsession='&forsession'
+GROUP BY valuedate,output
+) t2
+WHERE t1.valuedate=t2.valuedate AND
+t1.output=t2.output AND
+Abs(t1.original-t2.efectos)>0.1
+;
+
+
+/*
+
+
+-- select distinct estsession from ezcestimation order by 1
+
+
+
+SELECT valuedate,output,Sum(issue) AS efectos
+FROM ezcestimationissue
+WHERE
+estsession='e20130217Com.01'
+GROUP BY valuedate,output
+order by valuedate asc;
+
+
+
+
+SELECT *
+FROM ezcestimationissue
+WHERE
+estsession='&forsession'
+and output='ComElPaisCAM'
+;
+
+
+
+ SELECT *
+FROM ezcestimationissue
+WHERE
+estsession='&forsession' and issue<0
+
+
+
+
+
+
+SELECT output,count(*)
+FROM ezcestimationissue
+WHERE
+estsession='&forsession'
+GROUP BY output;
+
+
+
+ */
+

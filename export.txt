@@ -1,0 +1,53 @@
+exp usuario/password@servicio owner=usuario file=usuario.dmp log=usuario.Log
+
+
+
+Exp formarca/formarca@formarca  FILE=c:\pruegh.dmp Log=c:\pruegh.Log tables=pruegh;
+
+
+
+
+Imp formarca/formarca@oraloc  FILE=c:\partido.dmp tables=fn3partidofutbol
+
+
+
+
+
+
+
+
+
+
+Exp formarca/formarca@formarca  FILE=c:\partidotmp.dmp Log=c:\partido.Log tables=fn3partidofutboltmp10
+
+Imp formarca/formarca@oraloc  FILE=c:\partidotmp.dmp tables=fn3partidofutboltmp10
+
+
+
+
+Exp formarca/formarca@oraloc  FILE=c:\noaa.dmp Log=c:\datosnoaa.Log tables=formarca.datosnooa
+
+Imp formarca/formarca@oraloc  FILE=c:\partido.dmp tables=fn3partidofutbol
+
+
+
+
+
+
+
+Exp emu/emu@vpnemu FILE=c:\partido.dmp Log=c:\partido.Log tables=emupromotiondate
+
+
+Imp formarca/formarca@formarca FILE=c:\partido.dmp Log=c:\partido.Log tables=emupromotiondate
+
+
+
+
+
+
+
+
+
+
+exp ddd/ddd file=/dbf/u11/customer.dmp tables=AASC.AST_CUSTOMER_KEEP
+query=\'where CUA_TRANS_DTS \< add_months\(sysdate, -6\)\'

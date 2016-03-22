@@ -1,0 +1,123 @@
+Define año='2011';
+Define promocion = 'Maqueta3DCalderon&año';
+Define cabecera = 'MARCA';
+Define producto = 'DIARIO';
+Define tipoPromocion = 'Regalos';
+Define precio = '5.95';
+Define descripcionPro = 'Maqueta en 3D del Vicente Calderon por 5.95€ en concepto de transporte y manipulacion y 20 de 25 cuopnes.';
+Define descripcionProNod = '&descripcionPro Los cupones se publicaran de Martes a Sabado: Cartilla 20111030, 20 cupones de 20111031 a 20111126 y 5 comodines de 20111129 a 20111203.';
+Define promocionPadre = 'Regalos';
+Define nodo = 'ESP';
+Define expTmsPro = 'C-WD(1)-WD(7)+Day(y2011m10d30)';
+Define fechaIni = '20111030';
+Define fechaFin = '20111203';
+Define FatherNodes = '&nodo';
+Define diaCartilla = '0';
+Define diaPrimerCupon = '1';
+Define diaUltimoCupon = '20';
+Define diaPrimerComodin = '21';
+Define diaUltimoComodin = '25';
+Define inpRPC = 1; -- Si inpRPC = 1 crea el .rpc y si no el .rp para los inputs de marketing
+Define inpActivo = 'N';
+Define setInputFN3 = 'Promociones&nodo&año';
+Define setInpFatFN5 = 'PromoMarca&año';
+Define iniOmegaCartilla = '0.20';
+Define iniOmegaCupon = '0.15';
+Define iniOmegaComodin = '0.03';
+/*
+PoloCampeonesDelMundo2011  --> promociones Cartilla D y cupones LV
+BalonCampeonesDelMundo2011 --> promociones Cartilla D y cupones MS
+*/
+Define inpCopia = 'ToallaFerrari2011';
+
+insert into fn3promotion
+select '&cabecera', --header
+       '&producto', -- product
+       '&promocion', -- code
+       '&tipoPromocion', -- promotiontype
+       &precio, -- price
+       '&descripcionPro', -- description
+       '&promocionPadre' -- fatherpromotion
+from dual;
+
+insert into fn3promotionnode
+select '&cabecera', -- header
+       '&producto', -- product
+       '&promocion', -- promotion
+       '&nodo', -- node
+       '&expTmsPro', -- expression
+       to_date('&fechaIni', 'yyyymmdd'), -- inidate
+       to_date('&fechaFin', 'yyyymmdd'), -- enddate
+       &precio, -- price
+       '&descripcionProNod' -- description
+from dual;
+
+insert into fn3input
+select '&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.Cartilla', -- code
+       'SqlProNodCreaPulseIni("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'")', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       '&inpActivo', -- active
+       'Cartilla de la promocion '||'&promocion' -- description
+from dual
+union all
+select '&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.Cupon', -- code
+       'SqlProNodCreaIndNNFechPro("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'", &diaPrimerCupon, &diaUltimoCupon)', -- expression
+       --'SqlProNodCreaIndNMTms("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'", &diaPrimerCupon, &diaUltimoCupon, WD(1)+WD(2)+WD(3))', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       '&inpActivo', -- active
+       'Cupones de la promocion '||'&promocion' -- description
+from dual
+union all
+select '&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.Comodin', -- code
+       'SqlProNodCreaIndNNFechPro("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'", &diaPrimerComodin, &diaUltimoComodin)', -- expression
+       --'SqlProNodCreaIndNMTms("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'", &diaPrimerCupon, &diaUltimoCupon, WD(4))', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'N', -- active
+       'Comodines de la promocion '||'&promocion' -- description
+from dual
+union all
+select 'Mkt'||'&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.iv', -- code
+       'SqlProNodCreaIndVenGloNMFechPro("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'", &diaCartilla , &diaUltimoCupon)', -- expression
+       --'SqlProNodCreaIndNMTms("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", "'||'&FatherNodes'||'", &diaCartilla, &diaUltimoCupon, WD(1)+WD(2)+WD(3)+WD(4)+WD(7))', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'N', -- active
+       'Inverso de la venta para la promocion '||'&promocion' -- description
+from dual
+union all
+select 'Mkt'||'&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||(case when &inpRPC = 1 then '.rpc' else '.rp' end), -- code
+       (case when &inpRPC = 1
+             then 'RatioProductCupon2("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", Param[3], SrVentaGlobal, &diaCartilla, &diaUltimoCupon, 0.05, "Mkt'||'&setInputFN3'||'", "'||'&promocion'||'.iv")'
+             else 'RatioProduct("'||'&cabecera'||'", "'||'&producto'||'", "'||'&promocion'||'", Param[3], SrVentaGlobal, 0, 0, "Mkt'||'&setInputFN3'||'", "'||'&promocion'||'.iv")'
+        end), -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'N', -- active
+       (case when &inpRPC = 1
+             then 'RatioProductCupon para la promocion '||'&promocion'
+             else 'RatioProduct para la promocion '||'&promocion'
+        end)-- description
+from dual;

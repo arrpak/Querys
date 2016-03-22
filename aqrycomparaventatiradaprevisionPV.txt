@@ -1,0 +1,16 @@
+SELECT newsstand,Round(Avg(service+incidence-RETURN),5),
+                 Round(stddev(service+incidence-RETURN),5),
+                 Round(Sum(RETURN)/Sum(service),4) AS PorDev,
+                 Sum(RETURN) AS Dev,
+                 Round((Sum(RETURN)-Count(*))/(Sum(service)-Count(*)),5),
+                 Sum(Decode(RETURN,0,1,0)) AS Agot,
+                 Count(*)
+FROM fn3operation
+WHERE
+header='MARCA'
+AND product='DIARIO'
+AND SERVICE>0
+AND operationdate>SYSDATE-30
+AND newsstand LIKE '%75'
+GROUP BY newsstand
+HAVING Count(*)>1;

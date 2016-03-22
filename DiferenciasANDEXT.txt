@@ -1,0 +1,250 @@
+Diferencias emtre decision y servicio
+
+set pagesize 5000;
+select pri.dateprint,ope.newsstand,
+         SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   ,service,return
+from fn3printingdetail pri, fn3operation ope
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND', 'EXT')   and
+      pri.newsstand = ope.newsstand and
+      ope.header='MARCA' and
+      ope.product='DIARIO' and
+      pri.orderf = 1               and
+(      pri.dateprint >= to_date('20040610', 'YYYYMMDD') and
+       pri.dateprint <= to_date('20040610', 'YYYYMMDD')) and
+      pri.dateprint=ope.operationdate 
+    and  (decision=0 or service=0)
+      having  abs(SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) -service)>1
+group by ope.newsstand,pri.dateprint,service,return
+order by  ope.newsstand;
+
+
+
+Diferencias entre decision y servicio que produce agotado
+
+set pagesize 5000;
+select pri.dateprint,ope.newsstand,
+         SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   ,service,return
+from fn3printingdetail pri, fn3operation ope
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND', 'EXT')   and
+      pri.newsstand = ope.newsstand and
+      ope.header='MARCA' and
+      ope.product='DIARIO' and
+      pri.orderf = 1               and
+(      pri.dateprint >= to_date('20040325', 'YYYYMMDD') and
+       pri.dateprint <= to_date('20040406', 'YYYYMMDD')) and
+      pri.dateprint=ope.operationdate 
+and  decision>0
+and return=0
+      having  (SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) -service)>0             
+group by ope.newsstand,pri.dateprint,service,return
+order by  ope.newsstand;
+
+
+
+
+Diferencias entre decision y servicio que evitan agotado
+
+set pagesize 5000;
+select pri.dateprint,ope.newsstand,
+         SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   ,service,return
+from fn3printingdetail pri, fn3operation ope
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND', 'EXT')   and
+      pri.newsstand = ope.newsstand and
+      ope.header='MARCA' and
+      ope.product='DIARIO' and
+      pri.orderf = 1               and
+(      pri.dateprint >= to_date('20040325', 'YYYYMMDD') and
+       pri.dateprint <= to_date('20040406', 'YYYYMMDD')) and
+      pri.dateprint=ope.operationdate 
+and  decision>0
+and return=0
+      having  (SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) -service)<0             
+group by ope.newsstand,pri.dateprint,service,return
+order by  ope.newsstand;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Puntos con decision y sin operaciones
+-------------------------------------
+select newsstand
+from fn3printingdetail pri
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND', 'EXT')   and
+      pri.orderf = 1               and
+      pri.dateprint = to_date('20040610', 'YYYYMMDD') and 
+      pri.decision>0
+minus
+(select newsstand
+from fn3operation
+where header='MARCA' and product='DIARIO' and 
+operationdate=to_date('20040610', 'YYYYMMDD')
+UNION
+(select newsstand
+from fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and 
+operationdate=to_date('20040610', 'YYYYMMDD'))
+);
+
+
+Puntos con decision y sin operaciones y ultima fecha de dato
+-------------------------------------------------------------
+
+ select newsstand,max(operationdate)
+ from fn3operation
+ where header='MARCA' and
+ service>0
+ and newsstand in
+ (
+ select newsstand
+ from fn3printingdetail pri
+ where pri.header    = 'MARCA'       and
+       pri.product   = 'DIARIO'      and
+       pri.node  in ('AND', 'EXT')   and
+       pri.orderf = 1               and
+       pri.dateprint = to_date('20040407', 'YYYYMMDD') and
+       pri.decision>0
+ minus
+ (select newsstand
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ operationdate=to_date('20040407', 'YYYYMMDD')
+ UNION
+ (select newsstand
+ from fn3operationnotcontrolled
+ where header='MARCA' and product='DIARIO' and
+ operationdate=to_date('20040407', 'YYYYMMDD'))
+ ))
+ group by newsstand
+
+
+Puntos con operaciones y sin decision 
+-------------------------------------
+
+((select ope.newsstand
+from fn3operation ope ,fn3node nod
+where ope.header='MARCA' and ope.product='DIARIO' and 
+ope.operationdate=to_date('20040401', 'YYYYMMDD') and
+ope.header=nod.header and
+ope.product=nod.product and 
+ope.newsstand=nod.newsstand and
+service >0 and
+nod.fathernode like 'EXT%')
+UNION
+(select ope.newsstand
+from fn3operationnotcontrolled ope ,fn3node nod
+where ope.header='MARCA' and ope.product='DIARIO' and 
+ope.operationdate=to_date('20040401', 'YYYYMMDD') and
+ope.header=nod.header and
+ope.product=nod.product and 
+ope.newsstand=nod.newsstand and
+service >0 and
+nod.fathernode like 'EXT%'))
+minus
+(select newsstand
+from fn3printingdetail pri
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND', 'EXT')   and
+      pri.orderf = 1               and
+      pri.dateprint = to_date('20040401', 'YYYYMMDD') and 
+      pri.decision>0);
+
+
+
+
+Diferencias de prevision con el dato real de hace una semana
+------------------------------------------------------------
+
+select substr(output,11,12),valuedate,forecast,decision
+from fn3forecastseries ser,fn3node nod
+where forsession='2004020310.PV' and
+      (nod.fathernode  like 'AND%' or
+       nod.fathernode  like 'EXT%') and
+       nod.header='MARCA' and
+       nod.product='DIARIO' and
+      substr(output,11,12)=nod.newsstand;
+ 
+
+
+Diferencia de  decision,prevision y servicio de un punto
+--------------------------------------------------------
+
+select ope.newsstand,operationdate,service,incidence,venta,decision,decprev,forecast
+from
+(select newsstand,operationdate,service,incidence,(service+incidence-return) as venta
+from fn3operation 
+where header='MARCA' and product='DIARIO' and
+operationdate>to_date('20040115','yyyymmdd') and
+newsstand='041000428157') ope,
+(select newsstand,dateprint,
+       sum(case when (decision + increaseDec) <= 15
+            then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as decision
+from fn3printingdetail 
+where header='MARCA' and product='DIARIO' and
+dateprint>to_date('20040115','yyyymmdd') and
+node='AND' and
+newsstand='041000428157' and
+orderf=1
+group by newsstand,dateprint) pri,
+(select substr(output,11,12) as newsstand,valuedate,forsession,forecast,decision as decprev
+from fn3forecastseries
+where output='VentaMarca041000428157' and
+valuedate>to_date('20040115','yyyymmdd')) fore,
+(
+select distinct(forsession),dateprint
+from fn3printingnodeforsession
+where header='MARCA' and product='DIARIO' and
+dateprint>to_date('20040115','yyyymmdd') and
+node='AND') forses
+where 
+ope.newsstand=pri.newsstand and
+fore.newsstand=pri.newsstand and
+fore.valuedate=pri.dateprint and
+forses.dateprint=pri.dateprint and
+forses.forsession=fore.forsession and
+ope.operationdate=pri.dateprint;
+

@@ -1,0 +1,64 @@
+SET PAGESIZE 400
+SET LINESIZE 300
+select dateprint AS FECHA,
+       pri.node AS ZONA,
+       count(*) as NUMPV,
+          SUM(case  WHEN (decision + increaseDec) <= 15
+              then  CEIL (decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node='AND'                and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.orderf = 1                and
+      pri.dateprint = to_date('20061128', 'YYYYMMDD')
+group by dateprint, node
+UNION
+select dateprint AS FECHA,
+       pri.node AS ZONA,
+       count(*) as NUMPV,
+          SUM(case  WHEN (decision + increaseDec) <= 15
+              then  CEIL (decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA   
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node='AND'                and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.orderf = 1                and
+      pri.dateprint = to_date('20061128', 'YYYYMMDD')
+group by dateprint, node
+UNION
+select dateprint AS FECHA,
+       cod.delegate AS TOTAL,
+       count(*) as NUMPV,
+          SUM(case WHEN (decision + increaseDec) <= 15
+              then CEIL (decision + increaseDec)
+              else ROUND(decision + increaseDec) end) as TOTAL_TIRADA   
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('EXT')   and
+      pri.newsstand = cod.newsstand and
+      pri.orderf = 1              and
+      pri.dateprint = to_date('20061128', 'YYYYMMDD')
+group by dateprint, cod.delegate
+UNION
+select dateprint AS FECHA,
+       cod.delegate AS TOTAL,
+       count(*) as NUMPV,
+          SUM(case WHEN (decision + increaseDec) <= 15
+              then CEIL (decision + increaseDec)
+              else ROUND(decision + increaseDec) end) as TOTAL_TIRADA   
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.orderf = 1              and
+      pri.dateprint = to_date('20061128', 'YYYYMMDD')
+group by dateprint, cod.delegate
+ORDER BY TOTAL_TIRADA;

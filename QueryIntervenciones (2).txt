@@ -1,0 +1,35 @@
+update fn3input
+set active='N'
+where setinput='IntervencionANDALMCAP';
+
+
+
+
+
+
+insert into fn3outputinputinformation
+select output,'Eliminados','Diario',input,
+'E',null,null,null,null,'Y'
+from fn3estimationinput
+where
+estsession='20090203II.MG' and
+--output='VentaMarcaANDCORCAP' and
+(input like 'Int2%' or input like 'IntAND%' or input like 'IntCAM%')
+and abs(value)<0.1;
+
+
+
+
+
+insert into fn3input
+select output,'Diario',
+'Int'||to_char(valuedate,'YYYY')||to_char(valuedate,'mm')||
+to_char(valuedate,'dd'),
+'Pulse(y'||to_char(valuedate,'YYYY')||'m'||to_char(valuedate,'mm')||'d'||
+to_char(valuedate,'dd')||',Diario)',
+to_number(0),null,null,null,'Y',null
+from fn3estimationseries
+where
+estsession='20090203II.MG' and
+dating='Diario' and
+abs(standarizedresiduals)>3.5;

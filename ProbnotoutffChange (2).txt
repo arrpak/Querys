@@ -1,0 +1,70 @@
+select substr(est.output,11,22),percerror,stddeviation,estpower,probnotoutoff
+from fn3estimation est,fn3probnotoutoff prob
+where estsession='20030401_CAM.PV' and
+prob.output like 'VentaMarca028%' and
+prob.output=est.output;
+-----------------------------------------------------------------------------------------
+spool c:\2.txt;
+set linesize 200
+set pagesize 5000
+select substr(est.output,1,22),percerror,tabMedDes.dev ,stddeviation,estpower,probnotoutoff,
+       tabMedDes.media as avgsale
+from fn3estimation est,fn3probnotoutoff prob,
+ ( 
+ select header, 
+        product, 
+        newsStand, 
+	avg(return)	                       as dev,	
+        avg(service + incidence - return)      as media
+  from FN3OPERATION
+ where  header         = 'MARCA'               and 
+        product        = 'DIARIO'              and 
+        newsstand like '028%'                  and
+        operationDate <   to_date('20030331', 'yyyymmdd')  and 
+        operationDate >   to_date('20030304', 'yyyymmdd') 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+where est.estsession='20030401_CAM.PV' and
+      substr(tabMedDes.newsstand,1,3)='028'  and
+      prob.probdate>to_date('20020330','yyyymmdd') and
+      tabMedDes.header='MARCA' and
+      tabMedDes.product='DIARIO' and
+      est.output='VentaMarca'||newsstand and
+      prob.output=est.output;
+spool off;
+
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+spool c:\1.txt;
+set linesize 200
+set pagesize 5000
+select substr(est.output,1,22),percerror,stddeviation,estpower,probnotoutoff,
+       tabMedDes.media as avgdev
+from fn3estimation est,
+ (select output,probnotoutoff
+from fn3probnotoutoff 
+where output like 'VentaMarca028%'
+and probdate>=to_date('20030402','yyyymmdd'))
+prob,
+ ( 
+ select header, 
+        product, 
+        newsStand,
+        avg(return)            as media
+  from FN3OPERATION
+ where  header         = 'MARCA'               and 
+        product        = 'DIARIO'              and 
+        newsstand like '028%' and
+        operationDate <   to_date('20020331', 'yyyymmdd')  and 
+        operationDate >   to_date('20020304', 'yyyymmdd') 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+where est.estsession='20030401_CAM.PV' and
+      substr(tabMedDes.newsstand,1,3)='028'  and
+      tabMedDes.header='MARCA' and
+      tabMedDes.product='DIARIO' and
+      est.output='VentaMarca'||newsstand and
+      prob.output=est.output;
+spool off;
+

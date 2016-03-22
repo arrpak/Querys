@@ -1,0 +1,72 @@
+--select header,product,newsstand,'SAT',decode(greatest(service,2),2,service,service/2)
+
+-----------------------------------
+--Metemos los de operationnotloaded
+-----------------------------------
+insert into fn3serviceminimum
+select header,product,newsstand,'SAT',decode(service,1,1,2,2,3,2) as ser
+from fn3operationnotloaded
+Where header='EXPANSION'
+and product='DIARIO'	 
+and operationdate=to_date('20020406','yyyymmdd')
+and service>0
+and service<4
+and newsstand like '028%' 
+and newsstand not in(
+select newsstand
+from fn3serviceminimum
+where weekday='SAT');
+-----------------------------
+--Metemos los de operation
+-----------------------------
+insert into fn3serviceminimum
+select header,product,newsstand,'SAT',decode(service,1,1,2,2,3,3,2) as ser
+from fn3operation
+Where header='EXPANSION'
+and product='DIARIO'	 
+and operationdate=to_date('20020406','yyyymmdd')
+and service>0
+and service<4
+and newsstand like '028%' 
+and newsstand not in(
+select newsstand
+from fn3serviceminimum
+where weekday='SAT');
+------------------------
+--Contar o borrar servicios de un dia
+------------------------
+delete
+--select count(*)
+from fn3serviceminimum
+where header='EXPANSION' and
+weekday='SAT';
+-------------------------------
+--PARA METER EL RESTO CON CEROS
+-------------------------------
+insert into fn3serviceminimum
+select 'EXPANSION','DIARIO',CODE,'SAT',0
+FROM FN3NEWSSTAND
+WHERE CODE IN
+(
+select newsstand
+from fn3newsstandon
+where dateoff is null and
+newsstand like '028%' minus
+(select newsstand
+from fn3serviceminimum
+where header='EXPANSION' and
+weekday='SAT'));
+-----------------------------
+--Copia de un dia a otro
+-----------------------------
+insert into fn3serviceminimum
+select header,product,newsstand,'FRI',service
+from fn3serviceminimum
+where header='EXPANSION' and
+      product='DIARIO' and  
+      weekday='THU';
+
+
+
+
+

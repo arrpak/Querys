@@ -1,0 +1,27 @@
+SELECT t1.header AS cabecera,
+       t1.newsstand AS CodMarca,
+       t3.distributorcode AS CoDDis,
+       CASE
+       WHEN weekday='MON' THEN 'LUN'
+       WHEN weekday='TUE' THEN 'MAR'
+       WHEN weekday='WED' THEN 'MIE'
+       WHEN weekday='THU' THEN 'JUE'
+       WHEN weekday='FRI' THEN 'VIE'
+       WHEN weekday='SAT' THEN 'SAB'
+       WHEN weekday='SUN' THEN 'DOM'
+       WHEN weekday='ALL' THEN 'TODOS'
+       END AS DiaSem,
+       CASE WHEN dateuntil>SYSDATE+365 THEN 'SinFecha'ELSE To_Char(dateuntil,'yyyy/mm/dd') end AS FechaHasta,
+       'ServicioFijo' AS Tiposervicio,
+       service
+FROM fn3servicefixed t1,fn3newsstandon t2,fn3codification t3
+WHERE
+t1.product='DIARIO' AND
+t1.dateuntil >To_Date('20120101','yyyymmdd')
+AND t2.dateoff IS null
+AND t1.newsstand=t2.newsstand
+AND t1.newsstand=t3.newsstand
+AND T3.DISTRIBUTOR='GELESA'
+ORDER BY CODMARCA
+
+;

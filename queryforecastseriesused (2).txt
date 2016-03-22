@@ -1,0 +1,79 @@
+insert into fn3forecastseriesused
+select nodo.newsstand,pri.dateprint,previ.forecast,previ.decision
+--select *
+from
+(select sonnode,dateprint,forsession,orderf
+from fn3printingnodeforsession
+where
+header='MARCA' and product='DIARIO' and node='AND'
+and dateprint=to_date('20041001','yyyymmdd')) prinode,
+(select substr(output,11,12) as new,
+valuedate,forecast,decision,forsession
+from fn3forecastseries
+where valuedate=to_date('20041001','yyyymmdd')) previ,
+(select newsstand,fathernode
+from fn3node
+where
+--description='Nodo Terminal'and 
+fathernode like 'AND%'
+and header='MARCA' and product='DIARIO'
+) nodo,
+(select dateprint,orderf
+from fn3printing
+where
+header='MARCA' and product='DIARIO' and node='AND'
+and dateprint=to_date('20041001','yyyymmdd')
+and used='Y') pri
+where
+prinode.orderf=pri.orderf and
+prinode.dateprint=pri.dateprint and
+nodo.newsstand=previ.new and
+previ.valuedate=prinode.dateprint and
+previ.forsession=prinode.forsession and
+nodo.fathernode=prinode.sonnode
+;
+
+
+
+
+select ope.newsstand,operationdate,
+service+incidence-return as venta,fused.forecast
+from fn3forecastseriesused fused,fn3operation ope
+where
+header='MARCA' and product='DIARIO' and
+ope.newsstand=fused.newstand and
+operationdate>=to_date('20041001','yyyymmdd') and
+ope.operationdate=fused.valuedate;
+
+
+
+
+
+select ope.newsstand,sum(abs(service+incidence-return-fused.forecast))
+from fn3forecastseriesused fused,fn3operation ope
+where
+header='MARCA' and product='DIARIO' and
+ope.newsstand=fused.newstand and
+operationdate>=to_date('20041001','yyyymmdd') and
+ope.operationdate=fused.valuedate
+group by newsstand
+order by sum(abs(service+incidence-return-fused.forecast)) asc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT
+ DATEPRINT,FORSESSION,SONNODE
+  FROM
+   FN3PRINTINGNODEFORSESSION
+  WHERE
+  HEADER = 'MARCA'  AND  PRODUCT = 'DIARIO'  AND  NODE = 'AND'

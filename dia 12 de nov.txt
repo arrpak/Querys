@@ -1,0 +1,28 @@
+  select fecha,sum(servicio-devolucion)
+    from fn2operacion
+  where fecha >=to_date('2000/11/01','yyyy/mm/dd')
+ group by fecha;
+
+
+
+
+ select dia,sum(servicio),sum(incidencia),sum(devolucion),sum(servicio-devolucion)
+from opemarca
+ where dia >=to_date('2000/11/01','yyyy/mm/dd')
+group by dia;
+.
+
+select fecha,sum(servicio),sum(incidencia),sum(devolucion),sum(servicio-devolucion)
+  from fn2operacion
+  where fecha >=to_date('2000/11/01','yyyy/mm/dd')
+  and producto='DIARIO'
+ group by fecha;
+
+
+select fecha,fn2operacion.puntoventa,ruta||punto,fn2operacion.servicio-opemarca.servicio
+from fn2operacion,opemarca
+where fecha =to_date('2000/11/12','yyyy/mm/dd')
+and dia=to_date('2000/11/12','yyyy/mm/dd')
+and puntoventa=ruta||punto
+and fn2operacion.servicio-opemarca.servicio>0
+order by fn2operacion.servicio-opemarca.servicio desc;

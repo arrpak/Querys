@@ -1,0 +1,27 @@
+select count(fn3newsstand.code),town,postcode
+from fn3newsstand,fn3newsstandon non
+where substr(fn3newsstand.code,1,3)='028' and
+non.dateoff is null and
+fn3newsstand.code=newsstand and
+newsstand not in
+(select code
+from fn3newsstand
+where newsstandtype='GA'
+and province='Madrid' and town!='MADRID') 
+group by town,postcode;
+
+
+
+
+select fn3newsstand.code,town,postcode
+from fn3newsstand,fn3newsstandon non
+where substr(fn3newsstand.code,1,3)='028' and
+non.dateoff is null and
+fn3newsstand.code=newsstand and
+newsstand not in
+(select code
+from fn3newsstand
+where newsstandtype='GA')
+order by town,postcode;
+
+

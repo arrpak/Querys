@@ -1,0 +1,37 @@
+select *
+from fn3processcontrol
+where active='Y';
+
+
+
+*
+
+				   fn3newsstand
+
+
+UPDATE fn3processcontrol
+SET active='N' WHERE active='Y'	 and idsession='y2009m09d24h09n09s37';
+and process='puntoventaestpack4.bat';
+and idsession='20081220.PV.3';
+
+UPDATE fn5processcontrol
+SET active='N' WHERE active='Y'
+
+
+delete
+from fn3processcontroloutput
+where idsession='20090914.PV_4';
+
+
+
+fn3fuerzaequipotmp10
+
+
+
+
+DELETE fn3forecastseries
+WHERE forsession='2008111421.PV'
+
+
+DELETE fn3forecast
+WHERE forsession='2008111421.PV'

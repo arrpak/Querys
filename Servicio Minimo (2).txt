@@ -1,0 +1,51 @@
+------------------------------------------------------------------------------------
+--
+--ESTA QUERY SACA LA MAXIMA VENTA DE UN CONJUNTO DE DIAS, LA COMPARA CON EL SERVICIO Y 
+--LE DA UNA PROPUESTA DE SERVICIO, SE QUITAN LOS CERRADOS Y LOS DE CAMAER (con operationnotcontrolled)
+--
+INSERT INTO FN3SERVICEMODIFIED
+select 'MARCA','DIARIO',
+pri.newsstand,TO_DATE('20030518','YYYYMMDD'),
+--venta,
+--dec,
+round(venta*1.15) as Propuesta
+from
+(select newsstand,max(service-return) as Venta
+from
+(
+select *
+from fn3operation
+where header='MARCA'
+and   product='DIARIO'
+and substr(newsstand,1,3)='028'
+and return=0
+and   operationdate in
+(to_date('20030511','yyyymmdd'),
+ to_date('20030504','yyyymmdd'))
+UNION
+select *
+from fn3operationnotcontrolled
+where header='MARCA'
+and   product='DIARIO'
+and substr(newsstand,1,3)='028'
+and return=0
+and   operationdate in
+(to_date('20030511','yyyymmdd'),
+ to_date('20030504','yyyymmdd'))
+)
+group by newsstand) SerMin,
+(select newsstand
+from fn3node
+where fathernode !='CAMAER'
+and header='MARCA' and product='DIARIO') CAMAER,
+(select newsstand,round(decision+increasedec) as dec
+from fn3printingdetail
+where header='MARCA' 
+and product='DIARIO'
+and dateprint=to_date('20030518','yyyymmdd') and
+decision>0 and
+node='CAM' and orderf=1) Pri
+where pri.newsstand=sermin.newsstand
+and pri.newsstand=CAMAER.newsstand
+and dec<venta-6
+;

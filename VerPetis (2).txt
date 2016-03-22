@@ -1,0 +1,42 @@
+select newsstand,to_char(operationdate, 'DY'),operationdate,
+service+incidence as serv, service+incidence-return as venta
+from fn3operationhistorical
+where header='MARCA' and
+product='DIARIO' and 
+newsstand='028001100405' 
+and operationdate>to_date('2002/08/01','yyyy/mm/dd');
+
+select newsstand, to_char(p.dateprint, 'DY'),p.dateprint,decision,
+substr(forsession,1,30)
+from fn3printingdetail d ,fn3printing p
+where d.header='MARCA' and
+d.product='DIARIO' and
+newsstand='028001100405' and
+p.dateprint>to_date('2002/08/25','yyyy/mm/dd') and
+p.used='Y'and
+p.node='CAM' and
+p.orderf=d.orderf and
+d.header=p.header and
+p.dateprint=d.dateprint and
+d.product=p.product;
+---------------------------------------------------
+select d.newsstand, to_char(p.dateprint, 'DY'),p.dateprint,d.decision+d.increasedec as dec,
+substr(forsession,1,30),service+incidence as serv,
+service+incidence-return as venta,return as dev
+from fn3printingdetail d ,fn3printing p,fn3operationhistorical o
+where d.header='MARCA' and
+d.product='DIARIO' and
+d.newsstand='028001100405' and
+p.dateprint>to_date('2002/08/14','yyyy/mm/dd') and
+p.used='Y'and
+p.node='CAM' and
+p.orderf=d.orderf and
+d.header=p.header and
+p.header=o.header and
+p.dateprint=d.dateprint and
+d.dateprint=o.operationdate and
+d.product=p.product and
+p.product=o.product and
+d.newsstand=o.newsstand;
+----------------------------------------------------------
+

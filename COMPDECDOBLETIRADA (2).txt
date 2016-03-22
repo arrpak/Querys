@@ -1,0 +1,59 @@
+CREATE OR REPLACE PROCEDURE compdecdobletirada
+(v_heade IN VARCHAR2,v_product IN VARCHAR2,v_nod IN VARCHAR2,v_datep IN DATE,
+v_orden1 IN INTEGER,v_orden2 IN INTEGER,v_inf IN INTEGER,v_sup IN INTEGER)
+IS
+CURSOR c IS
+SELECT t1.newsstand AS newsstand ,t1.decision AS baja,greatest(t2.decision,t1.decision) AS alta ,
+Round((greatest(t2.decision,t1.decision))/(t1.decision),3) AS increm
+FROM
+(SELECT newsstand,Round(decision+increasedec)   AS decision
+FROM fn3printingdetail
+WHERE
+header=v_heade AND product=v_product
+AND node=v_nod
+AND dateprint=v_datep
+AND orderf=v_orden1)
+ t1,
+(SELECT newsstand,Round(decision+increasedec)  AS decision
+FROM fn3printingdetail
+WHERE
+header=v_heade AND product=v_product
+AND node=v_nod
+AND dateprint=v_datep
+AND orderf=v_orden2)
+t2
+WHERE
+t1.newsstand=t2.newsstand AND
+--t1.header=v_header AND
+--t1.product=v_product AND
+--t1.node=v_nod AND
+--t1.dateprint=v_datep
+t2.decision>0
+AND (Round((greatest(t2.decision,t1.decision))/t1.decision,3)   < v_inf OR Round((greatest(t2.decision,t1.decision))/t1.decision,3)  > v_sup)
+--AND Round((greatest(t2.decision,t1.decision))/t1.decision,3) >1
+ORDER BY 4 desc
+;
+BEGIN
+  FOR i IN c LOOP
+    BEGIN
+      UPDATE fn3printingdetail
+      SET increasedec=0,decision=(CASE WHEN (i.increm<v_inf) THEN Round(i.baja*v_inf)
+                                      ELSE CASE WHEN i.increm>v_sup THEN Round(i.baja*v_sup) END END )
+      --SET increasedec=0,decision=greatest(i.baja,i.alta)
+      WHERE
+      header=v_heade AND
+      product=v_product AND
+      node=v_nod AND
+      dateprint=v_datep AND
+      newsstand=i.newsstand AND
+      orderf=v_orden2;
+      Dbms_Output.Put_Line(i.newsstand||'     '||i.increm||'      '||i.baja     ||'        '||i.alta||'      '||'case da  ');
+    --||CASE WHEN i.increm<v_inf THEN i.baja*v_inf WHEN i.increm>v_sup THEN i.baja*v_sup END);
+    END ;
+END  LOOP ;
+END;
+/
+
+BEGIN
+  compdecdobletirada  ('MARCA','DIARIO','CAM',Dat('20091003'),1,2,1.2,1.7);
+END;

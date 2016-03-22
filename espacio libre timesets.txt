@@ -1,0 +1,20 @@
+select tablespace_name, sum(bytes)/(1024*1024*1024) AS LibreGB
+from dba_free_space
+group by tablespace_name;
+
+
+
+
+
+select * from dba_segments
+where tablespace_name='USERDATA' and segment_type='TABLE';
+
+
+
+
+SELECT tablespace_name,
+round(sum(BYTES/1024/1024),0)
+FROM dba_data_files b
+WHERE tablespace_name NOT LIKE '%TEMP%'
+GROUP BY b.tablespace_name;
+

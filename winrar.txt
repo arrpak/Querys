@@ -1,0 +1,9 @@
+
+
+
+
+winrar a -r  -n*.tol -n*.prj -n*.bat -n*.bst -n*.bdt -n*.sql -n*.seed -n*.sql c:\fn3bkp.rar C:\document\entidad\fornews\F\fn3
+
+winrar a -r  -n*.xls  c:\fn3bkpXLS.rar  C:\document\entidad\fornews\F\fn3
+
+

@@ -1,0 +1,73 @@
+define dateprint='20080725';
+define nodo='AST';
+
+Select sum(tirmarca), sum(tirmarca2),
+sum(tirbayes) , sum(tirbayes2),
+sum(service),sum(return),sum(venta),sum(ventabayes),sum(devobayes),sum(VentaBayes)-sum(venta)
+from
+(
+SELECT t1.newsstand,
+  case
+    when t1.decision<>t3.service  then t1.decision --t3.service
+  else t1.decision
+  end AS TirMarca,
+ t1.decision AS TirMarca2,
+  case
+    when t1.decision<>t3.service  then t2.decision --t3.service
+  else t2.decision
+  end AS TirBayes,
+t2.decision AS TirBAyes2 ,
+t3.service,t3.RETURN,
+t3.venta,
+  case
+    when t1.decision<>t3.service  then t3.service
+  else t2.decision
+  end -	greatest(  case
+    when t1.decision<>t3.service  then t3.service
+  else t2.decision
+  end-t3.venta,0) as VentaBayes,
+greatest(  case
+    when t1.decision<>t3.service  then t3.service
+  else t2.decision
+  end-t3.venta,0) as DevoBayes,
+  case
+    when t1.decision<>t3.service  then t3.service
+  else t2.decision
+  end -	greatest(  case
+    when t1.decision<>t3.service  then t3.service
+  else t2.decision
+  end-t3.venta,0)-T3.VENTA as VentaPerdida
+from
+(SELECT dateprint,(
+Ceil(((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))))) AS decision,newsstand
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND product='DIARIO'
+AND dateprint=dat('&dateprint')
+AND node='&nodo'
+AND orderf=1
+GROUP BY dateprint,newsstand  ) t1,
+(SELECT dateprint,(
+Ceil(((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))))) AS decision,newsstand
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND product='DIARIO'
+AND dateprint=dat('&dateprint')
+AND node='&nodo'
+AND orderf=20
+GROUP BY dateprint,newsstand  ) t2,
+(
+SELECT newsstand,service+incidence as service ,RETURN,(service+incidence-RETURN) AS venta
+FROM fn3operation
+WHERE
+header='MARCA' AND product='DIARIO'
+AND operationdate=dat('&dateprint')
+) t3
+WHERE
+t1.newsstand=t2.newsstand and
+t3.newsstand=t2.newsstand
+);

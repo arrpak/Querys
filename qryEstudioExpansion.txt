@@ -1,0 +1,113 @@
+SELECT header,product,infodate,Sum(numpv),Sum(numopen),Sum(service+incidence)
+,Sum(numoutoff),Sum(servoutoff),Sum(numpvcont),Sum(numopencont),Sum(numoutoffcont),Sum(servoutoffcont),
+Sum(returncont)/Sum(service+incidence) AS PorDev,
+Sum(numoutoff)/Sum(numpv) AS PorAgo,Sum(returncont)
+
+FROM fn3nodeinformation
+WHERE
+header='EXPANSION' AND
+product='DIARIO'AND
+node IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS') AND
+--node IN ('CAMAER','CAMGAS','CAMPER','CAMSIE') AND
+infodate>=To_Date('20101001','YYYYMMDD') AND
+infodate<=To_Date('20101231','YYYYMMDD') AND
+service>0
+GROUP BY header,product,infodate;
+
+
+------------------------------------------------------------------------------------------------------------------------
+SELECT OPERATIONDATE,To_Char(OPERATIONDATE,'YYYY') AS año,To_Char(OPERATIONDATE,'MM') AS mes,To_Char(OPERATIONDATE,'dy') AS diasem,
+CASE WHEN
+FATHERNODE IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS','CAMAER') THEN 'CAPITAL' ELSE 'PERIFERIA' END AS ZONA,
+FATHERNODE,
+Sum(T1.SERVICE+INCIDENCE),
+SUM(RETURN),
+Sum(T1.SERVICE+INCIDENCE-RETURN) as venta,
+Count(*),
+Sum(CASE WHEN RETURN=0 THEN 1 ELSE 0 END) AS AGOTADOS,
+Sum(CASE WHEN SERVICE+INCIDENCE-RETURN=0 THEN 1 ELSE 0 END) AS VENTACERO
+FROM FN3OPERATION T1,FN3NODE T2
+WHERE
+T1.HEADER='EXPANSION' AND T1.PRODUCT='DIARIO' AND
+T1.OPERATIONDATE>=To_Date('20090101','YYYYMMDD')
+AND SERVICE>0
+AND T1.HEADER=T2.HEADER
+AND T1.PRODUCT=T2.PRODUCT
+AND T1.NEWSSTAND=T2.NEWSSTAND
+GROUP BY OPERATIONDATE,To_Char(OPERATIONDATE,'YYYY'),To_Char(OPERATIONDATE,'MM'),To_Char(OPERATIONDATE,'dy'),FATHERNODE
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+
+
+SELECT DISTINCT To_Char(OPERATIONDATE,'YYYY') AS año,To_Char(OPERATIONDATE,'MM') AS mes,
+CASE WHEN FATHERNODE IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS','CAMAER') THEN 'CAPITAL' ELSE 'PERIFERIA' END AS ZONA,
+T1.SERVICE+INCIDENCE,RETURN,fathernode,Count(*)
+FROM FN3OPERATION T1,FN3NODE T2
+WHERE
+T1.HEADER='EXPANSION' AND T1.PRODUCT='DIARIO' AND
+T1.OPERATIONDATE>=To_Date('20090101','YYYYMMDD')
+AND SERVICE>0
+AND RETURN=0
+AND T1.HEADER=T2.HEADER
+AND T1.PRODUCT=T2.PRODUCT
+AND T1.NEWSSTAND=T2.NEWSSTAND
+GROUP BY To_Char(OPERATIONDATE,'YYYY'),To_Char(OPERATIONDATE,'MM'),FATHERNODE,T1.SERVICE+INCIDENCE,RETURN;
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+
+
+SELECT DISTINCT To_Char(OPERATIONDATE,'YYYY') AS año,To_Char(OPERATIONDATE,'MM') AS mes,
+CASE WHEN FATHERNODE IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS','CAMAER') THEN 'CAPITAL' ELSE 'PERIFERIA' END AS ZONA,
+T1.SERVICE+INCIDENCE,RETURN,fathernode,Count(*)
+FROM FN3OPERATION T1,FN3NODE T2
+WHERE
+T1.HEADER='EXPANSION' AND T1.PRODUCT='DIARIO' AND
+T1.OPERATIONDATE>=To_Date('20090101','YYYYMMDD')
+AND SERVICE>0
+and T1.OPERATIONDATE=To_Date('20101231','YYYYMMDD')
+AND RETURN=0
+AND T1.HEADER=T2.HEADER
+AND T1.PRODUCT=T2.PRODUCT
+AND T1.NEWSSTAND=T2.NEWSSTAND
+GROUP BY To_Char(OPERATIONDATE,'YYYY'),To_Char(OPERATIONDATE,'MM'),FATHERNODE,T1.SERVICE+INCIDENCE,RETURN;
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+
+
+SELECT DISTINCT To_Char(OPERATIONDATE,'YYYY') AS año,To_Char(OPERATIONDATE,'MM') AS mes,
+CASE WHEN FATHERNODE IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS','CAMAER') THEN 'CAPITAL' ELSE 'PERIFERIA' END AS ZONA,
+T1.SERVICE+INCIDENCE,RETURN,fathernode,Count(*)
+FROM FN3OPERATION T1,FN3NODE T2
+WHERE
+T1.HEADER='EXPANSION' AND T1.PRODUCT='DIARIO' AND
+T1.OPERATIONDATE>=To_Date('20090101','YYYYMMDD')
+AND SERVICE>0
+--AND RETURN=0
+AND T1.HEADER=T2.HEADER
+AND T1.PRODUCT=T2.PRODUCT
+AND T1.NEWSSTAND=T2.NEWSSTAND
+GROUP BY To_Char(OPERATIONDATE,'YYYY'),To_Char(OPERATIONDATE,'MM'),FATHERNODE,T1.SERVICE+INCIDENCE,RETURN;
+
+
+ ------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+
+SELECT t1.newsstand,operationdate,count(*),
+CASE WHEN FATHERNODE IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS','CAMAER') THEN 'CAPITAL' ELSE 'PERIFERIA' END AS ZONA,
+T1.SERVICE+INCIDENCE,RETURN,T1.SERVICE+INCIDENCE-RETURN,fathernode,To_Char(OPERATIONDATE,'dy')
+FROM FN3OPERATION T1,FN3NODE T2
+WHERE
+T1.HEADER='EXPANSION' AND T1.PRODUCT='DIARIO' AND
+T1.OPERATIONDATE>=To_Date('20101101','YYYYMMDD')
+AND SERVICE>0
+AND RETURN=0
+AND T1.HEADER=T2.HEADER
+AND T1.PRODUCT=T2.PRODUCT
+AND T1.NEWSSTAND=T2.NEWSSTAND
+GROUP BY t1.newsstand,operationdate,CASE WHEN FATHERNODE IN ('CAMCAP','CAMATI','CAMVIP','CAMVLR','CAMVIA','CAMGAS','CAMAER') THEN 'CAPITAL' ELSE 'PERIFERIA' END,
+T1.SERVICE+INCIDENCE,RETURN,fathernode,To_Char(OPERATIONDATE,'dy'),T1.SERVICE+INCIDENCE-RETURN;

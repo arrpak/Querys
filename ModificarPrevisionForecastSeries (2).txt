@@ -1,0 +1,16 @@
+SELECT output,forecast,Exp(noise+filter),noise,filter
+FROM fn3forecastseries
+WHERE forsession='2008050310.MG'
+AND output LIKE 'VentaMarcaANDHUE%'
+
+--Modificar el Filter
+UPDATE fn3forecastseries
+SET filter=filter+0.3
+WHERE forsession='2008050310.MG'
+AND output LIKE 'VentaMarcaANDHUE%'
+
+--Modificar la prevision
+UPDATE fn3forecastseries
+SET forecast=Exp(noise+filter)
+WHERE forsession='2008050310.MG'
+AND output LIKE 'VentaMarcaANDHUE%'

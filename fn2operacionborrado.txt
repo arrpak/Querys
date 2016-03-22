@@ -1,0 +1,6 @@
+insert into fn3operationnotloaded
+select cabecera,producto,
+'028'||SubStr(puntoVenta, 1, 1)||SubStr(puntoVenta, 5, 8),
+fecha,fecharecepcion
+from fn2operacionborrado
+where fecha>=to_date('20020208','yyyymmdd');

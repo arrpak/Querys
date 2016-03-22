@@ -1,0 +1,257 @@
+Define newfs ='20101014.02.MktMensual.BSR';
+Define oldest='20100920.04.MktMensual.BSR';
+Define estsemar='20100910.01.MktMensual.BSR';
+Define fechadesde='20100501';
+Define fechahasta='20100830';
+
+
+
+
+/*
+
+--Venta Base AS
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+select estsession,valuedate,round(sum(issue))--,saletype
+from fn3EstimationIssue ei,fn3inputsaletype  ist
+where estsession='&newfs'
+--and ei.input=pi.input
+and ei.input=ist.input
+AND ist.saletype IN ('NOI','EST')
+AND ist.header='AS'
+AND valuedate>SYSDATE-180
+group by estsession,valuedate--,saletype
+order by valuedate
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+--Venta Base MARCA
+select estsession,valuedate,round(sum(issue))--,saletype
+from fn3EstimationIssue ei,fn3inputsaletype  ist
+where estsession='&estsemar'
+--and ei.input=pi.input
+and ei.input=ist.input
+AND ist.saletype IN ('NOI','EST')
+AND ist.header='MARCA'
+AND valuedate>SYSDATE-180
+group by estsession,valuedate--,saletype
+order by valuedate
+
+
+
+
+
+
+
+
+
+
+
+
+
+select estsession,promotion,valuedate,round(sum(issue))
+from fn3EstimationIssue ei, fn3PromotionInput pi
+where estsession='&newfs'
+and ei.input=pi.input
+group by estsession,promotion,valuedate
+;
+
+
+select estsession,promotion,valuedate,round(sum(issue))
+from fn3EstimationIssue ei, fn3PromotionInput pi
+where estsession='&oldest'
+and ei.input=pi.input
+group by estsession,promotion,valuedate
+
+
+select estsession,promotion,round(sum(issue))
+from fn3EstimationIssue ei, fn3PromotionInput pi
+where estsession='&newfs'
+and ei.input=pi.input
+group by estsession,promotion
+order by promotion
+
+*/
+
+select t1.promotion,ejempmednew,ejempmedold
+from
+(
+select estsession,promotion,round(SUM(issue)) as ejempmednew
+from fn3EstimationIssue ei, fn3PromotionInput pi
+where estsession='&newfs'
+and ei.input=pi.input
+and ei.valuedate>=to_date('&fechadesde','yyyymmdd')
+and ei.valuedate<=to_date('&fechahasta','yyyymmdd')
+group by estsession,promotion) t1,
+(
+select estsession,promotion,round(SUM(issue)) as ejempmedold
+from fn3EstimationIssue ei, fn3PromotionInput pi
+where estsession='&oldest'
+and ei.input=pi.input
+and ei.valuedate>=to_date('&fechadesde','yyyymmdd')
+and ei.valuedate<=to_date('&fechahasta','yyyymmdd')
+and ei.valuedate>=to_date('20010501','yyyymmdd')
+group by estsession,promotion) t2
+where t1.promotion=t2.promotion;
+
+
+
+
+
+
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------
+--CREATE OR REPLACE VIEW fn3reporteejemplares	 as
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionInput esi,fn3Input isi
+where
+--isi.code = ei.input and
+esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise')
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei
+where
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input = 'noise')
+;
+
+
+
+
+
+/*
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+
+
+
+
+---------------------
+CREATE OR REPLACE VIEW fn3reporteejemplaresentregado
+as
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionSetInput esi,fn3InputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise')
+minus
+(select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionSetInput esi,fn3InputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.output='ComABCCAM'
+and ei.valuedate>=to_date('20090403','yyyymmdd')
+and ei.valuedate<=to_date('20090405','yyyymmdd'))
+)
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei
+where
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input = 'Forecast')
+;
+
+
+
+
+--select *
+--from fn3EstimationIssue ei,fn3PromotionSetInput esi,fn3InputSetInput isi
+--where isi.input = ei.input and  esi.setinput = isi.setinput
+--and  ei.estsession = 'e20100131Com.03'
+--and  ei.dating     = 'Diario'
+--and  ei.input like  '%JuegoCuchillos%'
+
+
+
+-----------------
+CREATE OR REPLACE VIEW fn3reporteejemplaresold
+as
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionSetInput esi,fn3InputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise')
+minus
+(select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionSetInput esi,fn3InputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.output='ComABCCAM'
+and ei.valuedate>=to_date('20090403','yyyymmdd')
+and ei.valuedate<=to_date('20090418','yyyymmdd'))
+)
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei
+where
+ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.input = 'noise')
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei
+where
+ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.input = 'Forecast');
+
+
+*/
+
+
+
+
+

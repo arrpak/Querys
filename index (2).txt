@@ -1,0 +1,21 @@
+Me ha salido el siguiente error:
+
+ERROR: (SQL)
+Key violation.
+[Oracle][ODBC][Ora]ORA-01654: unable to extend index FORMARCA.FN3ESTIMATIONINPUTPK by 3749 in tablespace MARCA_IDX
+
+
+Y he hecho y cambiado el siguiente indice:
+
+select  TABLESPACE_NAME,FILE_ID,((BYTES/1024)/1024) as ESPACIO_EN_MB
+from dba_free_space
+where TABLESPACE_NAME = 'MARCA_IDX'
+order by BYTES desc;
+
+select index_name, next_extent
+from all_indexes
+where index_name ='FN3ESTIMATIONINPUTPK';
+
+alter index FN3FORECASTPK
+STORAGE(NEXT 8 M);
+

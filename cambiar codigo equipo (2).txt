@@ -1,0 +1,133 @@
+define equOld = 'RBS';
+define equNew = 'SAZ';
+
+INSERT INTO fn3equipocompite
+SELECT competicion, dominio, categoria, temporada, '&equNew', relevancia
+FROM fn3equipocompite t1
+WHERE equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+AND (SELECT Count(*)
+     FROM fn3equipocompite t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.equipo = '&equNew') = 0;
+
+INSERT INTO fn3equipocompitefase
+SELECT competicion, dominio, categoria, temporada, fase, '&equNew', tipo, grupo
+FROM fn3equipocompitefase t1
+WHERE equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+AND (SELECT Count(*)
+     FROM fn3equipocompitefase t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.fase = t1.fase
+     AND t2.equipo = '&equNew') = 0;
+
+UPDATE fn3partidofutbol SET equipolocal    = CASE WHEN equipolocal     <> '&equOld'
+                                                  THEN equipolocal
+                                                  ELSE '&equNew'
+                                                  END,
+                            equipovisitante = CASE WHEN equipovisitante <> '&equOld'
+                                                   THEN equipovisitante
+                                                   ELSE '&equNew'
+                                                   END
+WHERE
+--COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008' AND
+(equipolocal = '&equOld' OR equipovisitante = '&equOld');
+
+UPDATE fn3probabilidadpuestofase t1 SET t1.equipo = '&equNew'
+WHERE t1.equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+AND (SELECT Count(*)
+     FROM fn3probabilidadpuestofase t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.fase = t1.fase
+     AND t2.equipo = '&equNew'
+     AND t2.puesto = t1.puesto
+     AND t2.fechacalculo = t1.fechacalculo) = 0;
+
+UPDATE fn3probabilidadpasarfase t1 SET t1.equipo = '&equNew'
+WHERE t1.equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+AND (SELECT Count(*)
+     FROM fn3probabilidadpasarfase t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.fase = t1.fase
+     AND t2.equipo = '&equNew'
+     AND t2.fechacalculo = t1.fechacalculo) = 0;
+
+UPDATE fn3probabilidadpuesto t1 SET equipo = '&equNew'
+WHERE equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+AND (SELECT Count(*)
+     FROM fn3probabilidadpuesto t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.equipo = '&equNew') = 0;
+
+
+UPDATE fn3puntosfase t1 SET equipo = '&equNew'
+WHERE equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+AND (SELECT Count(*)
+     FROM fn3puntosfase t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.equipo = '&equNew') = 0;
+
+UPDATE fn3puntosCOMPETICION t1 SET equipo = '&equNew'
+WHERE equipo = '&equOld'
+--AND COMPETICION='COPAEUROPA' AND TEMPORADA>'2007/2008'
+;
+/*
+AND (SELECT Count(*)
+     FROM fn3puntosfase t2
+     WHERE t2.competicion = t1.competicion
+     AND t2.dominio = t1.dominio
+     AND t2.categoria = t1.categoria
+     AND t2.temporada = t1.temporada
+     AND t2.equipo = '&equNew') = 0;   */
+
+
+DELETE fn3probabilidadpuesto
+WHERE equipo = '&equOld';
+
+DELETE fn3probabilidadpasarfase
+WHERE equipo = '&equOld';
+
+DELETE fn3probabilidadpuestofase
+WHERE equipo = '&equOld';
+
+
+
+select *
+from fn3partidofutbol
+where equipolocal='RBS'
+
+DELETE fn3equipocompitefase
+WHERE equipo = '&equOld';
+
+--SELECT * FROM FN3PARTIDOFUTBOL WHERE EQUIPOLOCAL='BGA'
+--SELECT * FROM FN3PUNTOSCOMPETICION WHERE EQUIPO='&equOld';
+
+DELETE fn3equipocompite
+WHERE equipo = '&equOld';
+
+DELETE fn3equipofutbol
+WHERE tipoequipo = 'CLB'
+AND codigo = '&equOld'

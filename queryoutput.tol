@@ -1,0 +1,175 @@
+//////////////////////////////////////////////////////////////////////////////
+// FILE    :
+// PURPOSE :
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// Informa de la tabla que da lugar a error de integridad.
+//////////////////////////////////////////////////////////////////////////////
+select table_name 
+from ALL_CONSTRAINTS 
+where CONSTRAINT_NAME = 'SYS_C003576';
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Venta nodo.
+//////////////////////////////////////////////////////////////////////////////
+select Opemarca.dia, sum(Opemarca.venta)
+from   OpeMarca, Fn2Nodo
+where Fn2Nodo.NodoPadre = 'CAMSIE' and
+      OpeMarca.venta >= 0 and
+      OpeMarca.dia >= to_date('2000/06/01', 'YYYY/MM/DD') and
+      OpeMarca.dia <= to_date('2000/06/03', 'YYYY/MM/DD') and
+      OpeMarca.ruta||opemarca.punto = Fn2Nodo.Codigo
+group by Opemarca.dia
+order by Opemarca.dia;
+
+//////////////////////////////////////////////////////////////////////////////
+// Ultima fecha.
+//////////////////////////////////////////////////////////////////////////////
+select max(OpeMarca.dia)
+from   OpeMarca, Fn2Nodo
+where  Fn2Nodo.NodoPadre = 'CAMCAP'   and
+       OpeMarca.venta > 0             and
+       OpeMarca.haydatosdistrib = 'S' and
+       OpeMarca.ruta||opemarca.punto = Fn2Nodo.Codigo      and
+       OpeMarca.dia >= to_date('2000/06/01', 'YYYY/MM/DD') and
+       OpeMarca.dia <= to_date('2000/06/03', 'YYYY/MM/DD');
+
+
+select max(OpeMarca.dia)
+from  fn2Output, fn2Nodo, Opemarca, fn2PuntoVenta
+where fn2Output.output = 'VentaMarcaCAMMET' and
+      fn2Output.nodo = fn2Nodo.NodoPadre and
+      fn2Nodo.cabecera = fn2Output.cabecera and
+      fn2Nodo.producto = fn2Output.producto and
+      ruta = SUBSTR(fn2Nodo.PuntoVenta,1,7) and
+      punto = SUBSTR(fn2Nodo.PuntoVenta,8,12) and
+      dia >= to_date('2000/08/01','YYYY/MM/DD') and
+      dia <= to_date('2000/09/14','YYYY/MM/DD') and
+      Opemarca.venta >= 0 and
+      Opemarca.haydatosdistrib = 'S' and
+      fn2PuntoVenta.Codigo = fn2Nodo.PuntoVenta;
+
+//////////////////////////////////////////////////////////////////////////////
+// Ratio cierre.
+//////////////////////////////////////////////////////////////////////////////
+select Opemarca.dia, 1-(sum(least(1,venta))/count(*))
+from   OpeMarca, Fn2Nodo, fn2puntoventa
+where fn2puntoventa.operativo = 'S' and
+      Fn2Nodo.NodoPadre = 'CAMSIE'  and
+      OpeMarca.ruta||opemarca.punto = fn2puntoventa.Codigo and
+      OpeMarca.ruta||opemarca.punto = Fn2Nodo.Codigo       and
+      OpeMarca.dia >= to_date('2000/06/01', 'YYYY/MM/DD')  and
+      OpeMarca.dia <= to_date('2000/06/03', 'YYYY/MM/DD')
+group by Opemarca.dia
+order by Opemarca.dia;
+
+
+"
+select Opemarca.dia, 1 - (sum(least(1, Opemarca.venta))/count(*)) 
+from  fn2Nodo, Opemarca, fn2PuntoVenta
+where fn2Nodo.NodoPadre = '"+ nodo +"' and
+      fn2PuntoVenta.Operativo = 'S' and
+      ruta  = substr(fn2Nodo.PuntoVenta,1,7) and
+      punto = substr(fn2Nodo.PuntoVenta,8,12) and
+      "+ SqlCondFechas("dia", fechaDesde, fechaHasta) +" and
+      fn2PuntoVenta.Codigo = fn2Nodo.PuntoVenta
+group by Opemarca.dia
+order by Opemarca.dia";
+
+
+//////////////////////////////////////////////////////////////////////////////
+// NumPto.
+//////////////////////////////////////////////////////////////////////////////
+select TabIniKio.iniKio, count(*)
+from 
+(select ruta, punto, min(dia) as iniKio
+ from   OpeMarca, Fn2Nodo, fn2puntoventa
+ where fn2puntoventa.operativo = 'S' and
+       Fn2Nodo.NodoPadre = 'CAMSIE'  and
+       OpeMarca.venta > 0            and
+       OpeMarca.dia >= to_date('2000/06/01', 'YYYY/MM/DD')  and
+       OpeMarca.dia <= to_date('2000/06/03', 'YYYY/MM/DD')  and
+       OpeMarca.ruta||opemarca.punto = fn2puntoventa.Codigo and
+       OpeMarca.ruta||opemarca.punto = Fn2Nodo.Codigo
+ group by OpeMarca.ruta, OpeMarca.punto) TabIniKio
+ group by TabIniKio.iniKio;
+
+select TabIniKio.iniKio, count(*)
+from
+ (select Opemarca.ruta, Opemarca.punto, min(dia) as iniKio
+  from fn2Output, fn2Nodo, Opemarca, fn2PuntoVenta
+  where fn2Output.output = 'VentaMarcaCAMGAS' and
+        fn2Output.nodo = fn2Nodo.NodoPadre and
+        fn2Nodo.cabecera = fn2Output.cabecera and
+        fn2Nodo.producto = fn2Output.producto and
+        fn2PuntoVenta.Operativo = 'S' and
+        ruta = SUBSTR(fn2Nodo.PuntoVenta,1,7) and
+        punto = SUBSTR(fn2Nodo.PuntoVenta,8,12) and
+        dia >= to_date('2000/08/10','YYYY/MM/DD') and
+        dia <= to_date('2000/08/11','YYYY/MM/DD') and
+        Opemarca.venta > 0 and
+        fn2PuntoVenta.Codigo = fn2Nodo.PuntoVenta
+ group by Opemarca.ruta, Opemarca.punto) TabIniKio
+group by TabIniKio.iniKio;
+
+"
+select TabIniKio.iniKio, count(*)
+from
+ (select Opemarca.ruta, Opemarca.punto, "+ codeTxt +"(dia) as iniKio
+  from fn2Nodo, Opemarca, fn2PuntoVenta
+  where fn2Nodo.NodoPadre = '"+ nodo +"' and
+        fn2PuntoVenta.Operativo = 'S' and
+        ruta  = substr(fn2Nodo.PuntoVenta,1,7) and
+        punto = substr(fn2Nodo.PuntoVenta,8,12) and
+        "+ SqlCondFechas("dia", fechaDesde, fechaHasta) +" and
+        Opemarca.venta > 0 and
+        fn2PuntoVenta.Codigo = fn2Nodo.PuntoVenta
+  group by Opemarca.ruta, Opemarca.punto) TabIniKio
+group by TabIniKio.iniKio";
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// VENTAS PARA UNA SERIE GLOBAL
+//////////////////////////////////////////////////////////////////////////////
+
+SELECT opemarca.dia, SUM(opemarca.venta) as SumaVenta
+  FROM Fn2Output, Fn2Nodo, opemarca
+ WHERE 
+       Fn2Output.output = 'VentaMarcaCAMGAS'
+   AND
+       Fn2Output.nodo   = Fn2Nodo.NodoPadre
+   AND
+       Fn2Nodo.cabecera = Fn2Output.cabecera
+   AND
+       Fn2Nodo.producto = Fn2Output.producto
+--   AND
+--       ruta||punto = Fn2Nodo.PuntoVenta
+   AND
+       ruta = SUBSTR(Fn2Nodo.PuntoVenta,1,7)
+   AND
+       punto = SUBSTR(Fn2Nodo.PuntoVenta,8,12)
+   AND 
+       opemarca.dia >= to_date('2000/07/01','YYYY/MM/DD')
+   AND
+       opemarca.dia <= to_date('2000/08/01','YYYY/MM/DD')
+   AND
+       opemarca.venta >= 0
+GROUP BY opemarca.dia
+ORDER BY opemarca.dia
+;
+
+//////////////////////////////////////////////////////////////////////////////
+// Numero de kioscos con distribucion de un nodo cada dia.
+//////////////////////////////////////////////////////////////////////////////
+select dia, count(*)
+ from fn2Nodo, Opemarca, fn2PuntoVenta
+ where fn2Nodo.nodopadre = 'CAMGAS'                 and
+       ruta = SUBSTR(fn2Nodo.PuntoVenta,1,7)     and
+       punto = SUBSTR(fn2Nodo.PuntoVenta,8,12)   and
+       haydatosdistrib = 'S'                      and
+       dia >= to_date('2000/08/15', 'YYYY/MM/DD') and
+       fn2PuntoVenta.Codigo = fn2Nodo.PuntoVenta
+group by dia;

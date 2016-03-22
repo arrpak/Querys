@@ -1,0 +1,690 @@
+CREATE TABLE Fn3partidotmp
+(
+competicion VARCHAR2(50),
+temporada VARCHAR2(50),
+fecha DATE,
+equipolocal VARCHAR2(3),
+goleslocal NUMBER,
+golesvisitante NUMBER,
+equipovisitante VARCHAR2(3),
+INFO1 VARCHAR(200),
+INFO2 VARCHAR(200))
+;
+
+delete	   Fn3partidotmp
+where (goleslocal is null or golesvisitante is null)
+
+delete	   Fn3partidotmp
+where fecha is null
+
+ALter table  Fn3partidotmp
+add valido varchar2(1)
+
+ALter table  Fn3partidotmp
+rename column  fecha to fechapartido
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+select *
+from fn3partidotmp
+where equipolocal='COS'
+--and competicion='MUNDIAL' AND TEMPORADA='2002'
+UNION
+(select *
+from fn3partidotmp
+where equipovisitante='COS'
+--and competicion='MUNDIAL' AND TEMPORADA='2002'
+)
+
+
+
+select equipolocal as eq,av(difgol)
+from
+(
+(select equipolocal,goleslocal-golesvisitante as difgol
+from fn3partidotmp
+where equipolocal='COS'
+and competicion='MUNDIAL'
+--AND TEMPORADA='2002'
+)
+UNION all
+(
+select equipovisitante,golesvisitante-goleslocal as difgol
+from fn3partidotmp
+where equipovisitante='COS'
+and competicion='MUNDIAL'
+--AND TEMPORADA='2002'
+))
+
+
+
+create table fn3fuerzaequipoaux
+as select * from fn3fuerzaequipo
+
+
+select count(*),fecha
+from fn3fuerzaequipo
+where
+fecha=dat('20020530') and
+--fecha<dat('197501010')
+group by fecha
+
+select *
+ from fn3fuerzaequipo
+where
+fecha=dat('20020530')
+
+
+--EQUIPOS QUE COMPITEN
+
+INSERT INTO  fn3equipocompite
+SELECT competicion,dominio,categoria,temporada,'CNO',0
+FROM fn3equipocompite
+WHERE   equipo='CON'
+ AND dominio='MUN'
+AND  competicion||dominio||categoria||temporada NOT IN
+(SELECT competicion||dominio||categoria||temporada
+FROM fn3equipocompite
+   WHERE   equipo='CNO')
+
+
+
+INSERT INTO fn3equipocompitefase
+SELECT competicion,dominio,categoria,temporada,fase,'CNO',tipo,grupo
+FROM fn3equipocompitefase
+WHERE   equipo='CON'
+ AND dominio='MUN'
+AND  competicion||dominio||categoria||temporada NOT IN
+(SELECT competicion||dominio||categoria||temporada
+FROM fn3equipocompitefase
+   WHERE   equipo='CNO' and dominio='MUN')
+
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+define comp='CLASMUNDIAL';
+DEFINE AN1='1971';
+DEFINE AN2='1974';
+DEFINE TEMP='&AN1/&AN2';
+
+
+
+
+
+INSERT INTO FN3TEMPORADA SELECT  '&TEMP','TEMPORADA &TEMP' FROM DUAL;
+INSERT INTO FN3COMPETICIONFUTBOL SELECT '&COMP','MUN','PRIMERA','&TEMP',DAT('&AN1/01/01'),DAT('&AN2/12/31') FROM DUAL;
+INSERT INTO FN3FASECOMPETICION   SELECT '&COMP','MUN','PRIMERA','&TEMP','UNICAUNI',DAT('&AN1/01/01'),DAT('&AN2/12/31'),0,0 FROM DUAL;
+INSERT INTO FN3FASEJORNADACOMPETICION   SELECT '&COMP','MUN','PRIMERA','&TEMP','UNICAUNI','UNICA',DAT('&AN1/01/01'),DAT('&AN2/12/31') FROM DUAL;
+
+insert INTO fn3equipocompite
+SELECT '&COMP','MUN','PRIMERA','&TEMP',codigo,0
+FROM fn3equipofutbol
+WHERE tipoequipo='SEL'
+AND CODIGO NOT IN
+(
+SELECT equipo
+FROM fn3equipocompite
+WHERE temporada='&TEMP' AND competicion='&COMP'  AND   dominio='MUN') ;
+
+
+
+insert INTO fn3equipocompitefase
+SELECT '&COMP','MUN','PRIMERA','&TEMP','UNICAUNI',codigo,'CLA','O'
+FROM fn3equipofutbol
+WHERE
+tipoequipo='SEL' AND
+CODIGO NOT IN
+(
+SELECT equipo
+FROM fn3equipocompiteFASE
+WHERE temporada='&TEMP' AND competicion='&COMP' and dominio='MUN')  ;
+
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+SELECT DISTINCT(equipolocal)
+FROM fn3partidotmp t1,fn3fasecompeticion t2
+WHERE
+--t1.competicion<>'AMISTOSO' and
+t2.fechafin <dat('22220222')
+AND t1.competicion=t2.competicion
+--AND fechafin-fechainicio<=1865
+AND t2.dominio='MUN'
+AND t2.categoria='PRIMERA'
+AND t2.fase='UNICAUNI'
+--AND t2.jornada='UNICA'
+AND fechapartido>=t2.fechainicio
+AND fechapartido<=t2.fechafin
+--AND equipolocal='MEX' AND equipovisitante='ING'
+AND t2.numeqclas IS NULL
+MINUS
+(SELECT codigo
+FROM fn3equipofutbol)
+
+
+
+
+SELECT t1.eq,numloc,numvis
+--SELECT Count(*)
+FROM
+( SELECT equipolocal AS eq,Count(*) AS numloc
+ FROM fn3partidotmp2
+ WHERE fechapartido<SYSDATE-10
+ GROUP BY equipolocal) t1,
+ (
+ SELECT equipovisitante as eq ,Count(*) AS numvis
+ FROM fn3partidotmp2
+ WHERE fechapartido<SYSDATE-10
+ GROUP BY equipovisitante) t2
+ WHERE t1.eq=t2.eq
+
+
+SELECT *
+FROM fn3partidotmp2
+--WHERE equipolocal='MNO'
+WHERE equipovisitante='MNO'
+
+
+SELECT *
+FROM fn3partidotmp2
+WHERE
+(equipovisitante='Cup')
+
+
+SELECT distinct(equipolocal)
+FROM fn3partidotmp2
+UNION
+
+DELETE
+FROM fn3partidotmp2
+WHERE equipovisitante
+IN(
+SELECT distinct(equipolocal)
+FROM fn3partidotmp2
+MINUS
+(SELECT codigo FROM fn3equipofutbol))
+
+
+
+
+
+
+
+TRUNCATE TABLE fn3partidotmp2
+
+
+
+
+
+
+ --delete
+ SELECT Count(equipolocal),Count(equipovisitante),Count(*)
+ FROM fn3partidotmp2
+
+
+INSERT INTO FN3TIPOCOMPETICIONFUTBOL
+SELECT DISTINCT COMPETICION, 'SEL',NULL
+FROM FN3PARTIDOTMP2
+MINUS
+(SELECT CODIGO, 'SEL', NULL
+FROM FN3TIPOCOMPETICIONFUTBOL)
+
+
+INSERT INTO FN3CLASECOMPETICIONFUTBOL
+SELECT DISTINCT COMPETICION, 'MUN', 'PRIMERA' , NULL
+FROM FN3PARTIDOTMP2
+MINUS
+(SELECT COMPETICION, DOMINIO, CATEGORIA, NULL
+FROM FN3CLASECOMPETICIONFUTBOL)
+--------
+INSERT INTO fn3temporada
+SELECT DISTINCT TEMPORADA||'/'||temporada ,'Temporada '||TEMPORADA||'/'||temporada
+FROM FN3PARTIDOTMP2
+WHERE temporada IS NOT NULL
+MINUS
+(SELECT *
+FROM fn3temporada)
+
+
+
+-----
+
+
+INSERT INTO fn3temporada
+SELECT DISTINCT TEMPORADA ,'Temporada '||TEMPORADA
+from
+(sELECT DISTINCT COMPETICION, 'MUN', 'PRIMERA',To_Char(Min(FECHAPARTIDO)-1,'yyyy')||'/'||To_Char(Max(FECHAPARTIDO)-1,'yyyy') AS temporada, Min(FECHAPARTIDO)-1,Max(FECHAPARTIDO)
+FROM FN3PARTIDOTMP2
+gROUP BY COMPETICION, 'MUN', 'PRIMERA' , TEMPORADA
+--HAVING To_Char(Min(FECHAPARTIDO)-1,'yyyy')<>temporada
+MINUS
+(SELECT competicion,dominio,categoria,temporada,fechainicio,fechafin
+fROM FN3COMPETICIONFUTBOL ))
+
+MINUS
+(SELECT DISTINCT  codigo,descripcion
+FROM fn3temporada       )
+
+
+-----
+
+INSERT INTO FN3COMPETICIONFUTBOL
+sELECT DISTINCT COMPETICION, 'MUN', 'PRIMERA',To_Char(Min(FECHAPARTIDO)-1,'yyyy')||'/'||To_Char(Max(FECHAPARTIDO)-1,'yyyy'), Min(FECHAPARTIDO)-1,Max(FECHAPARTIDO)
+FROM FN3PARTIDOTMP2
+gROUP BY COMPETICION, 'MUN', 'PRIMERA' , TEMPORADA
+--HAVING To_Char(Min(FECHAPARTIDO)-1,'yyyy')<>temporada
+MINUS
+(SELECT competicion,dominio,categoria,temporada,fechainicio,fechafin
+FROM FN3COMPETICIONFUTBOL)
+
+
+
+INSERT INTO fn3fasecompeticion
+SELECT competicion,dominio,categoria,'UNICAUNI',temporada,fechainicio,fechafin,NULL,NULL
+FROM(
+SELECT competicion,dominio,categoria,temporada,fechainicio,fechafin
+FROM fn3competicionfutbol
+MINUS
+(
+SELECT competicion,dominio,categoria,temporada,fechainicio,fechafin
+FROM fn3fasecompeticion))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT *
+FROM ALL_CONSTRAINTS
+WHERE CONSTRAINT_NAME='FN3CLASECOMPETICIONFUTBOLCOMFK';
+
+
+
+
+INSERT INTO fn3fasecompeticion
+SELECT competicion,'MUN',categoria,temporada,'UNICAUNI',fechainicio,fechafin,NULL,NULL
+FROM(
+SELECT competicion,dominio,categoria,temporada,fechainicio,fechafin
+FROM fn3competicionfutbol
+WHERE COMPETICION||DOMINIO||TEMPORADA NOT IN
+(SELECT competicion||dominio||temporada
+FROM fn3fasecompeticion))
+
+
+INSERT INTO fn3fasejornadacompeticion
+SELECT competicion,'MUN',categoria,temporada,fase,'UNICA',fechainicio,fechafin
+FROM
+(
+SELECT competicion,dominio,categoria,temporada,fase,fechainicio,fechafin
+FROM fn3fasecompeticion
+WHERE fase='UNICAUNI' and COMPETICION||DOMINIO||TEMPORADA||fase||categoria NOT IN
+(SELECT competicion||dominio||temporada||fase||categoria
+FROM fn3fasejornadacompeticion
+))
+MINUS
+(SELECT * FROM       fn3fasejornadacompeticion)
+
+
+INSERT INTO  fn3equipocompite
+SELECT competicion,dominio,categoria,temporada,'CNO',0
+FROM fn3equipocompite
+WHERE   equipo='CON'
+ AND dominio='MUN'
+AND  competicion||dominio||categoria||temporada NOT IN
+(SELECT competicion||dominio||categoria||temporada
+FROM fn3equipocompite
+   WHERE   equipo='CNO')
+
+
+
+INSERT INTO fn3equipocompitefase
+SELECT competicion,dominio,categoria,temporada,fase,'CNO',tipo,grupo
+FROM fn3equipocompitefase
+WHERE   equipo='CON'
+ AND dominio='MUN'
+AND  competicion||dominio||categoria||temporada NOT IN
+(SELECT competicion||dominio||categoria||temporada
+FROM fn3equipocompitefase
+   WHERE   equipo='CNO' and dominio='MUN')
+
+
+
+
+
+
+
+SELECT fechapartido,equipolocal,equipovisitante
+FROM
+(
+SELECT fechapartido,equipolocal,equipovisitante,Count(*)
+FROM fn3partidofutbol
+GROUP BY fechapartido,equipolocal,equipovisitante
+HAVING Count(*)>1)
+
+
+
+
+
+--delete
+SELECT competicion,fase,fechapartido,equipolocal,equipovisitante
+
+
+SELECT *
+
+DELETE
+FROM fn3partidofutbol
+where (fechapartido,equipolocal,equipovisitante)
+in
+(select fechapartido,equipolocal,equipovisitante
+from
+(
+SELECT fechapartido,equipolocal,equipovisitante,Count(*)
+FROM fn3partidofutbol
+GROUP BY fechapartido,equipolocal,equipovisitante
+HAVING Count(*)>1))
+MINUS
+(
+SELECT competicion,fase,fechapartido,equipolocal,equipovisitante
+FROM fn3partidofutbol
+where (fechapartido,equipolocal,equipovisitante)
+in
+(select fechapartido,equipolocal,equipovisitante
+from
+(
+SELECT fechapartido,equipolocal,equipovisitante,Count(*)
+FROM fn3partidofutbol
+GROUP BY fechapartido,equipolocal,equipovisitante
+HAVING Count(*)>1))
+intersect
+(SELECT competicion,'UNICAUNI',fechapartido,equipolocal,equipovisitante
+FROM fn3partidotmp)
+)
+
+
+
+CREATE TABLE FN3PARTIDOFUTBOLAUX
+AS
+SELECT *
+FROM fn3partidofutbol
+where (fechapartido,equipolocal,equipovisitante)
+in
+(select fechapartido,equipolocal,equipovisitante
+from
+(
+SELECT fechapartido,equipolocal,equipovisitante,Count(*)
+FROM fn3partidofutbol
+GROUP BY fechapartido,equipolocal,equipovisitante
+HAVING Count(*)>1))
+
+SELECT * FROM FN3PARTIDOFUTBOLAUX
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO FN3PARTIDOFUTBOL
+SELECT *
+FROM   fn3partidofutbolAUX
+WHERE ( competicion,'UNICAUNI',fechapartido,equipolocal,equipovisitante)
+IN
+
+
+
+
+(
+SELECT   competicion,dominio,categoria,temporada',fase,jornada,fechapartido,neutral,valido,minjugados,equipolocal,equipovisitante,goleslocal,golesvisitante,penaltieslocal,penaltiesvisitante,interes
+FROM fn3partidofutbolAUX
+intersect
+(SELECT competicion,'MUN','PRIMERA','temporada','UNICA','UNICAUNI',fechapartido,neutral,valido,equipolocal,equipovisitante,GOLESLOCAL,GOLESVISITANTE,NULL,NULL,NULL
+fROM fn3partidotmp))
+
+
+INSERT INTO FN3PARTIDOFUTBOL
+
+SELECT   competicion,fechapartido,equipolocal,equipovisitante,goleslocal,golesvisitante
+FROM(
+SELECT   competicion,fechapartido,equipolocal,equipovisitante,goleslocal,golesvisitante
+FROM fn3partidofutbolAUX
+NOT intersect
+(SELECT competicion,fechapartido,equipolocal,equipovisitante,goleslocal,golesvisitante
+fROM fn3partidotmp)
+
+)
+
+
+SELECT COMPETICION,TEMPORADA,Count(*)
+--SELECT *
+FROM FN3PARTIDOFUTBOL
+WHERE
+COMPETICION='CLASMUNDIAL'
+GROUP BY COMPETICION,TEMPORADA
+
+
+
+--INSERT INTO fn3partidofutbol
+SELECT t1.competicion,t2.temporada,t1.temporada||'/'||t1.TEMPORADA,fechapartido,equipolocal,goleslocal,golesvisitante,
+ equipovisitante,info1,info2,valido
+FROM FN3PARTIDOTMP2 t1 ,
+(SELECT COMPETICION,TEMPORADA,FECHAINICIO,FECHAFIN
+FROM FN3COMPETICIONFUTBOL WHERE dominio='MUN') T2
+WHERE
+t2.fechainicio<=fechapartido AND
+t2.fechafin>=fechapartido AND
+t2.competicion=t1.competicion AND
+FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE IN
+(
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOTMP2
+MINUS
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOFUTBOL)
+
+
+
+
+
+SELECT competicion,temporada||'/'||TEMPORADA,fechapartido,equipolocal,goleslocal,golesvisitante,
+ equipovisitante,info1,info2,valido
+FROM FN3PARTIDOTMP2
+WHERE
+-- COMPETICION='MUNDIAL' AND
+FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE IN
+(
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOTMP2
+MINUS
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOFUTBOL)
+
+           --------------------------------------------
+
+SELECT competicion,temporada||'/'||TEMPORADA,fechapartido,equipolocal,goleslocal,golesvisitante,
+ equipovisitante,info1,info2,valido
+FROM FN3PARTIDOTMP2
+WHERE    FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE IN
+(
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOTMP2
+MINUS
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOFUTBOL)
+MINUS
+(
+SELECT t1.competicion,t2.temporada,fechapartido,equipolocal,goleslocal,golesvisitante,
+ equipovisitante,info1,info2,valido
+FROM FN3PARTIDOTMP2 t1 ,
+(SELECT COMPETICION,TEMPORADA,FECHAINICIO,FECHAFIN
+FROM FN3COMPETICIONFUTBOL WHERE dominio='MUN') T2
+WHERE
+t2.fechainicio<=fechapartido AND
+t2.fechafin>=fechapartido AND
+t2.competicion=t1.competicion AND
+FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE IN
+(
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOTMP2
+MINUS
+SELECT FECHAPARTIDO||EQUIPOLOCAL||EQUIPOVISITANTE
+FROM FN3PARTIDOFUTBOL))
+
+
+
+SELECT t1.competicion,FECHAPARTIDO,equipolocal,equipovisitante,Count(*)
+FROM fn3partidotmp t1,fn3fasecompeticion t2
+WHERE
+--t1.competicion<>'AMISTOSO' and
+t2.fechafin <dat('22220222')
+AND t1.competicion=t2.competicion
+--AND fechafin-fechainicio<=1865
+AND t2.dominio='MUN'
+AND t2.categoria='PRIMERA'
+AND t2.fase='UNICAUNI'
+--AND t2.jornada='UNICA'
+AND fechapartido>=t2.fechainicio
+AND fechapartido<=t2.fechafin
+AND t2.numeqclas IS NULL
+GROUP BY t1.competicion,FECHAPARTIDO,equipolocal,equipovisitante
+HAVING Count(*)>1
+
+
+INSERT INTO fn3partidofutbol
+SELECT t1.competicion,'MUN','PRIMERA',t2.temporada,'UNICAUNI','UNICA',FECHAPARTIDO,'N','S',90,equipolocal,
+equipovisitante,goleslocal,golesvisitante,NULL,NULL,null
+FROM fn3partidotmp t1,fn3fasecompeticion t2
+WHERE
+--t1.competicion<>'AMISTOSO' and
+t2.fechafin <dat('22220222')
+AND t1.competicion=t2.competicion
+--AND fechafin-fechainicio<=1865
+AND t2.dominio='MUN'
+AND t2.categoria='PRIMERA'
+AND t2.fase='UNICAUNI'
+--AND t2.jornada='UNICA'
+AND fechapartido>=t2.fechainicio
+AND fechapartido<=t2.fechafin
+--AND equipolocal='MEX' AND equipovisitante='ING'
+AND t2.numeqclas IS NULL
+
+
+----------------------------------------
+
+--INSERT INTO fn3equipocompite
+SELECT comp,'MUN','PRIMERA',temp, eq ,0
+FROM
+(
+SELECT t1.competicion AS comp,'MUN','PRIMERA',t2.temporada AS temp, equipolocal AS eq
+FROM fn3partidotmp t1,fn3fasecompeticion t2
+WHERE
+--t1.competicion<>'AMISTOSO' and
+t2.fechafin <dat('22220222')
+AND t1.competicion=t2.competicion
+--AND fechafin-fechainicio<=1865
+AND t2.dominio='MUN'
+AND t2.categoria='PRIMERA'
+AND t2.fase='UNICAUNI'
+--AND t2.jornada='UNICA'
+AND fechapartido>=t2.fechainicio
+AND fechapartido<=t2.fechafin
+--AND equipolocal='MEX' AND equipovisitante='ING'
+AND t2.numeqclas IS NULL
+UNION
+SELECT t1.competicion AS comp,'MUN','PRIMERA',t2.temporada AS temp,equipovisitante  AS eq
+FROM fn3partidotmp t1,fn3fasecompeticion t2
+WHERE
+--t1.competicion<>'AMISTOSO' and
+t2.fechafin <dat('22220222')
+AND t1.competicion=t2.competicion
+--AND fechafin-fechainicio<=1865
+AND t2.dominio='MUN'
+AND t2.categoria='PRIMERA'
+AND t2.fase='UNICAUNI'
+--AND t2.jornada='UNICA'
+AND fechapartido>=t2.fechainicio
+AND fechapartido<=t2.fechafin
+--AND equipolocal='MEX' AND equipovisitante='ING'
+AND t2.numeqclas IS NULL      )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

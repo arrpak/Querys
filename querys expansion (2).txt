@@ -1,0 +1,8 @@
+describe expoperation
+
+select ruta||punto,servicio,venta,dia  from expoperation
+where dia>=to_date('2000/10/01','yyyy/mm/dd') and
+punto='02663' and
+ruta='1000039';
+
+

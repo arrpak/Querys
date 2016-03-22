@@ -1,0 +1,9 @@
+select ruta||punto,dia,venta,incidencia,
+servicio,devolucion,
+decision+incremdecision as tirada
+from expoperation
+where ruta='3000001' and
+punto='23397' and
+dia>=to_date('2000/10/01','yyyy/mm/dd')
+order by dia;
+

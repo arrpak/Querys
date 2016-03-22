@@ -1,0 +1,25 @@
+define codnewsta = '000000002328';
+
+
+INSERT INTO fn3operation
+SELECT td.header, td.product, td.newsstand, td.operationdate, service, incidence, RETURN
+FROM fn3operationnewstanotexist td,
+(SELECT Max(loadsession) AS lastsession, header, product, newsstand, operationdate
+ FROM fn3operationnewstanotexist
+ WHERE header = 'MARCA'
+ AND product = 'DIARIO'
+ GROUP BY header, product, newsstand, operationdate) tls,
+(SELECT '&codnewsta' AS code FROM dual) tns
+WHERE tls.newsstand = tns.code
+AND td.loadsession = tls.lastsession
+AND td.header = tls.header
+AND td.product = tls.product
+AND td.newsstand = tls.newsstand
+AND td.operationdate = tls.operationdate;
+
+DELETE FROM fn3operationnewstanotexist
+WHERE header = 'MARCA'
+AND product = 'DIARIO'
+AND newsstand = '&codnewsta';
+
+COMMIT;

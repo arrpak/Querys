@@ -1,0 +1,6 @@
+SELECT
+t1.header,t1.product,To_Char(t1.newsstand),t1.OPERATIoNDATE,'|',max(t1.service),'|',max(t1.incidence),'|',max(t1.RETURN)
+FROM FN3OPERATIONNEWSTANOTEXIST t1,fn3newsstandon t2
+WHERE
+t1.newsstand=t2.newsstand
+GROUP BY t1.header,t1.product,t1.newsstand,t1.operationdate

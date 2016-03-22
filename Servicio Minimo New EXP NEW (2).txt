@@ -1,0 +1,75 @@
+
+
+
+
+
+select 'EXPANSION','DIARIO',code,'MON',1
+from
+fn3newsstand
+where code in
+(
+select newsstand
+from fn3operation
+where header='EXPANSION'
+and operationdate>sysdate-80
+and to_char(operationdate,'dy')!='sáb'
+group by newsstand
+having avg(service+incidence-return) >0
+and avg(service+incidence-return) <1.52);
+
+
+order by avg(service+incidence-return));
+
+
+
+
+));
+
+----------------------------------------------------
+---------------------------------------------------
+
+
+update fn3serviceminimum
+set service=1
+where header='EXPANSION' 
+and weekday='MON' and
+newsstand in
+(
+ select newsstand
+ from fn3operation
+ where header='EXPANSION'
+ and operationdate>sysdate-80
+ and to_char(operationdate,'dy')!='sáb'
+ group by newsstand
+ having avg(service+incidence-return) >0
+ and avg(service+incidence-return) <2);
+
+
+
+insert into fn3serviceminimum
+ select 'EXPANSION','DIARIO',code,'MON',0
+ from
+ fn3newsstand
+ where code in
+ (
+ select newsstand
+ from fn3operation
+ where header='EXPANSION'
+ and operationdate>sysdate-80
+ and to_char(operationdate,'dy')!='sáb'
+ group by newsstand
+ having avg(service+incidence-return) >0
+ and avg(service+incidence-return) <1.52)
+and code not in
+(select newsstand
+from fn3serviceminimum
+where 
+header='EXPANSION' and weekday='MON');
+
+
+
+
+
+
+
+

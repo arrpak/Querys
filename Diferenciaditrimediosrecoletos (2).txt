@@ -1,0 +1,35 @@
+
+select to_char(decision.newsstand),servicio.service,decision
+from
+(select newsstand,service,to_number(null)
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20091019','yyyymmdd')
+union
+(select newsstand,service,to_number(null) as decision
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20091019','yyyymmdd'))) servicio,
+(select newsstand,to_number(null) as service,
+(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as decision
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+ and
+orderf=1
+and
+dateprint=to_date('20091019','yyyymmdd')) decision
+where
+decision.newsstand=servicio.newsstand(+)
+--and decision <>  servicio.service
+--and (decision=0 or servicio.service=0)
+--and not(decision=0 and servicio.service is null)
+--and abs(decision-servicio.service)>0
+AND servicio.service IS NULL and decision>0
+;

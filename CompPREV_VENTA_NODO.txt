@@ -1,0 +1,36 @@
+DEFINE FECHA='2008/07/11';
+define node='NOR';
+
+SELECT  t3.output,t3.valuedate,t3.forecast,t3.forsession,t4.node,t4.service+incidence-returncont+estimatedsale AS venta
+from
+(
+SELECT  header,product,node,dateprint,orderf,sonnode,Replace(forsession,'PV','MG') AS forses
+,increaseporc,increasetab
+FROM FN3PRINTINGNODEFORSESSION
+WHERE DATEPRINT=DAT('&FECHA')
+AND header='MARCA' AND product='DIARIO' AND node='&node') t1,
+(SELECT header,product,node,dateprint,orderf,used,comunicationdate,origdate,description
+FROM fn3printing
+WHERE used='Y') t2,
+(SELECT forsession,output,dating,valuedate,forecast,variance,decision,filter,noise,forcens,used,closed
+FROM fn3forecastseries
+WHERE valuedate>SYSDATE-30) t3 ,
+(SELECT header,product,node,infodate,numpv,numopen,service,servicecont,incidence,
+incidencecont,returncont,estimatedsale,numoutoff,servoutoff,numpvcont
+,numopencont,numoutoffcont,servoutoffcont
+FROM fn3nodeinformation
+WHERE infodate>SYSDATE-30) t4
+WHERE
+t1.dateprint=t2.dateprint
+AND t1.header=t2.header
+AND t1.product=t2.product
+AND t1.header=t4.header
+AND t1.product=t4.product
+AND t3.valuedate=t2.dateprint
+AND t1.dateprint=t4.infodate
+AND t2.orderf=t1.orderf
+AND t2.node=t1.node
+AND t1.sonnode=t4.node
+AND 'VentaMarca'||t1.sonnode=t3.output
+AND t1.forses=t3.forsession
+

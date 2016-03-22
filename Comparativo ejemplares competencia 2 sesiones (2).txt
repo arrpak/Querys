@@ -1,0 +1,111 @@
+Define newfs ='e20111023Com.01';
+Define oldfs ='e20111016Com.01';
+define lastdate='20111023';
+
+
+
+SELECT t1.cabecera,t1.promocion,t1.ejemnuevo,t2.ejemantiguo,round(ejemnuevomed,0),round(ejemantiguomed,0),round(ejemnuevomed,0)-round(ejemantiguomed,0) as dif
+FROM
+(select cabecera,promocion,sum(numejemplares) AS ejemnuevo,avg(numejemplares) AS ejemnuevomed
+from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20110601','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion) t1,
+(select cabecera,promocion,sum(numejemplares) AS ejemantiguo,avg(numejemplares) AS ejemantiguomed
+from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20110601','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion
+) t2
+WHERE t1.cabecera=t2.cabecera AND
+t1.promocion=t2.promocion;
+
+
+
+
+
+
+
+
+
+/*
+select distinct(output)
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and esi.setinput = isi.setinput
+and
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20100901','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd')
+
+
+
+--HACER QUERY PARA VER PROMOCIONES YA TERMINADAS
+
+select 	t1.output,t1.input,max(t1.valuedate)
+from EzcEstimationIssue t1,bsr_d_parameter t2
+where
+t1.estsession = '&newfs'
+AND t1.valuedate>=To_Date('20100101','yyyymmdd')
+and t2.co_fixed='N'
+and t1.input=t2.co_parameter
+and 'Obs.'||t1.output=t2.co_node
+group by t1.output,t1.input
+order by 3 asc;
+
+
+
+select * from bsr_d_parameter
+where co_node like '%ABC%'
+
+
+
+
+update bsr_d_parameter
+set co_active='N'
+where co_parameter='DVDCineDelOeste2009.Ini'
+and co_model='InformeMarketingComElPaisCAM'
+
+
+
+select *
+from EzcEstimationIssue
+where
+estsession = '&newfs'
+and issue<0
+and input<>'noise'
+
+
+
+
+
+select *
+from EzcEstimationIssue
+where
+estsession = 'e20101219Com.01'
+and issue<0
+and input<>'noise'
+
+
+ */

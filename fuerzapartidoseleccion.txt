@@ -1,0 +1,31 @@
+Define eq='AUT';
+
+select competicion,fechapartido,neutral,equipolocal,equipovisitante,goleslocal,golesvisitante,fuerza
+from fn3partidofutbol t1,fn3fuerzaequipoaux10 t2
+where
+(t1.equipolocal='&eq' or t1.equipovisitante='&eq')
+and t2.equipo='&eq'
+and t2.fecha=t1.fechapartido
+--AND competicion<>'AMISTOSO'
+order by fechapartido
+
+
+
+
+SELECT *
+FROM fn3fuerzaequipoaux10
+WHERE EQUIPO='AUT'
+ORDER BY FECHA
+
+
+DELETE   fn3fuerzaequipoaux10
+WHERE FECHA>DAT('20040201')
+
+UPDATE FN3FUERZAEQUIPOAUX10
+SET FUERZA=0 WHERE FUERZA IS NULL;
+
+
+SELECT *
+FROM fn3fuerzaequipo
+WHERE EQUIPO='SPA'
+ORDER BY FECHA

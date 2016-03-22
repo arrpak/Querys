@@ -1,0 +1,129 @@
+delete from Fn3PRINTINGDETAIL
+where
+datePrint =  to_date('20051217', 'yyyymmdd')   and
+orderF    =2 and 
+header = 'EXPANSION'              and 
+product = 'DIARIO'                and 
+newsstand in
+(
+ select tirada.newsStand
+ from formarca.Fn3PRINTINGDETAIL tirada, 
+ ( 
+ select header, 
+        product, 
+        newsStand, 
+        avg(service + incidence - return)            as media, 
+       greatest(stddev(service+incidence-return), 1) as desviacion 
+ from formarca.Fn3OPERATION
+ where  header         = 'EXPANSION'              and 
+        product        = 'DIARIO'              and 
+        operationDate <  to_date('20051217', 'yyyymmdd')  and 
+ ( 
+operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(0))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(1))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(2))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(3))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(4)) 
+ ) 
+    and service> 0 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+ where tirada.header    = tabMedDes.header           and 
+       tirada.product   = tabMedDes.product          and 
+       tirada.node      = 'CAM'              and 
+       tirada.datePrint =  to_date('20051217', 'yyyymmdd')               and 
+       tirada.orderF    =1 and 
+       tirada.newsStand = tabMedDes.newsStand        and 
+       tirada.decision   != 0                       and 
+       (tirada.decision   < 0  OR  
+ceil(tirada.decision+tirada.increasedec) < tabMedDes.media));
+
+
+
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',tirada.newsStand,to_date('20051217', 'yyyymmdd'),
+        greatest(ceil(tabMedDes.media),round(tabMedDes.media* (1 + 0.24)), 0)
+ from formarca.Fn3PRINTINGDETAIL tirada, 
+ ( 
+ select header, 
+        product, 
+        newsStand, 
+        avg(service + incidence - return)            as media, 
+       greatest(stddev(service+incidence-return), 1) as desviacion 
+ from formarca.Fn3OPERATION
+ where  header         = 'EXPANSION'              and 
+        product        = 'DIARIO'              and 
+        operationDate <  to_date('20051217', 'yyyymmdd')  and 
+ ( 
+operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(0))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(1))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(2))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(3))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(4)) 
+ ) 
+    and service> 0 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+ where tirada.header    = tabMedDes.header           and 
+       tirada.product   = tabMedDes.product          and 
+       tirada.node      = 'CAM'              and 
+       tirada.datePrint =  to_date('20051217', 'yyyymmdd')               and 
+       tirada.orderF    = 1 and 
+       tirada.newsStand = tabMedDes.newsStand        and 
+       tirada.decision   != 0                       and 
+       (tirada.decision   < 0  OR  
+ceil(tirada.decision+tirada.increasedec) < tabMedDes.media);
+
+
+
+
+
+
+
+
+ select 
+    tirada.header, 
+    tirada.product, 
+    tirada.newsstand,
+    tirada.datePrint, 
+    round(tabMedDes.media, 4)                    as media, 
+    round(tabMedDes.desviacion, 4)               as desviacion, 
+    case when (decision + increaseDec) <= 50
+              then  ceil(decision + increaseDec)
+              else  decision + increaseDec end   as decision, 
+    round((tabMedDes.media * (1 + 0.24)), 4) as propuesta 
+ from formarca.Fn3PRINTINGDETAIL tirada, 
+ ( 
+ select header, 
+        product, 
+        newsStand, 
+        avg(service + incidence - return)            as media, 
+       greatest(stddev(service+incidence-return), 1) as desviacion 
+ from formarca.Fn3OPERATION
+ where  header         = 'EXPANSION'              and 
+        product        = 'DIARIO'              and 
+        operationDate <  to_date('20051217', 'yyyymmdd')  and 
+ ( 
+operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(0))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(1))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(2))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(3))  
+or operationDate =  to_date('20051217', 'yyyymmdd')  - (7*(4)) 
+ ) 
+    and service> 0 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+ where tirada.header    = tabMedDes.header           and 
+       tirada.product   = tabMedDes.product          and 
+       tirada.node      = 'CAM'              and 
+       tirada.datePrint =  to_date('20051217', 'yyyymmdd')               and 
+       tirada.orderF    = 1 and 
+       tirada.newsStand = tabMedDes.newsStand        and 
+       tirada.decision   != 0                       and 
+       (tirada.decision   < 0  OR  
+ceil(tirada.decision+tirada.increasedec) < tabMedDes.media)
+ order by decision - propuesta desc ;
+

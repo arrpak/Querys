@@ -1,0 +1,58 @@
+
+
+DEFINE dprint='20070822';
+DEFINE dcomp1='20070814';
+DEFINE dcomp2='20070814';
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('&dprint','yyyymmdd'),
+Greatest(round(maxven*1.2,maxven+2))
+--,maxven*1.2,dec,maxven+2
+from
+(
+select newsstand,avg(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where
+header='MARCA' and product='DIARIO' and
+(
+   operationdate=to_date('&dcomp1','yyyymmdd')
+or operationdate=to_date('&dcomp2','yyyymmdd')
+)
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where
+header='MARCA' and product='DIARIO' and
+(
+   operationdate=to_date('&dcomp1','yyyymmdd')
+or operationdate=to_date('&dcomp2','yyyymmdd')
+))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='AND' and dateprint=to_date('&dprint','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where newsstand LIKE '028%' AND dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('&dprint','YYYYMMDD')
+--AND newsstand LIKE '028%'
+AND header='MARCA' and product='DIARIO')) mod
+where
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1.1
+and pri.dec>0
+and pri.orderf=1;

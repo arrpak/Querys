@@ -1,0 +1,155 @@
+
+PUNTOS QUE RECIBIMOS DATOS Y ESTAN NO OPERATIVOS
+-------------------------------------------------
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(
+newsstand like '011%' or
+newsstand like '010%' or
+newsstand like '041%' or 
+newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '006%' or
+newsstand like '004%' or
+newsstand like '014%' or
+newsstand like '023%' or
+newsstand like '052%' or
+newsstand like '028%' or
+newsstand like '018%')
+and operationdate=to_date('20060315','yyyymmdd')
+union
+select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+service>0 and
+(
+newsstand like '011%' or
+newsstand like '010%' or
+newsstand like '041%' or 
+newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '006%' or
+newsstand like '004%' or
+newsstand like '014%' or
+newsstand like '023%' or
+newsstand like '052%' or
+newsstand like '028%' or
+newsstand like '018%')
+and operationdate=to_date('20060315','yyyymmdd'))
+minus
+(select newsstand
+from fn3newsstandon
+where dateoff is null);
+
+
+
+
+PUNTOS CERRADOS A LOS QUE SEGUIMOS MANDANDO SERVICIOS
+-----------------------------------------------------
+(select newsstand
+from fn3newsstandon
+where dateoff is null
+AND 
+(
+newsstand like '011%' or
+newsstand like '010%' or
+newsstand like '041%' or 
+newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '006%' or
+newsstand like '004%' or
+newsstand like '014%' or
+newsstand like '023%' or
+newsstand like '052%' or
+newsstand like '028%' or
+newsstand like '018%'))
+minus
+select newsstand
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and node='AND'
+and orderf=1
+and dateprint=to_date('20060315','yyyymmdd')
+MINUS
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+((
+newsstand like '011%' or
+newsstand like '010%' or
+newsstand like '041%' or 
+newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '006%' or
+newsstand like '004%' or
+newsstand like '014%' or
+newsstand like '023%' or
+newsstand like '052%' or
+newsstand like '028%' or
+newsstand like '018%'))
+and operationdate=to_date('20060315','yyyymmdd')
+AND SERVICE>0
+union
+(select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(
+newsstand like '011%' or
+newsstand like '010%' or
+newsstand like '041%' or 
+newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '006%' or
+newsstand like '004%' or
+newsstand like '014%' or
+newsstand like '023%' or
+newsstand like '052%' or
+newsstand like '028%' or
+newsstand like '018%')
+and operationdate=to_date('20060315','yyyymmdd')
+AND SERVICE>0)
+);
+
+PUNTOS CON SERVICIO Y DE LOS QUE NO RECIBIMOS DATO
+--------------------------------------------------
+select det.newsstand
+from fn3printingdetail det ,fn3newsstandon non
+where det.header='MARCA' and det.product='DIARIO' and
+(
+det.newsstand like '011%' or det.newsstand like '041%' or
+det.newsstand like '029%' or det.newsstand like '021%' or 
+det.newsstand like '004%' or det.newsstand like '014%' or
+det.newsstand like '023%' or det.newsstand like '052%' or
+det.newsstand like '018%' or det.newsstand like '028%') and 
+det.decision>0 and
+det.orderf=1 and
+det.dateprint=to_date('20060306','yyyymmdd')
+and det.newsstand=non.newsstand
+and dateoff is null
+minus
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '011%' or newsstand like '041%' or 
+newsstand like '029%' or newsstand like '021%' or 
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '018%' or newsstand like '028%')
+and operationdate=to_date('20060306','yyyymmdd')
+union
+select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '011%' or newsstand like '041%' or 
+newsstand like '029%' or newsstand like '021%' or 
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '018%' or newsstand like '028%')
+and operationdate=to_date('20060315','yyyymmdd'));

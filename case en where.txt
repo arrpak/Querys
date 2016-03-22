@@ -1,0 +1,21 @@
+define header='jhkjh';
+
+
+
+
+SELECT *
+FROM fn3printing
+WHERE
+product='DIARIO'
+AND dateprint=To_Date('20110514','yyyymmdd')
+AND header IN  ( case   WHEN   '&header'='MARCA' THEN 'MARCA'
+                        WHEN   '&header'='EXPANSION' THEN 'EXPANSION'
+                        ELSE    header
+END);
+
+
+
+
+
+
+

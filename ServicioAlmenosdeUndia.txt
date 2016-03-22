@@ -1,0 +1,22 @@
+insert into fn3servicemodified
+select 'MARCA','DIARIO',hoy.newsstand,to_date('20040909','yyyymmdd'),
+ceil(greatest(hoy.ser,ayer.ser))
+from
+(select newsstand,decision+increasedec as ser
+from fn3printingdetail
+where header='MARCA'
+and product='DIARIO'
+and node='EXT'
+and dateprint=to_date('20040909','yyyymmdd')
+and orderf=1)  hoy,
+(select newsstand,decision+increasedec as ser
+from fn3printingdetail
+where header='MARCA'
+and product='DIARIO'
+and node='EXT'
+and dateprint=to_date('20040908','yyyymmdd')
+and orderf=1)  ayer
+where
+ayer.newsstand=hoy.newsstand
+and hoy.ser<ayer.ser;
+

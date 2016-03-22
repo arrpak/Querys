@@ -1,0 +1,74 @@
+
+
+
+
+insert into fn3operation
+--select count(*)
+select *
+from fn3operationnotcontrolled
+where
+header='EXPANSION' and product='DIARIO' and
+operationdate<=to_date('20091130','yyyymmdd') and
+substr(newsstand,1,3) in ('028')
+and service>0
+
+
+delete
+from fn3operationnotcontrolled
+where
+header='EXPANSION' and product='DIARIO' and
+operationdate<=to_date('20091130','yyyymmdd') and
+substr(newsstand,1,3) in ('028')
+and service>0
+;
+
+
+
+
+
+
+insert into fn3operation
+--select count(*)
+select *
+from fn3operationnotcontrolled
+where
+product='DIARIO' and
+operationdate>=to_date('20061001','yyyymmdd') and
+operationdate<=to_date('20071231','yyyymmdd') and
+substr(newsstand,1,3) in  ('028');
+
+
+delete
+from fn3operationnotcontrolled
+where
+product='DIARIO' and
+operationdate>=to_date('20061001','yyyymmdd') and
+operationdate<=to_date('20071231','yyyymmdd') and
+			substr(newsstand,1,3) in
+('028');
+
+
+
+loadsession='20050523_ANDEXT2'
+
+
+insert into fn3operation
+SELECT header,product,newsstand,operationdate,service,incidence,return
+from fn3operationnewstanotexist
+where
+loadsession='20051122_CAM' and newsstand ='028002425271'
+;
+
+
+insert into fn3operation
+SELECT header,product,newsstand,operationdate,max(service),max(incidence),max(return)
+from fn3operationnewstanotexist
+where
+newsstand = '029000572200'
+and operationdate<to_date('20050509','yyyymmdd')
+group by header,product,newsstand,operationdate
+;
+
+
+
+

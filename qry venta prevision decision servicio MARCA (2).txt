@@ -1,0 +1,38 @@
+SELECT fecha,venta,prevision,decision,servicio
+from
+(
+SELECT output,dating,valuedate,forsession,Round(forecast,2) AS prevision,Round(decision,2)AS decision
+FROM fn3forecastseries
+WHERE  output='VentaMarca028000100002'
+AND valuedate>=To_Date('20100101','yyyymmdd')
+) t1,
+( select
+   Replace(NEWSSTAND,' ','') as Prefijo,
+OPERATIONDATE as Fecha ,
+(SERVICE) as Servicio ,
+(incidence) as Incidencia ,
+(RETURN) as Devolucion ,
+ SERVICE+INCIDENCE-RETURN as Venta
+ from FN3OPERATION
+ where header    in ('MARCA')
+   and product   in ('DIARIO')
+   and newsStand in ('028000100002')
+ order by Fecha, Prefijo
+ )  t2,
+(
+SELECT DISTINCT t1.dateprint,FORSESSION
+FROM FN3printing t1,FN3printingnodeFORsession t2
+WHERE
+t1.header='MARCA' AND t1.product='DIARIO'
+AND t1.dateprint>=To_Date('20100101','yyyymmdd')
+AND t1.header=t2.header
+AND t1.product=t2.product
+AND t1.orderf=t2.orderf
+AND t1.dateprint=t2.dateprint
+AND used='Y'
+) t3
+WHERE fecha =valuedate
+AND t1.FORsession=t3.forsession
+AND t1.valuedate=t3.dateprint
+order by valuedate ;
+

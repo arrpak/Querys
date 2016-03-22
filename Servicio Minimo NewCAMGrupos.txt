@@ -1,0 +1,235 @@
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20051127','yyyymmdd'),
+Greatest(round(maxven*1.1,dec+3))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20051002','yyyymmdd')
+or operationdate=to_date('20051106','yyyymmdd')
+)
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20051002','yyyymmdd')
+or operationdate=to_date('20051106','yyyymmdd')
+))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='CAM' and dateprint=to_date('20051127','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandgroup
+where newsstandgroup='Opencor_Madrid'
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20051127','YYYYMMDD'))) mod
+where 
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1.0
+and pri.dec>0
+and pri.orderf=1;
+
+
+
+----------------------------------------------------------
+----------------------------------------------------------
+PLAYAS
+PLAYAS
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20030806','yyyymmdd'),
+Greatest(round(maxven*1.10,dec+2))
+from
+(
+select newsstand,max(ven) as maxven
+from
+(select newsstand,(service+incidence-return) as ven
+from fn3operation
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040531','yyyymmdd') OR 
+operationdate=to_date('20030609','yyyymmdd'))
+union
+select newsstand,(service+incidence-return) as ven
+from fn3operationnotcontrolled
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040531','yyyymmdd') OR 
+operationdate=to_date('20030609','yyyymmdd')))
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='EXT' and dateprint=to_date('20030806','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20030806','YYYYMMDD'))) mod,
+(select newsstand
+from fn3node
+where fathernode like '%PLA%') pla
+where 
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+and pla.newsstand=pri.newsstand
+and pri.dec<=ope.maxven
+and pri.dec>0
+and pri.orderf=1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delete
+FROM FN3SERVICEMODIFIED
+WHERE MODIFIEDDATE=TO_DATE('20040306','YYYYMMDD')
+and newsstand like '028%';
+
+
+
+ANTIGUA
+ANTIGUA
+ANTIGUA
+ANTIGUA
+ANTIGUA
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date(20030806','yyyymmdd'),
+Greatest(round(maxven*1.10),dec+2)
+from
+(select newsstand,max(service+incidence-return) as maxven
+from fn3operation
+where 
+header='MARCA' and product='DIARIO' and
+(
+operationdate=to_date('20040405','yyyymmdd') OR 
+operationdate=to_date('20040412','yyyymmdd')
+)
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+--forsession!='ServicioFijo' and
+node='EXT' and dateprint=to_date(20030806','yyyymmdd')
+group by newsstand,orderf) pri
+where 
+ope.newsstand=pri.newsstand
+and pri.dec<=ope.maxven
+and pri.dec>1
+and pri.orderf=1
+AND PRI.NEWSSTAND NOT IN
+(SELECT NEWSSTAND
+FROM FN3SERVICEMODIFIED
+WHERE MODIFIEDDATE=TO_DATE(20030806','YYYYMMDD'));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

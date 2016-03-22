@@ -1,0 +1,14 @@
+SELECT ope.newsstand,ope.service,
+(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL_TIRADA
+FROM fn3operation ope,fn3printingdetail pridet
+WHERE
+ope.operationdate=To_Date('20050602','yyyymmdd')
+AND pridet.dateprint=To_Date('20050609','yyyymmdd')
+AND substr(ope.newsstand,1,3) in('029','004','014','023','041','011','021','052','018','006','010')
+AND pridet.node='AND'
+AND FORSESSION='2005060916.PV'
+AND ope.RETURN=0
+AND ope.newsstand=pridet.newsstand(+)
+AND Ceil(decision+increasedec)<=ope.service

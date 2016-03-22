@@ -1,0 +1,112 @@
+select puntoventa   from fn2operacion
+where servicio =0 
+and fecha=to_date('2000/11/26','yyyy/mm/dd')
+minus 
+(select puntoventa   from fn2operacion
+where servicio =0 
+and fecha=to_date('2000/11/05','yyyy/mm/dd'))
+
+
+
+select puntoventa from  fn2cierreregular
+where exprtol like  '%CtCieHiper%'
+minus
+(select puntoventa   from fn2operacion
+where servicio =0 
+or servicio=''
+and fecha=to_date('2000/11/26','yyyy/mm/dd'));
+
+
+
+
+select tab.puntoventa
+from  fn2operacion,
+     (select puntoventa, count(*) as numdat
+      from fn2operacion
+      where fecha = to_date('2000/11/26','yyyy/mm/dd')
+      group by puntoventa) tab
+where servicio = 0 and
+      (fecha = to_date('2000/11/26','yyyy/mm/dd') or
+       numdat = 0) and
+      tab.puntoventa = fn2operacion.puntoventa
+minus 
+select fn2operacion.puntoventa
+from fn2operacion
+where (servicio = 0 and
+       fecha = to_date('2000/11/05','yyyy/mm/dd'));
+
+
+--NO SALE
+select fn2operacion.puntoventa
+from fn2operacion,
+     (select puntoventa, count(*) as numdat
+      from fn2operacion
+      where fecha = to_date('2000/11/26','yyyy/mm/dd')
+      group by puntoventa) tab20001126
+where ((servicio = 0 and fecha = to_date('2000/11/26', 'yyyy/mm/dd')) or
+       tab20001126.numdat = 0) and
+      (servicio != 0 and fecha = to_date('2000/11/05', 'yyyy/mm/dd')) and
+      tab20001126.puntoventa = fn2operacion.puntoventa;
+
+
+
+
+select count(tab.puntoventa)
+from  fn2operacion,
+     (select puntoventa, count(*) as numdat
+      from fn2puntoventa, fn2operacion
+      where operativo = 'S' and
+            fecha = to_date('2000/11/26','yyyy/mm/dd') and
+            fn2puntoventa.codigo = fn2operacion.puntoventa
+      group by puntoventa) tab
+where servicio = 0 and
+      (fecha = to_date('2000/11/26','yyyy/mm/dd') or
+       numdat = 0) and
+      tab.puntoventa = fn2operacion.puntoventa;
+select count(fn2operacion.puntoventa)
+from fn2operacion
+where (servicio = 0 and
+       fecha = to_date('2000/11/05','yyyy/mm/dd'));
+
+
+
+select count(*) as numdat
+from fn2puntoventa, fn2operacion
+where operativo = 'S' and
+      fecha = to_date('2000/11/26','yyyy/mm/dd') and
+      fn2puntoventa.codigo = fn2operacion.puntoventa
+
+select count(*) as numdat
+from   fn2operacion
+where  fecha = to_date('2000/11/26','yyyy/mm/dd')
+
+-----------------------------------------------------------------------------------------
+select codigo as puntoventa 
+from fn2puntoventa
+where operativo='S'
+minus
+select puntoventa
+from fn2operacion
+where servicio>0 and
+      fecha=to_date('2000/11/26','yyyy/mm/dd');
+
+
+
+select puntoventa
+       from  fn2operacion,fn2puntoventa
+       where fn2puntoventa.operativo='S'	
+minus
+select puntoventa
+       from  fn2operacion
+       where fecha = to_date('2000/11/05','yyyy/mm/dd')
+       and servicio!=0;
+
+
+select *
+from   partidofutbol
+where  fechapartido >= to_date('19941203', 'YYYYMMDD') and
+       fechapartido <= to_date('19941204', 'YYYYMMDD')
+order  by fechapartido;
+
+
+

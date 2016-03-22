@@ -1,0 +1,154 @@
+select newsstand,to_date('20031105','yyyymmdd'),round(max(service+incidence-return))
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and substr(newsstand,1,3) in
+('004','006','008','010','011','014','018','021','023','026','029','041','052') and
+to_char(to_date('20031105','yyyymmdd'),'DY')=to_char(operationdate,'DY') and
+operationdate>sysdate-25
+group by newsstand;
+
+
+
+
+ select fn3operation.newsstand,to_date('20031105','yyyymmdd'),
+        round(max(fn3operation.service+fn3operation.incidence-fn3operation.return)) as maxven,
+        round(decision+increasedec) as dec
+ from fn3operation,fn3printingdetail
+ where fn3operation.header='MARCA' and fn3operation.product='DIARIO'
+ and substr(fn3operation.newsstand,1,3) in
+ ('004','006','008','010','011','014','018','021','023','026','029','041','052') and
+ to_char(to_date('20031105','yyyymmdd'),'DY')=to_char(fn3operation.operationdate,'DY') and
+ fn3operation.operationdate>sysdate-15 and
+ dateprint=to_date('20031105','yyyymmdd') and
+ (node='AND' or node ='EXT') and
+ orderf=1 and
+ fn3operation.newsstand=fn3printingdetail.newsstand
+ group by fn3operation.newsstand,round(decision+increasedec)
+
+
+
+---------------------------------------------------------------
+
+
+set pagesize 5000;
+set linesize 120:
+select 'MARCA','DIARIO','AND',to_date('20031105','yyyymmdd'),1,fn3operation.newsstand,to_date('20031105','yyyymmdd'),
+       'ModificaciondeServicio',
+       Gt(round(max(fn3operation.service+fn3operation.incidence-fn3operation.return)),round(decision+increasedec) as maxven,0
+from fn3operation,fn3printingdetail
+where fn3operation.header='MARCA' and fn3operation.product='DIARIO'
+and substr(fn3operation.newsstand,1,3) in
+('004','006','008','010','011','014','018','021','023','026','029','041','052') and
+to_char(to_date('20031105','yyyymmdd'),'DY')=to_char(fn3operation.operationdate,'DY') and
+fn3operation.operationdate>sysdate-15 and
+dateprint=to_date('20031105','yyyymmdd') and
+(node='AND') and
+round(max(fn3operation.service+fn3operation.incidence-fn3operation.return)),round(decision+increasedec)
+orderf=1 and
+fn3operation.newsstand=fn3printingdetail.newsstand
+group by fn3operation.newsstand,round(decision+increasedec);
+
+
+
+--------------------------------------------------------------------------------------------
+
+
+
+
+select pri.newsstand,pri.dateprint,Greatest(round(maxven*1.1),deci)
+from
+(select newsstand,round(AVG(service+incidence-return)) as maxven
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+--and substr(newsstand,1,3) in
+--('004','006','008','010','011','014','018','021','023','026','029','041','052') and
+--to_char(to_date('20031106','yyyymmdd'),'DY')=to_char(operationdate,'DY') and
+(operationdate=to_date('20030121','yyyymmdd') OR
+operationdate=to_date('20001107','yyyymmdd'))
+group by newsstand) ope,
+------------------
+(select newsstand,dateprint,ceil(decision+increasedec) as deci
+from fn3printingdetail
+where header='MARCA' and product='DIARIO'
+and 
+dateprint=to_date('20031111','yyyymmdd') 
+and
+node='AND' and
+orderf=1) pri
+where maxven>deci and
+pri.newsstand=ope.newsstand;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',pri.newsstand,pri.dateprint,Greatest(round(maxven*1),deci)
+from
+(select newsstand,round(AVG(service+incidence-return)) as maxven
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+--and substr(newsstand,1,3) in
+--('004','006','008','010','011','014','018','021','023','026','029','041','052') and
+--to_char(to_date('20031106','yyyymmdd'),'DY')=to_char(operationdate,'DY') and
+(operationdate=to_date('20030121','yyyymmdd') OR
+operationdate=to_date('20030121','yyyymmdd'))
+group by newsstand) ope,
+------------------
+(select newsstand,dateprint,ceil(decision+increasedec) as deci
+from fn3printingdetail
+where header='MARCA' and product='DIARIO'
+and 
+dateprint=to_date('20031112','yyyymmdd') 
+and
+node='EXT' and
+orderf=1) pri
+where maxven>deci and
+pri.newsstand=ope.newsstand
+AND PRI.NEWSSTAND NOT IN
+(SELECT NEWSSTAND
+FROM FN3SERVICEMODIFIED
+WHERE MODIFIEDDATE=TO_DATE('20031111','YYYYMMDD'));
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+INSERT INTO FN3SERVICEMODIFIED
+select 'MARCA','DIARIO',pri.newsstand,pri.dateprint,Greatest(round(maxven*1.1),deci*1.1)
+from
+(select newsstand,ROUND(MAX(service+incidence-return)) as maxven
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+(operationdate=to_date('20031117','yyyymmdd') OR
+ operationdate=to_date('20031118','yyyymmdd') OR
+ operationdate=to_date('20031119','yyyymmdd') OR
+ operationdate=to_date('20031113','yyyymmdd') OR
+ operationdate=to_date('20031114','yyyymmdd') 
+)
+group by newsstand) ope,
+------------------
+(select newsstand,dateprint,ceil(decision+increasedec) as deci
+from fn3printingdetail
+where header='MARCA' and product='DIARIO'
+and 
+dateprint=to_date('20031126','yyyymmdd') 
+and
+node='CAM' and
+orderf=1) pri
+where maxven>deci and
+pri.newsstand=ope.newsstand
+AND PRI.NEWSSTAND NOT IN
+(SELECT NEWSSTAND
+FROM FN3SERVICEMODIFIED
+WHERE MODIFIEDDATE=TO_DATE('20031126','YYYYMMDD'));
+
+
+
+
+
+

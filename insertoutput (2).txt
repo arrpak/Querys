@@ -1,0 +1,37 @@
+
+
+insert into fn3node
+values('MARCA', 'DIARIO', '012055829370', 'nodo terminal', '012055829370', 'CAVCASPER');
+
+insert into fn3output
+values('VentaMarca012055829370', 'MARCA', 'DIARIO', '012055829370');
+
+insert into fn3outputdating
+values('VentaMarca012055829370', 'Diario', 1, NULL, NULL, 'P1_SDIF0_0.1AR0_0MA0_0.1',
+       NULL, NULL, NULL);
+
+insert into fn3probnotoutoff
+values('VentaMarca012055829370', to_date('20081103', 'YYYYMMDD'), 0.92);
+
+
+insert into Fn3Estimation
+values('FICTICIA', 'VentaMarca012055829370', 'Diario', 'P1_SDIF0_0.1AR0_0MA0_0.1',
+       to_date(NULL), to_date(NULL), to_date(NULL), to_date(NULL),
+       to_number(NULL), to_number(NULL), to_char(NULL), to_char(NULL),
+       to_char(NULL), to_char(NULL), to_number(NULL), to_number(NULL),
+       to_number(NULL), to_number(NULL), to_number(NULL), to_number(NULL),
+       to_number(NULL), 'END', 'Estimacion para la prevision de pv sin datos', to_char(NULL));
+
+
+insert into Fn3Estimation        
+values('DiasTipicos', 'VentaMarca012055829370', 'Diario', 'P1_SDIF0_0.1AR0_0MA0_0.1',
+       to_date(NULL), to_date(NULL), to_date(NULL), to_date(NULL),
+       to_number(NULL), to_number(NULL), to_char(NULL), to_char(NULL),
+       to_char(NULL), to_char(NULL), to_number(NULL), to_number(NULL),
+       to_number(NULL), to_number(NULL), to_number(NULL), to_number(NULL),
+       to_number(NULL), 'END', 'Estimacion para la prevision por DiasTipicos', to_char(NULL));
+
+commit;
+
+
+

@@ -1,0 +1,49 @@
+
+SELECT t1.equipo,grupo,nacion,t3.puesto
+FROM fn3equipocompitefase t1,fn3equipofutbol t2,
+     fn3probabilidadpuestofase t3,fn3probabilidadpuestofase t4
+WHERE 
+t1.competicion='COPAEUROPA'
+AND t1.dominio='EUR'
+AND t1.categoria='PRIMERA'
+AND t1.temporada='2011/2012'
+AND t1.fase='LIGUILLA1DOB'
+AND t3.probabilidad=1
+AND t1.fase=t3.fase
+AND t1.temporada=t3.temporada
+AND t2.codigo=t1.equipo
+AND t1.equipo=t3.equipo
+AND t1.competicion=t3.competicion
+AND t1.dominio=t3.dominio
+AND t1.categoria=t3.categoria
+AND t3.competicion=t4.competicion
+AND t3.dominio=t4.dominio
+AND t3.categoria=t4.categoria
+AND t3.temporada=t4.temporada
+AND t4.equipo=t3.equipo
+AND t4.competicion=t3.competicion
+AND t4.dominio=t3.dominio
+AND t4.fechacalculo=t3.fechacalculo
+AND t4.categoria=t3.categoria
+AND t4.puesto=t3.puesto
+AND t3.puesto IN ('1','2')
+AND t4.fechacalculo=(
+select Max(fechacalculo)
+FROM fn3probabilidadpuestofase
+WHERE
+competicion='COPAEUROPA'
+AND dominio='EUR'
+AND categoria='PRIMERA'
+AND temporada='2011/2012'
+AND fase='LIGUILLA1DOB')
+AND t1.equipo IN
+(
+SELECT equipo
+FROM FN3EQUIPOCOMPITEFASE
+WHERE 
+competicion='COPAEUROPA'
+AND dominio='EUR'
+AND categoria='PRIMERA'
+AND temporada='2011/2012'
+AND fase='CUARTOSDOB')
+ORDER BY puesto

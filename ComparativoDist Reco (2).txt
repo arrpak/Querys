@@ -1,0 +1,126 @@
+select operationdate,sum(tirada),sum(servicio),
+sum(case when return=0 then 1 else 0 end) as AgotDis,
+sum(case when tirada-venta<=0 then 1 else 0 end) as AgotRec,
+sum(case when tirada-venta<=0 then tirada else venta end) as VentaRec,       
+sum(case when servicio=return and tirada>servicio then tirada-return else 0 end) as VentaPerdidaDis,
+sum(Tirada-(case when tirada-venta<=0 then tirada else venta end)) as DevoRec,
+sum(return) as DevoDis,
+sum(case when tirada-venta<0 then venta-tirada else 0 end) as VentaPerdidaRec,
+sum(venta) as VentaDist,
+--
+       count(*)
+from
+(select newsstand,dateprint,orderf,
+ (case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as tirada  
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+newsstand like '028%' and
+dateprint>=to_date('20041101','yyyymmdd')) reco,
+(select newsstand,operationdate,
+       service+incidence as servicio,service+incidence-return as venta,return
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20041101','yyyymmdd') and
+newsstand like '028%') distri,
+(select dateprint,orderf
+from fn3printing
+where node='CAM' and used='Y') orden
+where
+reco.newsstand=distri.newsstand and
+reco.orderf=orden.orderf and
+orden.dateprint=reco.dateprint and
+operationdate=reco.dateprint
+group by operationdate
+;
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+
+select reco.newsstand,sum(tirada),sum(servicio),
+sum(case when return=0 then 1 else 0 end) as AgotDis,
+sum(case when tirada-venta<=0 then 1 else 0 end) as AgotRec,
+sum(case when tirada-venta<=0 then tirada else venta end) as VentaRec,       
+sum(case when servicio=return and tirada>servicio then tirada-return else 0 end) as VentaPerdidaDis,
+sum(case when tirada-venta<0 then venta-tirada else 0 end) as VentaPerdidaRec,
+sum(venta) as VentaDist,
+--
+       count(*)
+from
+(select newsstand,dateprint,orderf,
+ (case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as tirada  
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+newsstand like '028%' and
+dateprint>=to_date('20041101','yyyymmdd')) reco,
+(select newsstand,operationdate,
+       service+incidence as servicio,service+incidence-return as venta,return
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20041101','yyyymmdd') and
+newsstand like '028%') distri,
+(select dateprint,orderf
+from fn3printing
+where node='CAM' and used='Y') orden
+where
+reco.newsstand=distri.newsstand and
+reco.orderf=orden.orderf and
+orden.dateprint=reco.dateprint and
+operationdate=reco.dateprint
+group by reco.newsstand
+;
+
+
+
+
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+
+select reco.newsstand,reco.dateprint,tirada,servicio,
+(case when tirada-venta<=0 then tirada else venta end) as VentaRec, 
+(venta) as VentaDist,
+(case when tirada-venta<0 then venta-tirada else 0 end) as VentaPerdidaRec,
+(case when servicio=return and tirada>servicio then tirada-return else 0 end) as VentaPerdidaDis,
+(Tirada-(case when tirada-venta<=0 then tirada else venta end)) as DevoRec,
+Return as DevoDist,(case when return=0 then 1 else 0 end) as AgotDis,
+(case when tirada-venta<=0 then 1 else 0 end) as AgotRec
+from
+(select newsstand,dateprint,orderf,
+ (case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as tirada  
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+newsstand like '028%' and
+dateprint>=to_date('20041101','yyyymmdd')) reco,
+(select newsstand,operationdate,
+       service+incidence as servicio,service+incidence-return as venta,return
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20041101','yyyymmdd') and
+newsstand like '028%') distri,
+(select dateprint,orderf
+from fn3printing
+where node='CAM' and used='Y') orden
+where
+reco.newsstand=distri.newsstand and
+reco.orderf=orden.orderf and
+orden.dateprint=reco.dateprint and
+operationdate=reco.dateprint
+and reco.newsstand='023001002726'
+;
+
+
+
+
+

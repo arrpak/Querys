@@ -1,0 +1,71 @@
+drop  Fn2EstSessionKK;
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2EstSessionKK
+--
+-- PURPOSE: Definicion de la tabla de estimaciones por sesión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo             char(80),
+  fecha              date,
+  sessionIni         char(80),
+  estSessionNodoPadre  char(80),
+  fechaIni           date,
+  fechaFin           date,
+  descripcion          char(80),
+--////////////////////////////////////////////////////////////////////////////
+--'sessionIni' debe se ser NULL o ser un dato introducido en el campo 'codigo'
+--////////////////////////////////////////////////////////////////////////////
+  Constraint check_sessionIni Check
+       (sessionIni IS NULL OR sessionIni IN (codigo)),
+  CONSTRAINT pk_EstSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX
+ )
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+insert into Fn2EstSessionKK (codigo, fecha, sessionIni, estSessionNodoPadre,fechaIni, fechaFin)
+      values ('1', '10/10/2000', '' , '', '10/10/2000', '10/10/2000');
+insert into Fn2EstSessionKK (codigo, fecha, sessionIni, fechaIni, fechaFin)
+       values ('2', '10/10/2000', '1', '3', '10/10/2000', '10/10/2000');
+insert into Fn2EstSessionKK (codigo, fecha, sessionIni, fechaIni, fechaFin)
+       values ('3', '10/10/2000', '4', '1', '10/10/2000', '10/10/2000');
+
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2DetalleTiradaKK
+--
+-- PURPOSE: Definicion de la tabla de detalles de tirada.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  fecha              date,
+  orden              integer,
+  cabecera           char(12),
+  producto           char(12),
+  outputDef          char(80),
+  forSession         char(80)           not null,
+  decision           float(126),
+  increnDecision     float(126),
+--////////////////////////////////////////////////////////////////////////////
+--'decision' ha de ser igual que 'fn2ForecastDetail.decision'
+--////////////////////////////////////////////////////////////////////////////
+  foreign key       (fecha, orden, cabecera, producto)
+          references Fn2Tirada(fecha, orden, cabecera, producto),
+  foreign key       (outputDef, forSession, fecha)
+          references Fn2ForecastDetail(outputDef, forSession, valueDate),
+  CONSTRAINT pk_DetalleTirada PRIMARY KEY(fecha, orden, cabecera, producto, outputDef)
+                             USING INDEX TABLESPACE MARCA_IDX
+)
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);

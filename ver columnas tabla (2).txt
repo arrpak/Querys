@@ -1,0 +1,28 @@
+SELECT *
+FROM FN3Datosondeo
+
+
+
+SELECT * FROM DICT WHERE UPPER(COMMENTS) LIKE '%COLUM%'
+
+SELECT Upper(COLUMN_NAME),DATA_TYPE,DATA_LENGTH
+FROM USER_TAB_COLS
+WHERE TABLE_NAME='FN3DATOSONDEO';
+
+
+Fechaportada,
+COdProduct",
+producto,
+COdDesglose,
+,"Cód. Estructura",
+estructura,
+"Cód. Nodo",nodo,"Cód. Zona Geográfica",
+"Zona Geográfica",
+envíos,incidencias,"Reparos Env.",
+devoluciones,"Reparos Dev.",
+atrasados,tirada,servicio,devolución,"% Dev.",
+ventas,"Env. Estad.",
+"Dev. Estad.","Ventas Estad.","% Dev. Estad.","% Tratamiento","Dev. Estimada",
+"Venta Estimada","% Var. Envíos","% Var. Devolución","% Var. Ventas","Nº Ptos Servicio",
+"Nº Ptos Agotados","Ejem. en Agotados","Ejem. en Nulos","Nº Ptos. Nulos","Dev. Media por Pto.",
+"% Agot.","% Puntos Nulos",sondeo

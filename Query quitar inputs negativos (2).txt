@@ -1,0 +1,41 @@
+UPDATE FN3INPUT
+SET ACTIVE='-'
+WHERE
+SETINPUT='Temporal' and
+code LIKE 'Sr%';
+
+
+
+insert into fn3outputinputinformation
+select output,'Eliminados','Diario',input,'E',null,null,null,null,'Y'
+from fn3estimationinput
+where
+value<0
+and orderf=0
+and estsession='20110225.MG'
+and output like 'VentaMarcaCAM%ER%'
+--and output='VentaMarcaANDMEL'
+and input in
+(select code
+from fn3input
+where setinput='Temporal' and
+active='Y');
+
+
+DELETE fn3outputinputinformation
+WHERE TYPE='E' AND OUTPUT='VentaMarcaEXTCACPER';
+
+
+
+select 'Temporal','Diario',inp,null,null,null,
+null,null,'Y',null
+from
+(
+ select distinct(input) as inp
+  from fn3estimationinput
+  where estsession='20050311.MG'
+  and output like 'VentaMarcaCAM%'
+ minus(
+select code
+ from fn3input
+ where setinput='Temporal'))

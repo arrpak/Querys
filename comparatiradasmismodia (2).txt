@@ -1,0 +1,24 @@
+select t1.newsstand,t1.decision+t1.increasedec as dia,
+                    t2.decision+t2.increasedec as lib
+from fn3printingdetail t1, fn3printingdetail t2
+where t1.header='EXPANSION' and t2.header='EXPANSION' and
+      t1.product='DIARIO' and t2.product='LIBRO' and
+      t1.orderf=t2.orderf and
+      t1.dateprint=to_date('20020625','yyyymmdd') and
+      t1.decision+t1.increasedec<t2.decision+t2.increasedec and
+      t1.dateprint=t2.dateprint and
+      t1.newsstand=t2.newsstand;
+
+  
+insert into fn3servicemodified
+select 'EXPANSION','DIARIO',t1.newsstand,
+       to_date('20020625','yyyymmdd'),t2.decision+t2.increasedec 
+from fn3printingdetail t1, fn3printingdetail t2
+where t1.header='EXPANSION' and t2.header='EXPANSION' and
+      t1.product='DIARIO' and t2.product='LIBRO' and
+      t1.orderf=t2.orderf and
+      t1.dateprint=to_date('20020625','yyyymmdd') and
+      t1.decision+t1.increasedec<t2.decision+t2.increasedec and
+      t1.dateprint=t2.dateprint and
+      t1.newsstand=t2.newsstand;
+

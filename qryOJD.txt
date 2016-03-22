@@ -1,0 +1,26 @@
+
+ INSERT INTO emuojd
+SELECT cabecera,provincia,valuedate,ventanumero
+ FROM emuojdprovincial
+ WHERE To_Char(valuedate,'yyyymm')='201103';
+
+
+
+DELETE emuojd WHERE edicion='TOTAL';
+
+INSERT INTO EMUOJD
+SELECT cabecera,'TOTAL',VALUEDATE,Sum(ventanumero)
+FROM emuojd
+WHERE
+--valuedate>To_Date('20110302','yyyymmdd') and
+edicion<>'EXTRANJERO'
+GROUP BY cabecera,VALUEDATE,'TOTAL';
+
+
+
+SELECT cabecera,edicion,ventanumero
+FROM emuojd
+WHERE
+valuedate=To_Date('20101101','yyyymmdd')
+AND edicion='TOTAL'
+ORDER BY 1,3 desc;

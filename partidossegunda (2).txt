@@ -1,0 +1,52 @@
+Oviedo-Extremadura
+Nastic-Racing
+Poli Ejido-Burgos
+Atlético-Jaén
+Murcia -Eibar
+Elche-R. Ferrol
+Córdoba-Leganés
+Albacete-Levante
+Numancia-Salamanca
+Badajoz-Recreativo
+Xerez-Sporting
+
+
+
+select count(*)
+from   fn3partidofutbol
+where  competicion = 'LIGA' and
+       dominio     = 'SPA' and
+       categoria   = 'SEGUNDA' and
+       temporada   = '2001/2002';
+
+
+
+
+insert into fn2partidofutbol
+select competicion, dominio, categoria, to_date('20010825', 'YYYYMMDD'), 
+       jornada, fechapartido, equipolocal, equipovisitante, goleslocal,
+       golesvisitante, penaltieslocal, penaltiesvisitante, interes
+from   fn3partidofutbol
+where  competicion = 'LIGA' and
+       dominio     = 'SPA' and
+       categoria   = 'SEGUNDA' and
+       temporada   = '2001/2002' and
+       jornada     > '09';
+
+insert into fn2partidofutbol
+select competicion, dominio, categoria, to_date('20010825', 'YYYYMMDD'), 
+       substr(jornada, 2, 1), fechapartido, equipolocal, equipovisitante, goleslocal,
+       golesvisitante, penaltieslocal, penaltiesvisitante, interes
+from   fn3partidofutbol
+where  competicion = 'LIGA' and
+       dominio     = 'SPA' and
+       categoria   = 'SEGUNDA' and
+       temporada   = '2001/2002' and
+       jornada     <= '09';
+
+
+
+
+select *
+from   all_constraints
+where  constraint_name LIKE '%C0013210%';

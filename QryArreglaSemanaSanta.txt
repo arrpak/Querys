@@ -1,0 +1,64 @@
+insert into fn3operation
+ select *
+  from fn3operationnotcontrolled
+   where operationdate<=to_date('20050321','yyyymmdd') and
+  substr(newsstand,1,3) in
+  ('011','021','041','029','052','023','004','014','018');
+
+
+
+ delete
+   from fn3operationnotcontrolled
+    where operationdate<=to_date('20050321','yyyymmdd') and
+   substr(newsstand,1,3) in
+ ('011','021','041','029','052','023','004','014','018');
+
+
+update fn3operation
+set operationdate=to_date('20050325','yyyymmdd')
+--select count(*) from fn3operation
+where operationdate=to_date('20050326','yyyymmdd') and
+newsstand in
+(select newsstand
+from fn3node
+where fathernode like 'ANDJAE%'
+and substr(newsstand,1,3) in '014');
+
+
+
+
+delegate='CORDOBA')
+and  substr(newsstand,1,3) in '018'
+;
+
+
+
+
+
+ ('011','021','041','029','052','023','004','014','018');
+
+
+select count(*)
+--delete
+from fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO'
+and operationdate=to_date('20050326','yyyymmdd')
+and    substr(newsstand,1,3)='004';
+
+
+SELECT COUNT(*)
+
+
+DELETE
+FROM FN3OPERATION
+WHERE OPERATIONDATE=TO_DATE('20050326','YYYYMMDD') AND
+   substr(newsstand,1,3) in
+ ('011','021','041','029','052','023','004','014','018');
+
+
+
+
+
+
+
+

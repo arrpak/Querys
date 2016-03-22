@@ -1,0 +1,8 @@
+describe opemarca
+
+select ruta||punto,servicio,venta,dia  from opemarca
+where dia>=to_date('2000/10/01','yyyy/mm/dd') and
+punto='22683' and
+ruta='3000001';
+
+

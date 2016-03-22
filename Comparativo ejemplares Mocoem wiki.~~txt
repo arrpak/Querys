@@ -1,0 +1,49 @@
+--Solo poner la sesión actual y la anterior y la ultima fecha de la sesion antigua, para comparar las mismas fechas
+
+Define newfs ='e20111113Com.01';
+Define oldfs ='e20111106Com.01';
+define lastdate='20111106';
+
+
+SELECT t1.cabecera,t1.promocion,t1.ejemnuevo,t2.ejemantiguo,round(ejemnuevomed,0),round(ejemantiguomed,0),round(ejemnuevomed,0)-round(ejemantiguomed,0) as dif
+FROM
+(select cabecera,promocion,sum(numejemplares) AS ejemnuevo,avg(numejemplares) AS ejemnuevomed
+from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20110601','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion) t1,
+(select cabecera,promocion,sum(numejemplares) AS ejemantiguo,avg(numejemplares) AS ejemantiguomed
+from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('20110601','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion
+) t2
+WHERE t1.cabecera=t2.cabecera AND
+t1.promocion=t2.promocion
+;
+
+
+
+
+
+
+
+

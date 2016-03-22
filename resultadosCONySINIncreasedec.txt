@@ -1,0 +1,270 @@
+-------------------------------Agotados sin incremdecision
+
+select count(*) from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and 
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+and ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+ope.newsstand in
+(select ope.newsstand 
+from fn3newsstandon
+where dateoff is null and
+ope.newsstand like '028%') and
+--------agotados
+ope.service-ope.return>=round(det.decision) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand;
+
+
+-------------------------------Agotados solo con incremdecision
+
+--select ope.newsstand,round(det.decision+det.increasedec),ope.service-ope.return as vent
+
+
+select count(*)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM'  and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+and ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+ope.newsstand in
+(select ope.newsstand 
+from fn3newsstandon
+where dateoff is null and
+ope.newsstand like '028%') and
+--------agotados
+ope.service-ope.return>=round(det.decision+det.increasedec) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand;
+
+
+
+
+----------------------------------------------------------------------------------------
+----------------------Dev sin incremdecision--------------------------------------------
+----------------------------------------------------------------------------------------
+select sum(Greatest(round(det.decision)-(ope.service-ope.return),0)) as dev,
+sum(service) as serv,sum(round(decision)) as deci
+----------select ope.newsstand,Greatest(round(det.decision)-(ope.service-ope.return),0)
+----------select ope.newsstand,round(det.decision)-(ope.service-ope.return)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and 
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+ope.newsstand in
+(select ope.newsstand 
+from fn3newsstandon
+where dateoff is null and
+ope.newsstand like '028%') and
+and ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+--ope.service-ope.return>=round(det.decision) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand
+;
+
+----------------------------------------------------------------------------------------
+----------------------Dev con incremdecision--------------------------------------------
+----------------------------------------------------------------------------------------
+select sum(Greatest(round(det.decision+increasedec)-(ope.service-ope.return),0)) as dev,
+sum(service) as serv,sum(round(decision+increasedec)) as deci
+----------select ope.newsstand,
+--Greatest(round(det.decision+increasedec)-(ope.service-ope.return),0)
+----------select ope.newsstand,round(det.decision+increasedec)-(ope.service-ope.return)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and 
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) and 
+ope.newsstand in
+(select ope.newsstand 
+from fn3newsstandon
+where dateoff is null and
+ope.newsstand like '028%') and
+ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+--ope.service-ope.return>=round(det.decision+increasedec) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand
+;
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+--Dev con incremdecision
+select sum(Greatest(round(det.decision+det.increasedec)-(ope.service-ope.return),0)) as dev,
+sum(service) as serv,sum(round(decision+increasedec)) as deci
+--select ope.newsstand,Greatest(round(det.decision)-(ope.service-ope.return),0)
+--select ope.newsstand,round(det.decision)-(ope.service-ope.return)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and dateprint=to_date('20030301','yyyymmdd') and
+orderf =
+(select orderf from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint=to_date('20030301','yyyymmdd'))
+and ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+--ope.service-ope.return>=round(det.decision) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand;
+
+
+---------------------------------------------------
+---------------------------------------------------
+---------------------------------------------------
+---------------------------------------------------
+varios dias
+---------------------------------------------------
+---------------------------------------------------
+---------------------------------------------------
+
+
+--Dev sin incremdecision
+select operationdate,
+sum(Greatest(round(det.decision)-(ope.service-ope.return),0)) as dev,
+sum(service) as serv,sum(round(decision)) as deci
+--select ope.newsstand,Greatest(round(det.decision)-(ope.service-ope.return),0)
+--select ope.newsstand,round(det.decision)-(ope.service-ope.return)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and 
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+and ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+--ope.service-ope.return>=round(det.decision) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand
+group by operationdate;
+
+
+
+--Dev CON incremdecision
+select operationdate,
+sum(Greatest(round(det.decision+det.increasedec)-(ope.service-ope.return),0)) as dev,
+sum(service) as serv,sum(round(decision)) as deci
+--select ope.newsstand,Greatest(round(det.decision+det.increasedec)-(ope.service-ope.return),0)
+--select ope.newsstand,round(det.decision+det.increasedec)-(ope.service-ope.return)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and 
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+and ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+--ope.service-ope.return>=round(det.decision+det.increasedec) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand
+group by operationdate;
+
+
+-------------------------------Agotados sin incremdecision
+
+select operationdate,count(*)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+and
+ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+ope.service-ope.return>=round(det.decision) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand
+group by operationdate;
+-------------------------------Agotados con incremdecision
+
+select operationdate,count(*)
+from fn3printingdetail det,fn3operation ope
+where
+det.header='MARCA' and det.product='DIARIO' and
+node='CAM' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd') and
+orderf||dateprint in
+(select orderf||dateprint from fn3printing
+where used='Y' and node='CAM' and header='MARCA' and product='DIARIO' and
+dateprint>to_date('20030102','yyyymmdd') and
+dateprint<to_date('20030305','yyyymmdd')) 
+and
+ope.header='MARCA' and ope.product='DIARIO' and
+substr(ope.newsstand,1,3) ='028' and
+--------agotados
+ope.service-ope.return>=round(det.decision+det.increasedec) and
+ope.operationdate=det.dateprint and
+ope.newsstand=det.newsstand
+group by operationdate;
+
+

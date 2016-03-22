@@ -1,0 +1,51 @@
+SELECT T1.VALUEDATE,T1.PREV AS OLD,T2.PREV AS NEW ,Count(*)
+FROM
+(SELECT valuedate,Sum(forecast) AS PREV
+FROM fn3forecastseries
+WHERE forsession='2008070916.MG'
+AND output LIKE 'VentaMarcaAND%'
+GROUP BY valuedate) t1,
+(
+SELECT valuedate,Sum(forecast) AS PREV
+FROM fn3forecastseries
+WHERE forsession='2008070916II.MG'
+AND output LIKE 'VentaMarcaAND%'
+GROUP BY valuedate) T2
+WHERE
+--t1.output LIKE 'VentaMarcaAND%'
+--AND T1.OUTPUT=T2.OUTPUT
+T1.VALUEDATE=T2.VALUEDATE
+GROUP BY T1.VALUEDATE,T1.PREV ,T2.PREV
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT T1.VALUEDATE,T1.PREV AS OLD,T2.PREV AS NEW
+FROM
+(SELECT valuedate,Sum(forecast) AS PREV
+FROM fn3forecastseries
+WHERE forsession='2008070916.MG'
+AND output LIKE 'VentaMarcaEXT%'
+GROUP BY valuedate) t1,
+(
+SELECT valuedate,Sum(forecast) AS PREV
+FROM fn3forecastseries
+WHERE forsession='2008070916II.MG'
+AND output LIKE 'VentaMarcaEXT%'
+GROUP BY valuedate) T2
+WHERE
+--t1.output LIKE 'VentaMarcaEXT%'
+--AND T1.OUTPUT=T2.OUTPUT
+T1.VALUEDATE=T2.VALUEDATE

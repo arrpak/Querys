@@ -1,0 +1,26 @@
+SELECT To_Char(FECHA,'YYYY/MM'),Avg(ENVIOS)
+FROM
+(
+SELECT FECHA,Sum(ENVIOS) AS ENVIOS
+FROM ba_ventas1
+WHERE
+fecha>=To_Date('2010/02/01','yyyy/mm/dd') --AND fecha<=To_Date('2010/03/31','yyyy/mm/dd')
+AND cod_estructura='933'
+AND cod_z_geografica IN ('68','63')
+AND producto='El Mundo'
+--AND nodo IN ('MEDIA PRESS','ENTREGAS URBANAS (Meco)')
+GROUP BY FECHA
+--ORDER BY to_char(FECHA,'YYYY/MM')
+)
+GROUP BY To_Char(FECHA,'YYYY/MM')
+ORDER BY to_char(FECHA,'YYYY/MM');
+
+
+
+
+
+
+
+SELECT *
+FROM EZCENTREGASURBANAS
+ORDER BY fecha

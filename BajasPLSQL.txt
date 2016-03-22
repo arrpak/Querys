@@ -1,0 +1,91 @@
+define fecha1='20070601'; -- FECHA EN EL QUE EMPIEZA A COGER DATOS. PARA NO UTILIZAR TODO EL HISTORICO
+define fecha2='20071015'; -- FECHA TOPE MÁXIMA DEL Max(operationdate)
+
+--UPDATE FN3NEWSSTANDON SET
+DECLARE
+  CURSOR C IS
+SELECT t1.newsstand AS newsstand, fecha, datefrom, dateuntil, comunicationdate--*
+from
+(
+  SELECT newsstand,Max(op1) AS fecha
+   FROM
+ (
+   SELECT ope.newsstand,Max(operationdate) AS op1
+     FROM fn3operation ope,fn3newsstandon non
+    WHERE ope.newsstand=non.newsstand
+    AND header = 'MARCA'
+    AND product = 'DIARIO'
+   AND dateoff IS NULL
+   AND service>0
+   AND (
+        ope.newsstand like '011%' or
+ope.newsstand like '041%' or ope.newsstand like '029%' or
+ope.newsstand like '021%' or ope.newsstand like '013%' or
+ope.newsstand like '004%' or ope.newsstand like '014%' or
+ope.newsstand like '023%' or ope.newsstand like '052%' OR
+ope.newsstand like '006%' or ope.newsstand like '010%' or
+ope.newsstand like '018%' OR ope.newsstand like '028%'
+
+       )
+   AND operationdate >To_Date('&fecha1','yyyymmdd')
+   GROUP BY ope.newsstand
+ UNION
+    (
+   SELECT ope2.newsstand,Max(operationdate) AS op1
+     FROM fn3operationnotcontrolled ope2,fn3newsstandon non
+    WHERE ope2.newsstand=non.newsstand
+    AND header = 'MARCA'
+    AND product = 'DIARIO'
+   AND dateoff IS NULL
+   AND service>0
+   AND (
+                 ope2.newsstand like '011%' or
+ope2.newsstand like '041%' or ope2.newsstand like '029%' or
+ope2.newsstand like '021%' or ope2.newsstand like '013%' or
+ope2.newsstand like '004%' or ope2.newsstand like '014%' or
+ope2.newsstand like '023%' or ope2.newsstand like '052%' OR
+ope2.newsstand like '006%' or ope2.newsstand like '010%' or
+ope2.newsstand like '018%' OR ope2.newsstand like '028%'
+
+       )
+      AND operationdate >To_Date('&fecha1','yyyymmdd')
+   GROUP BY ope2.newsstand)
+ )
+ GROUP BY newsstand
+ HAVING Max(op1) < To_Date('&fecha2','yyyymmdd')
+) t1,
+(
+  SELECT clo.*
+  FROM
+  fn3closingfixed clo,
+  (
+    SELECT newsstand, Max(dateuntil) AS max_closing
+    FROM   fn3closingfixed
+    GROUP BY newsstand
+  ) cloMax
+  WHERE clo.newsstand = cloMax.newsstand
+    AND clo.dateuntil = cloMax.max_closing
+) clo
+WHERE t1.newsstand = clo.newsstand(+)
+  AND (NOT (fecha+1 BETWEEN datefrom AND dateuntil) OR dateuntil IS NULL)
+ORDER BY fecha DESC;
+ --t1.newsstand--To_Char(Max(op1),'YYYY/mm/dd')
+  v_count NUMBER := 0;
+BEGIN
+  FOR i IN c LOOP
+  BEGIN
+    UPDATE fn3newsstandon
+    SET    dateoff = i.fecha
+    WHERE  newsstand = i.newsstand
+      AND  dateoff IS NULL;
+
+    v_count := v_count + SQL%ROWCOUNT;
+  EXCEPTION
+    WHEN OTHERS THEN
+    BEGIN
+       Dbms_Output.Put_Line('error en el pv: '|| i.newsstand);
+    END;
+  END;
+  END LOOP;
+  Dbms_Output.Put_Line('total: '|| v_count);
+END;

@@ -1,0 +1,33 @@
+Select servicio.newsstand,service,decision
+from
+((select newsstand,service
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and   operationdate=to_date('20040111','yyyymmdd')
+and   service>0
+union
+(select newsstand,service
+from fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO'
+and   service>0
+and   operationdate=to_date('20040111','yyyymmdd')
+))) servicio,
+(select newsstand,decision,orderf
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO'
+and   dateprint=to_date('20040111','yyyymmdd')
+and node='EXT'
+and decision=0
+)
+ tirada,
+(select orderf
+ from fn3printing
+where
+header='MARCA' and product='DIARIO' 
+and dateprint=to_date('20040111','yyyymmdd')
+and used='Y'
+and node='EXT') orden
+where
+servicio.newsstand=tirada.newsstand and
+tirada.orderf=orden.orderf ;

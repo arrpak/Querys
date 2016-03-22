@@ -1,0 +1,92 @@
+set pagesize 3000
+spool c:\20021125.txt;
+select t1.newsstand,
+       --t1.dateprint,
+       (t1.decision+t1.increasedec) as D20021121DT,
+       --t2.dateprint,
+       (t2.decision+t2.increasedec) as D2002121PV,
+       round(t1.decision+t1.increasedec)-round(t2.decision+t2.increasedec) as dif
+from fn3printingdetail t1,fn3printingdetail t2
+where
+t1.header='MARCA' and
+t1.product='DIARIO' and
+t1.node='CAM' and
+t1.orderf=1 and
+t2.orderf=2 and
+t1.dateprint=to_date('20021126','yyyymmdd') and
+t2.dateprint=to_date('20021126','yyyymmdd') and
+t1.header=t2.header and
+t1.product=t2.product and
+t1.node=t2.node and
+t1.newsstand=t2.newsstand 
+--and (t1.decision+t1.increasedec)>0
+order by round(t1.decision+t1.increasedec)-round(t2.decision+t2.increasedec) desc;
+spool off;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------
+
+       select 'MARCA', 'DIARIO', 'CAM',
+       to_date('2002/11/12', 'YYYY/MM/DD'), 1,
+       sf.newsstand, 'ServicioFijo', sf.service, 0
+       from Fn3ServiceFixed sf,
+       (
+        select sf.newsstand newssta
+        from Fn3ServiceFixed sf, Fn3NewsStandOn nso,
+             Fn3Node n, Fn3PrintingNodeForSession pnf
+        where sf.header = 'MARCA' and
+              sf.product = 'DIARIO' and
+              pnf.node = 'CAM' and
+              pnf.dateprint = to_date('2002/11/12', 'YYYY/MM/DD') and
+              pnf.orderf = 1 and
+              nso.dateon <= to_date('2002/11/12', 'YYYY/MM/DD') and
+              nvl(nso.dateoff, to_date('2002/11/12', 'YYYY/MM/DD') + 1) > to_date('2002/11/12', 'YYYY/MM/DD') and
+              to_date('2002/11/12', 'YYYY/MM/DD') between sf.datefrom and sf.dateuntil and
+              sf.weekday = 'TUE' and
+              pnf.header = sf.header and
+              pnf.product = sf.product and
+              n.fathernode = pnf.sonnode and
+              sf.newsstand = nso.newsstand and
+              sf.header = n.header and
+              sf.product = n.product and
+              sf.newsstand = n.newsstand
+        minus
+        select n.newsstand
+        from Fn3Node n, Fn3PrintingNodeForSession pnf, Fn3Output o,
+             Fn3ForecastSeries fS
+        where n.header = 'MARCA' and
+              n.product = 'DIARIO' and
+              pnf.node = 'CAM' and
+              pnf.orderf = 1 and
+              fS.valuedate = to_date('2002/11/12', 'YYYY/MM/DD') and
+              fS.closed = 'Y' and
+              n.header = pnf.header and
+              n.product = pnf.product and
+              n.fathernode = pnf.sonnode and
+              n.header = o.header and
+              n.product = o.product and
+              n.code = o.node and
+              pnf.header = o.header and
+              pnf.product = o.product and
+              pnf.forsession = fS.forsession and
+              pnf.dateprint = fS.valuedate and
+              o.code = fS.output
+       ) aux
+       where sf.header = 'MARCA' and
+             sf.product = 'DIARIO' and
+             to_date('2002/11/12', 'YYYY/MM/DD') between sf.datefrom and sf.dateuntil and
+             sf.weekday = 'TUE' and
+             sf.newsstand = aux.newssta
+       

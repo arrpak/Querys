@@ -1,0 +1,284 @@
+Define header='PUBLICO';
+Define promo='CamisetRepublicaReedicion':
+Define price='3';
+Define node='CAM';
+Define promotype='REGALOS';
+Define description='Reedicion Camiseta Republica';
+Define expression='C';
+Define inidate='20110410';
+Define enddate='20110414';
+Define iniinput='0';
+Define endinput='3';   //cupones necesarios
+Define year='2011';
+
+
+--SELECT * FROM emupromotiontype;
+
+INSERT INTO emupromotion VALUES ('&header','DIARIO','&promo'||'&year','&promotype',&price,'&description');
+--select * from emupromotion where code='&promo'||'&year';
+
+INSERT INTO emupromotionnode VALUES ('&header','DIARIO','&promo'||'&year','&node','&expression',
+                                      To_Date('&inidate','yyyymmdd'),To_Date('&enddate','yyyymmdd'),'&description');
+--select * from emupromotionnode where promotion='&promo'||'&year';
+
+insert into ezcinput values ('&promo'||'&year'||'.ini','SqlProNodCreaPulseIni("&header","DIARIO","&promo'||'&year","&node")','0.1',null,null,null,'Pulso Inicial para la promocion &promo de la cabecera &header',null,null,null,null,null);
+
+insert into ezcinput values ('&promo'||'&year'||'.iv',       'SqlProNodCreaIndInvVenNMTmsPro("&header","DIARIO","&promo'||'&year","&node",Serie OutputOrig2iv, Real &iniinput, Real &endinput)','0.1',null,null,null,'Inverso Venta para la promocion &promo de la cabecera &header',              null,null,null,null,null);
+
+insert into ezcinput values ('&promo'||'&year'||'.ivTen','SqlProNodCreaTendIndInvVenNMTmsPro("&header","DIARIO","&promo'||'&year","&node",Serie OutputOrig2iv, Real 1, Real 0)','0.1',null,null,null,'Tendencia del Inverso Venta para la promocion &promo de la cabecera &header',null,null,null,null,null);
+
+
+
+--select * from ezcinput where code like '&promo'||'&year'||'%';
+-- and code like '%2009%';
+
+insert into ezcsetinput values ('&header'||'_'||'&promo'||'&year',1,'Y' ,
+'Promociones'||'&header'||'_'||'&year'
+,'SetInput para los Inputs de la promocion '||'&promo'||' del periódico '||'&header'
+);
+
+--select * from ezcsetinput where code='&header'||'_'||'&promo'||'&year';
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ini' ,'0.1',null,null,null,
+                                     'Y','Pulso Inicial para la promocion &promo de la cabecera &header');
+
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.iv' ,'0.1',null,null,null,
+
+								      'Y','Inverso Venta para la promocion &promo de la cabecera &header');
+
+
+
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ivTen' ,'0.1',null,null,null,
+									  'N','Tendencia del Inverso Venta para la promocion &promo de la cabecera &header');
+
+
+
+
+
+--select 'ELPAIS'||'_'||'DVDPortatilHelloKitty'||'2009'  from dual;
+
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ini','0.1');
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.iv','0.1');
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ivTen','0.1');
+
+
+
+insert into ezcpromotionsetinput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year' ,'Competencia','&description'  );
+
+
+select distinct tree from ezcpromotionsetinput;
+--------------------------------
+----SI TIENE COMODINES----------
+--------------------------------
+
+/*
+insert into ezcinput values ('&promo'||'&year'||'.com',
+'SqlProNodCreaIndInvVenNMTmsPro("&header","DIARIO","&promo'||'&year","&node",Serie OutputOrig2iv, Real &iniinput+1, Real &endinput)','0.1',null,null,null,'Inverso Venta para la promocion &promo de la cabecera &header',              null,null,null,null,null);
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.com' ,'0.1',null,null,null,
+									  'N','Inverso Venta para comodin de la promocion &promo de la cabecera &header');
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.com','0.1');
+
+*/
+
+
+
+///SE HACEN LOS INSERT HASTA AQUI Y EL SELECT ES DE COMPROBACION
+
+ --select * from  ezcinputsetinput where setinput='&header'||'_'||'&promo'||'&year';
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-------------Insercion en BSR_D_PARAMETER
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+
+--ABC
+
+--delete bsr_d_parameter where co_parameter='TocadiscosUSBMP32011.iv'
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComABCCAM' ,'DVDCineBelico2011.ini', 'Obs.ComABCCAM', 0, 'Y', 'N',
+null, 0, 0.01, 0.001, 0.2, null,null
+from dual;
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComABCCAM' ,'DVDCineBelico2011.iv', 'Obs.ComABCCAM', 0, 'Y', 'N',
+null, 0, 0.4, 0.15, 0.2, null,null
+from dual;
+
+delete bsr_d_parameter
+where co_parameter='MTV22Pulgadas2011.iv'
+
+
+
+--LARAZON
+
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComLaRazonCAM' ,'DVDCineMolinaFlores2011.ini', 'Obs.ComLaRazonCAM', 0, 'Y', 'N',
+null, 0, 0.01, 0.007, 0.2, null,null
+from dual;
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComLaRazonCAM' ,'DVDCineMolinaFlores2011.iv', 'Obs.ComLaRazonCAM', 0, 'Y', 'N',
+null, 0, 0.2, 0.01, 0.2, null,null
+from dual;
+
+
+--ELPAIS
+
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComElPaisCAM' ,'BluetoothPrixton2011.ini', 'Obs.ComElPaisCAM', 0, 'Y', 'N',
+null, 0, 0.01, 0.007, 0.2, null,null
+from dual;
+
+--delete bsr_d_parameter where co_parameter='ELPAIS_TazaStarWars2011.iv';
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComElPaisCAM' ,'BluetoothPrixton2011.iv', 'Obs.ComElPaisCAM', 0, 'Y', 'N',
+null, 0, 0.02, 0.01, 0.2, null,null
+from dual;
+
+
+--PUBLICO
+
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComPublicoCAM' ,'CartelesRepublica2011.ini', 'Obs.ComPublicoCAM', 0, 'Y', 'N',
+null, 0, 0.01, 0.007, 0.2, null,null
+from dual;
+
+--delete bsr_d_parameter where co_parameter='BibliotecaRepublica2011.ini';
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComPublicoCAM' ,'CartelesRepublica2011.iv', 'Obs.ComPublicoCAM', 0, 'Y', 'N',
+null, 0, 0.02, 0.01, 0.2, null,null
+from dual;
+-------------------------------------------------
+--borrado de inputs
+-------------------------------------------------
+
+
+
+/*
+delete ezcpromotionsetinput where setinput like     '%&promo%';
+delete ezcpromotioninput where input like           '%&promo%';
+delete ezcinputsetinput	where setinput like         '%&promo%';
+delete ezcsetinput	where code like                 '%&promo%';
+delete ezcinput	where code like                     '%&promo%';
+delete emupromotionnode  where promotion like 		'%&promo%';
+delete bsr_d_parameter where co_parameter like 		'%&promo%';
+--delete ezcpromotioninput  where promotion like 	'%&promo%';
+--delete ezcpromotionsetinput  where promotion like	'%&promo%';
+delete emupromotion  where code like 				'%&promo%';
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delete bsr_d_parameter
+where co_parameter='MTV22Pulgadas2011.iv'
+
+
+
+
+
+
+
+
+
+
+INSERT INTO  bsr_d_parameter
+SELECT
+'InformeMarketingComABCCAM', 'ProtectorCuchilloJamonero2010.iv'
+, co_node, id_level, co_active, co_fixed, vl_ini, vl_min, vl_max, vl_muprior, vl_sigmaprior, vl_sigmapriorweight, ds_parameter
+FROM bsr_d_parameter
+WHERE co_parameter='ProtectorCuchilloJamonero2010.ini'
+
+
+
+
+
+
+
+
+
+/*
+select *
+from emupromotionnode
+where promotion = 'CineKidsII2006'
+*/
+
+
+-- delete ezcinputsetinput where input='ImpresoraMultifuncionHP.ivTen'
+
+--delete ezcinput where code='ImpresoraMultifuncionHP.ini'
+
+
+
+--select * from ezcsetinput where code='ELPAIS'||'_'||'ImpresoraMultifuncionHP2009'||'2009'
+
+
+
+
+
+
+
+
+
+
+
+
+select expression
+from ezcinput
+where expression like '%
+%'
+
+
+update 	ezcinput
+set expression=replace(expression,'
+','')
+where expression like '%
+%'
+
+select * from ezcinput where CODE = 'DVDHelloKitty2009.iv'
+
+SqlProNodCreaIndInvVenNMTmsPro("ELPAIS","DIARIO","DVDPortatilHelloKitty||2009","CAM",
+                             Serie OutputOrig2iv, Real 0, Real 5)
+
+
+
+
+
+
+
+
+
+
+
+
+  INSERT INTO emupromotion VALUES ('ABC','DIARIO','CentroPlanchadoPolti'||'2011','REGALOS',89.90,'http://distribucionespapiro.blogspot.com/2011/04/abc-centro-de-planchado-polti.html')

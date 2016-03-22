@@ -1,0 +1,10 @@
+SELECT distributorcode,dateprint,
+case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) END  AS tirada
+FROM fn3printingdetail t1, fn3codification t2
+WHERE
+t1.node='CATBAR'
+AND t1.dateprint=dat('20080804') AND orderf=2
+--AND t2.delegate='BARCELONA'
+AND t1.newsstand=t2.newsstand

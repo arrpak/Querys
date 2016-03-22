@@ -1,0 +1,44 @@
+SELECT Count(*),probdate
+FROM fn3probnotoutoff
+GROUP BY probdate
+ORDER BY probdate
+
+
+
+SELECT *
+FROM fn3probnotoutoff
+WHERE
+OUTPUT LIKE 'VentaMarca048%'
+ORDER by probdate
+
+AND probdate<dat('20080722')
+;
+
+
+INSERT into fn3probnotoutoff
+SELECT 'VentaMarca'||t1.code,TO_DATE('20081101','yyyymmdd'),0.93
+FROM fn3node t1,fn3output t2
+WHERE fathernode LIKE 'NAV%'
+AND t1.header='MARCA' AND t1.product='DIARIO'
+AND t1.code LIKE '0%'
+AND 'VentaMarca'||t1.code=t2.code
+
+
+SELECT *
+
+UPDATE fn3probnotoutoff
+SET probnotoutoff=0.85
+WHERE
+probdate=TO_DATE('20081101','yyyymmdd')
+AND output LIKE 'VentaMarca008%'
+
+
+
+SELECT *
+FROM fn3probnotoutoff
+WHERE
+OUTPUT LIKE 'VentaMarca041%'
+and probdate=dat('20081101');
+
+
+

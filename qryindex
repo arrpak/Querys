@@ -1,0 +1,21 @@
+SELECT *
+FROM all_indexes
+WHERE table_name='FN3ESTIMATIONSERIES'
+
+
+
+
+
+
+DROP INDEX ESTIMATIONSERIESIDX;
+
+
+
+
+CREATE INDEX estimationseriesidx
+  ON fn3estimationseries (
+    'FN3ESTIMATIONSERIES'
+  )
+  TABLESPACE marca_idx
+/
+

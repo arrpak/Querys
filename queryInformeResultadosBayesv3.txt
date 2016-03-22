@@ -1,0 +1,23 @@
+ SELECT CABECERA,NODO,AÑO,MES,FECHA,SERVICIO,DEVOLUCION,VENTA,PVABIERTOS,PVAGOTADOS,SERVAGOT,DEVPV,VENPV,PORCDEV,PORCAGOT
+ FROM
+ (select
+   header AS CABECERA,
+   node AS NODO,
+   To_Char(infodate,'YYYY') AS AÑO  ,
+   To_Char(infodate,'MM')  AS MES,
+    infoDate  AS FECHA ,
+(service) AS SERVICIO  ,
+(returnCont + (service - serviceCont + incidence -  incidenceCont - estimatedSale)) AS DEVOLUCION  ,
+((serviceCont + incidenceCont - returnCont) +  estimatedSale)  AS VENTA,
+(numOpen)  PVABIERTOS ,
+(numOutOff) PVAGOTADOS ,
+servOutOff  SERVAGOT,
+to_number(Decode((numOpen), 0, '', (returnCont + service - serviceCont + incidence - incidenceCont - estimatedSale) / (numOpen) )) AS DEVPV,
+to_number(Decode((numOpen), 0, '', (serviceCont + incidenceCont - returnCont + estimatedSale) / (numOpen) )) AS VENPV,
+(returnCont + (service - serviceCont + incidence -  incidenceCont - estimatedSale)) /service as PorcDev,
+numoutoff/numopen as PorcAgot
+from formarca.Fn3NODEINFORMATION
+where product = 'DIARIO'
+  and node='AND'
+  AND SERVICE>0
+  and INFODATE >=  to_date('2005/01/01', 'yyyy/mm/dd'))

@@ -1,0 +1,80 @@
+ update fn3outputdating
+ set power=1 
+ where output in
+ (
+  select 'VentaMarca'||newsstand
+    from fn3newsstandon
+    where dateoff is null
+   and newsstand in
+   (
+   select newsstand
+   from fn3node
+   where
+   (fathernode='ANDJAEPER' or fathernode='ANDJAESIE' or fathernode='ANDJAEPLA')));
+
+
+
+select est25.output,est20.percerror,est25.percerror,
+est25.percerror-est20.percerror as diferror
+from
+(select output,percerror
+from fn3estimation
+where estsession='20041025.PV'
+and output like 'VentaMarca023%') est25,
+(select output,percerror
+from fn3estimation
+where estsession='20041020II.PV'
+and output like 'VentaMarca023%') est20
+where 
+est20.output=est25.output
+order by est25.percerror-est20.percerror desc;
+
+update fn3outputdating
+set power=null
+where output in
+(select est20.output
+--,est18.percerror,est20.percerror,est20.percerror-est18.percerror as diferror
+from
+(select output,percerror
+from fn3estimation
+where estsession='20041025.PV'
+and output like 'VentaMarca023%') est25,
+(select output,percerror
+from fn3estimation
+where estsession='20041020II.PV'
+and output like 'VentaMarca023%') est20
+where 
+est25.output=est20.output);
+
+
+
+
+
+update fn3outputdating
+set power=1
+where output in
+(
+select est20.output
+--,est18.percerror,est20.percerror,est20.percerror-est18.percerror as diferror
+from
+(select output,percerror
+from fn3estimation
+where estsession='20041025.PV'
+and output like 'VentaMarca0%') est25,
+(select output,percerror
+from fn3estimation
+where estsession='20041020II.PV'
+and output like 'VentaMarca0%') est20
+where 
+est25.output=est20.output and
+(est25.percerror-est20.percerror)<-0.017);
+
+
+
+
+
+
+update fn3estimation
+set state='ERR'
+where estsession='20041025.PV';
+

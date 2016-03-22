@@ -1,0 +1,14 @@
+--DURACION ESTIMACIONES
+-----------------------
+SELECT output,86400*Sum(estdate-iniestdate)/60 AS tiempoest
+FROM emuestimation
+WHERE estsession LIKE 'E20100928.PV'
+GROUP BY  output
+ORDER BY 2 desc
+
+--PUNTOS CON MAYOR ERROR
+------------------------
+SELECT OUTPUT,DATING,TRANSFORMATION,STDDEVIATION
+FROM emuestimation
+WHERE estsession LIKE 'E20100928.PV'
+ORDER BY TRANSFORMATION,STDDEVIATION DESC;

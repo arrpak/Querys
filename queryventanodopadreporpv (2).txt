@@ -1,0 +1,30 @@
+
+SELECT  PV.NEWSS,Avg(PV.VEN),Avg(nodeinfo.venta),Avg(nodeinfo.venta/pv.ven),diasem
+FROM
+(
+SELECT op.newsstand AS NEWSS,Avg(service+incidence-RETURN) AS ven,nd.fathernode,To_Char(OPERATIONDATE,'DY') AS diasem,
+operationdate
+FROM fn3operation op ,fn3node nd
+WHERE operationdate>To_Date('20050501','yyyymmdd')
+AND RETURN>0
+and SubStr(op.newsstand,1,3)='028'
+AND nd.newsstand=op.newsstand AND
+op.header='MARCA' AND
+--OP.NEWSSTAND='028000100004' AND
+--To_Char(OPERATIONDATE,'DY')='LUN' AND
+op.product='DIARIO' AND
+OP.SERVICE>0 AND
+(op.service+op.incidence-op.RETURN)>0 and
+OP.RETURN>0 AND
+op.product=nd.product AND
+op.header=nd.header
+GROUP BY op.newsstand,nd.fathernode,operationdate) pv,
+(SELECT infodate,NODE,SERVICE+INCIDENCE-RETURNCONT AS VENTA
+FROM FN3NODEINFORMATION
+WHERE
+header='MARCA' AND product='DIARIO'
+AND NODE LIKE 'CAM%') nodeinfo
+WHERE
+NODEINFO.NODE=PV.FATHERNODE
+AND PV.operationdate=nodeinfo.infodate
+GROUP BY PV.NEWSS,diasem

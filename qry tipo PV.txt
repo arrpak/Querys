@@ -1,0 +1,113 @@
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Almeria'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Cadiz'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Cordoba'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Granada'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Huelva'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Jaen'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Malaga'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Sevilla'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Melilla'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Badajoz'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Caceres'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+
+
+select count(*),newsstandtype
+from fn3newsstand,fn3newsstandon
+where province='Madrid'
+and fn3newsstand.code=fn3newsstandon.newsstand
+and dateoff is null
+group by newsstandtype;
+
+
+
+  select count(*),newsstandtype
+ from fn3newsstand,fn3printingdetail pri
+ where province='Madrid'
+ and fn3newsstand.code=pri.newsstand
+and pri.node='CAM' and
+dateprint=to_date('20060418','yyyymmdd')
+and header='MARCA'group by newsstandtype;
+
+
+
+
+
+
+

@@ -1,0 +1,202 @@
+
+insert into fn3forsession
+select replace(code,'.MG','_EP0.MG') as code,sessiondate,estsession,fathernodeforsession,inidate,enddate,origdate,description
+from fn3forsession
+WHERE code >='200812' and code like '%MG%' and code not like 'ORIGINAL%' ;
+ --AND CODE <>'2009032129II.MG';
+
+
+INSERT INTO  fn3forecast
+SELECT replace(forsession,'.MG','_EP0.MG'),output,dating,inidate,enddate,inifordate,fordate,origdate,estsession,state,stateinfo,error,description
+FROM fn3forecast
+WHERE forsession >='200812' and forsession like '%MG%' and forsession not like 'ORIGINAL%' ;
+
+INSERT INTO  fn3forecastsetinputeffect
+SELECT replace(forsession,'.MG','_EP0.MG'),output,datingoutput,datinginput,setinput,valuedate,effect
+FROM fn3forecastsetinputeffect
+WHERE forsession >='200812' and forsession like '%MG%' and forsession not like 'ORIGINAL%' ;
+
+
+DECLARE
+	FORSESSION VARCHAR2(100);nombre_variable DATE;
+BEGIN
+	DECLARE
+	CURSOR C IS
+	SELECT distinct(FORSESSION)
+	FROM FN3FORECAST
+    WHERE FORSESSION LIKE '%_EP0.MG%';
+BEGIN
+FOR i IN C loop
+  INSERT INTO fn3forecastseries
+ (SELECT t2.code,t1.output,t1.dating,t1.valuedate,t1.forecast,t1.variance,t1.decision,t1.filter,t1.noise,t1.forcens,t1.used,t1.closed
+ from
+ (SELECT forsession,output,dating,valuedate,forecast,variance,decision,filter,noise,forcens,used,closed
+ FROM fn3forecastseries
+ WHERE forsession='ORIGINAL.MG') t1,
+ (SELECT code,sessiondate,estsession,fathernodeforsession,inidate,enddate,origdate
+ FROM fn3forsession
+  WHERE code=i.forsession) t2,
+ (SELECT forsession,output,dating
+ FROM fn3forecast
+  WHERE forsession=i.forsession) t3
+ WHERE
+ t1.output=t3.output
+ AND t1.dating=t3.dating
+ ) ;
+ dbms_output.put_line(i.forsession);
+   END LOOP;
+END;
+/*EXCEPTION
+		WHEN OTHERS THEN
+	dbms_output.put_line('Se ha producido un error en ');*/
+END;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO  fn3forecast
+SELECT '2009032129II.PV',output,dating,inidate,enddate,inifordate,fordate,origdate,estsession,state,stateinfo,error,description
+FROM fn3forecast
+WHERE forsession='2009032129.PV';
+
+
+
+
+SELECT T1.VALUEDATE,Sum(T1.FORECAST),Sum(T2.FORECAST)
+FROM
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129II.MG') T1,
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129.MG') T2
+WHERE
+T1.OUTPUT=T2.OUTPUT AND
+T1.DATING=T2.DATING AND
+T1.VALUEDATE=T2.VALUEDATE
+GROUP BY T1.VALUEDATE;
+
+
+SELECT T1.VALUEDATE,Sum(T1.FORECAST),Sum(T2.FORECAST),Sum(T2.DECISION),Sum(T1.DECISION)
+FROM
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE,DECISION
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129II.PV') T1,
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE,DECISION
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129.PV') T2
+WHERE
+T1.OUTPUT=T2.OUTPUT AND
+T1.DATING=T2.DATING AND
+T1.VALUEDATE=T2.VALUEDATE
+GROUP BY T1.VALUEDATE
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------
+
+INSERT INTO  fn3forecast
+SELECT '2009032129II.MG',output,dating,inidate,enddate,inifordate,fordate,origdate,estsession,state,stateinfo,error,description
+FROM fn3forecast
+WHERE forsession='2009032129.MG';
+
+INSERT INTO  fn3forecastsetinputeffect
+SELECT '2009032129II.MG',output,datingoutput,datinginput,setinput,valuedate,effect
+FROM fn3forecastsetinputeffect
+WHERE forsession='2009032129.MG';
+
+
+INSERT INTO  fn3forecastseries
+SELECT '2009032129II.MG',output,dating,valuedate,forecast*1.1,variance,decision,filter,noise,forcens,used,closed
+FROM fn3forecastseries
+WHERE forsession='ORIGINAL.MG';
+
+
+INSERT INTO  fn3forecast
+SELECT 'ORIGINAL.MG',output,dating,sysdate,sysdate,sysdate,sysdate,sysdate,'FICTICIA','END','FIN PREVISION',0,'SESION DE PREVISION ERROR CERO'
+FROM fn3forecast
+WHERE (forsession='2009032430.MG' or forsession='2009032431.MG')
+ORDER BY output
+;
+
+
+
+INSERT INTO  fn3forecast
+SELECT 'ORIGINAL.MG',output,dating,sysdate,sysdate,sysdate,sysdate,sysdate,'FICTICIA','END','FIN PREVISION',0,'SESION DE PREVISION ERROR CERO'
+FROM fn3forecast
+WHERE FORSESSION='2009032225_NOR_CAVCMU.MG'
+AND OUTPUT NOT IN (SELECT OUTPUT FROM FN3FORECAST WHERE FORSESSION='2009032431.MG')
+ORDER BY output
+;
+
+
+INSERT INTO fn3forecastseries
+SELECT 'ORIGINAL.MG',output,dating,valuedate,originalvalue,residuals*residuals,To_Number(NULL),filter,noise,To_Number(NULL),To_Number(NULL),To_Number(NULL)
+FROM fn3estimationseries
+WHERE (estsession='20090320.MG')  and valuedate>to_date('20090101','yyyymmdd');
+
+INSERT INTO fn3forecastseries
+SELECT 'ORIGINAL.MG',output,dating,valuedate,originalvalue,residuals*residuals,To_Number(NULL),filter,noise,To_Number(NULL),To_Number(NULL),To_Number(NULL)
+FROM fn3estimationseries
+WHERE estsession='20090318_NOR_CAVCMU.MG'  and valuedate>to_date('20090101','yyyymmdd');
+
+
+
+
+
+INSERT INTO  fn3forecast
+SELECT '2009032129II.PV',output,dating,inidate,enddate,inifordate,fordate,origdate,estsession,state,stateinfo,error,description
+FROM fn3forecast
+WHERE forsession='2009032129.PV';
+
+
+
+
+SELECT T1.VALUEDATE,Sum(T1.FORECAST),Sum(T2.FORECAST)
+FROM
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129II.MG') T1,
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129.MG') T2
+WHERE
+T1.OUTPUT=T2.OUTPUT AND
+T1.DATING=T2.DATING AND
+T1.VALUEDATE=T2.VALUEDATE
+GROUP BY T1.VALUEDATE;
+
+
+SELECT T1.VALUEDATE,Sum(T1.FORECAST),Sum(T2.FORECAST),Sum(T2.DECISION),Sum(T1.DECISION)
+FROM
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE,DECISION
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129II.PV') T1,
+(SELECT OUTPUT,DATING,FORECAST,VALUEDATE,DECISION
+FROM FN3FORECASTSERIES
+WHERE
+FORSESSION='2009032129.PV') T2
+WHERE
+T1.OUTPUT=T2.OUTPUT AND
+T1.DATING=T2.DATING AND
+T1.VALUEDATE=T2.VALUEDATE
+GROUP BY T1.VALUEDATE
+
+

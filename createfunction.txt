@@ -1,0 +1,19 @@
+CREATE OR REPLACE FUNCTION decisionnew (newsstand1 IN VARCHAR2, header1 IN VARCHAR2 ,product1 IN VARCHAR2 ,dateprint1 IN DATE ,orderf1 IN number)
+RETURN float AS
+dec  float ;
+BEGIN
+ SELECT (case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) INTO dec
+ FROM fn3printingdetail
+ WHERE newsstand = newsstand1
+ AND header=header1
+ AND product=product1
+ AND dateprint=dateprint1;
+ RETURN(dec);
+END;
+
+
+
+ SELECT decisionnew('028000100004','MARCA','DIARIO',to_date('20070118','yyyymmdd'),1)
+ FROM dual;

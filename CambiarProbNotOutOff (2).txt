@@ -1,0 +1,22 @@
+INSERT INTO fn3probnotoutoff
+SELECT output,SYSDATE,prob-0.02
+from
+(SELECT DISTINCT(t1.output) AS output,Max(probdate),probnotoutoff AS prob
+from
+(SELECT 'VentaMarca'||newsstand AS output
+FROM
+(SELECT newsstand
+FROM fn3newsstandon
+WHERE (DATEOFF IS NULL OR DATEOFF>SYSDATE-90)
+INTERSECT
+SELECT newsstand
+FROM fn3node
+WHERE
+(fathernode LIKE 'EXT%' OR fathernode LIKE 'AND%'))) t1,fn3probnotoutoff t2
+WHERE
+t1.output=t2.output
+--AND t1.dating=t2.dating
+GROUP BY t1.output,probnotoutoff,probnotoutoff
+--ORDER BY  Max(probdate)
+HAVING  Max(probdate)>=dat('20080115')
+)

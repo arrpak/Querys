@@ -1,0 +1,27 @@
+SELECT ds_diario,To_Char(dt_mes,'yyyy/mm/dd'),dt_mes,qt_venta_numero,numdias,numdom
+FROM
+OJD_F_OPERACION_DIARIO t1,
+(SELECT *
+FROM
+OJD_D_DIARIO
+WHERE ds_diario
+IN
+('EL DIARIO MONTAÑES','LA CRONICA DE LEON','LA VOZ DE CADIZ','LA RIOJA','LA VERDAD',
+'ULTIMA HORA','EL ADELANTO DE SALAMANCA','EL PERIODICO MEDITERRANEO')
+ORDER BY ds_diario) t2,
+(
+SELECT  To_Char(infodate,'yyyy/mm')||'/01'AS fecha, Count(*) AS numdias ,
+sum(CASE WHEN To_Char(infodate,'dy')='dom' THEN 1 ELSE 0 END) AS numdom
+FROM fn3nodeinformation
+WHERE header='MARCA' AND product='DIARIO'
+AND node='CAM'
+AND service>0
+ GROUP BY To_Char(infodate,'yyyy/mm')||'/01'
+ )  t3
+WHERE
+t1.id_diario=t2.id_diario
+AND To_Char(dt_mes,'yyyy/mm/dd')=t3.fecha
+ORDER BY 1,2;
+
+
+

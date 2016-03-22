@@ -1,0 +1,9 @@
+SELECT ope.newsstand,To_Char(operationdate,'dy'),Avg(service+incidence-RETURN)
+FROM fn3operation ope,fn3node nod
+WHERE ope.header='MARCA'
+AND ope.product='DIARIO'
+AND nod.header='MARCA'
+AND ope.operationdate>=dat('20060901')
+AND ope.newsstand=nod.newsstand
+AND nod.fathernode='CAMAER'
+GROUP BY ope.newsstand,To_Char(operationdate,'dy')

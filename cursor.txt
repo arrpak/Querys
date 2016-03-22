@@ -1,0 +1,20 @@
+DECLARE
+cont NUMBER :=1;
+BEGIN
+WHILE cont<=10 LOOP
+DBMS_OUTPUT.PUT_LINE(cont);
+cont:=cont+1;
+END LOOP;
+END;
+
+
+
+
+DECLARE
+CURSOR cc IS
+SELECT code,description
+FROM fn3waytype;
+BEGIN
+     Dbms_Output.Put_Line('2');
+END;
+

@@ -1,0 +1,34 @@
+
+
+
+delete  from kiosco where ruta='2000101' and punto='92401';
+delete  from opemarca where ruta='2000101' and punto='92401';
+delete  from expoperation where ruta='2000101' and punto='92401';
+delete  from elioperation where ruta='2000101' and punto='92401';
+
+
+
+delete from Fn2Sustitucion where puntoventa='100010324041' or
+                                 sustituible='100010324041';
+delete from Fn2CierrePrefijado where puntoventa='100010324041';
+delete from Fn2CierreRegular where puntoventa='100010324041';
+delete from Fn2apertura where puntoventa='100010324041';
+delete from fn2forecastdetail  where outputdef='VentaMarca100010324041';
+delete from fn2forecast  where outputdef='VentaMarca100010324041';
+delete from fn2estimation where outputdef='VentaMarca100010324041';
+delete from fn2inputestimation where outputdef='VentaMarca100010324041';
+delete from fn2arimaestimatedparam where outputdef='VentaMarca100010324041';
+delete from fn2probabilidadnoagotaroutput where output='VentaMarca100010324041';
+delete from Fn2outputdef  where outputdef='VentaMarca100010324041';
+delete from Fn2output     where output='VentaMarca100010324041';
+delete from Fn2nodo       where codigo='100010324041';
+delete from fn2operacionhistorico where puntoventa='100010324041';
+delete from fn2operacion  where puntoventa='100010324041';
+delete from fn2detalletirada where puntoventa='100010324041';
+delete from fn2puntoventaalta where puntoventa='100010324041';
+delete from Fn2puntoventa where codigo='100010324041';
+delete from fn2codificacion where puntoventa='100010324041';
+delete from fn2serviciofijo where puntoventa='100010324041';
+
+
+

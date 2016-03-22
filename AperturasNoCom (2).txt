@@ -1,0 +1,40 @@
+set linesize 400;
+set pagesize 400;
+--Select servicio.newsstand,service,decision
+Select 'VentaMarca'||servicio.newsstand
+from
+((select newsstand,service
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and   operationdate=to_date('20040103','yyyymmdd')
+and   service>0
+--and   substr(newsstand,1,3)='028'
+union
+(select newsstand,service
+from fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO'
+and   service>0
+and   operationdate=to_date('20040103','yyyymmdd')
+--and   substr(newsstand,1,3)='028'
+))) servicio,
+(select newsstand,decision,orderf
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO'
+and   dateprint=to_date('20040103','yyyymmdd')
+and decision=0
+and node='EXT'
+--and   substr(newsstand,1,3)='028'
+) tirada,
+(select orderf
+ from fn3printing
+where
+header='MARCA' and product='DIARIO' 
+and dateprint=to_date('20040103','yyyymmdd')
+and used='Y'
+and node='EXT') orden
+where
+servicio.newsstand=tirada.newsstand and
+tirada.orderf=orden.orderf
+;
+

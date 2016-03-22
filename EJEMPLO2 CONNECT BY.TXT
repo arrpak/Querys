@@ -1,0 +1,16 @@
+   select * from (
+   select isi.input--, isi.active 
+   from EzcInputSetinput isi, ( 
+    SELECT si.code AS Setinput
+      FROM Ezcsetinput si
+      START WITH si.code = '&setinput'
+      CONNECT BY PRIOR si.code = si.setinputfather) t
+    where t.setinput = isi.setinput
+      and isi.active = 'Y'
+    minus
+    select co_parameter--, co_active
+    from bsr_d_parameter
+     where co_model like 'InformeMarketingCom%'
+      --and co_parameter = 'Abanicos2006.iv '
+       )
+     order by input

@@ -1,0 +1,26 @@
+INSERT INTO fn3operation
+SELECT *
+FROM fn3operationnotcontrolled
+WHERE
+header='MARCA' AND product='DIARIO'
+AND newsstand LIKE '003%'
+AND operationdate<dat('20090311') AND
+(newsstand,operationdate) NOT IN
+(SELECT newsstand,operationdate
+FROM fn3operation
+ WHERE header='MARCA' AND product='DIARIO'
+ AND operationdate>dat('20080101')
+AND SubStr(newsstand,1,3)= '003')
+
+
+
+;
+
+
+delete
+FROM fn3operationnotcontrolled
+WHERE
+header='MARCA' AND product='DIARIO'
+AND newsstand LIKE '003%'
+AND operationdate<dat('20090311');
+

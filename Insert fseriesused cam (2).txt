@@ -1,0 +1,8 @@
+INSERT INTO fseriesused
+SELECT substr(output,11,12),valuedate,forecast,(decision),forsession
+FROM fn3forecastseries
+WHERE valuedate>=dat('20090601')
+AND output LIKE 'VentaMarca028%'
+AND used='Y'
+--AND OUTPUT='VentaMarca028000100002'
+AND forsession NOT LIKE '%ActPrev%'

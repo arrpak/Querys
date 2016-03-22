@@ -1,0 +1,38 @@
+Define fec1='20090618';
+Define fec2='20090606';
+Define fec3='20090610';
+Define fec4='20090604';
+Define dateprint='20090625';
+
+SELECT t2.newsstand,t1.VenMed,t1.prop,t2.dec
+from
+(
+SELECT newsstand,header,product,
+Round(Avg(service+incidence-RETURN)) AS VenMed,
+       Round(Max(service+incidence-RETURN)) AS VenMax,
+       StdDev(service+incidence-RETURN) AS Dev,
+       Round(Avg(service+incidence-RETURN)+StdDev(service+incidence-RETURN)) AS Prop
+FROM fn3operation
+WHERE
+header='MARCA' AND product='DIARIO'
+AND operationdate IN
+(dat('&fec1'),dat('&fec2'),dat('&fec3'),dat('&fec4'))
+--AND SubStr(newsstand,1,3)='028'
+AND newsstand LIKE '028%'
+--AND newsstand='028000100002'
+GROUP BY newsstand,header,product) t1,
+(
+SELECT newsstand,Round(decision+increasedec) AS dec,header,product
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND product='DIARIO'
+AND dateprint=dat('&dateprint')
+AND orderf=1) t2
+WHERE
+t1.newsstand=t2.newsstand
+AND t1.header=t2.header
+AND t1.product=t2.product
+
+
+
+

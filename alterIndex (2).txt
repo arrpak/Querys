@@ -1,0 +1,9 @@
+ALTER INDEX FN3ESTSETINPEFFPK
+STORAGE(NEXT 10M);
+
+
+ERROR: (SQL)
+Key violation.
+[Oracle][ODBC][Ora]ORA-01654: unable to extend index FORMARCA.FN3ESTIMATIONINPUTPK by 2560 in tablespace MARCA_IDX
+
+SqlDBExecQuery:

@@ -1,0 +1,39 @@
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',ope.newsstand,to_date('20041025','yyyymmdd'),
+Greatest(round(maxven,dec))
+from
+(
+select newsstand,max(service+incidence-return) AS MAXVEN
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+substr(newsstand,1,3) in ('011','041','052','021','029','004','014','018','004','023') and
+operationdate>=to_date('20031109','yyyymmdd') and
+operationdate<=to_date('20031214','yyyymmdd') and
+to_char(operationdate,'DY')='MAR'
+group by newsstand) ope,
+(select newsstand,orderf,
+   SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as dec
+--round(decision+increasedec) as dec
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and
+forsession!='ServicioFijo' and
+node='AND' and dateprint=to_date('20041025','yyyymmdd')
+group by newsstand,orderf) pri,
+(SELECT newsstand
+FROM FN3newsstandon
+where dateoff is null
+minus
+(select newsstand
+from fn3servicemodified
+WHERE MODIFIEDDATE=TO_DATE('20041025','YYYYMMDD'))) mod
+where
+ope.newsstand=pri.newsstand
+and mod.newsstand=pri.newsstand
+and pri.dec<=ope.maxven*1
+and pri.dec>0
+and pri.orderf=1;
+

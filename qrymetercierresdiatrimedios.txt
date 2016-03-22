@@ -1,0 +1,120 @@
+UPDATE fn3printingdetail
+SET decision=0,increasedec=0
+--SELECT Count(*) FROM fn3printingdetail
+WHERE
+dateprint=To_Date('20080228','yyyymmdd')
+AND node ='AND'
+and decision>0
+and newsstand in
+(
+SELECT t1.newsstand
+FROM fn3closingfixed t1,fn3newsstandon t2
+WHERE
+t2.dateoff IS NULL
+AND (T1.newsstand like '011%' or
+T1.newsstand like '010%' or
+T1.newsstand like '041%' or
+T1.newsstand like '029%' or
+T1.newsstand like '021%' or
+T1.newsstand like '006%' or
+T1.newsstand like '004%' or
+T1.newsstand like '014%' or
+T1.newsstand like '028%' or
+T1.newsstand like '023%' or
+T1.newsstand like '052%' or
+T1.newsstand like '028%')
+AND datefrom <=To_Date('20080228','yyyymmdd')
+AND dateuntil>=To_Date('20080228','yyyymmdd')
+AND t1.newsstand=t2.newsstand
+)
+;
+
+
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',t1.newsstand,To_Date('20070304','yyyymmdd'),0
+FROM fn3closingfixed t1,fn3newsstandon t2
+WHERE
+t2.dateoff IS NULL
+AND
+(
+(
+T1.newsstand like '011%' or
+T1.newsstand like '010%' or
+T1.newsstand like '041%' or
+T1.newsstand like '029%' or
+T1.newsstand like '021%' or
+T1.newsstand like '006%' or
+T1.newsstand like '004%' or
+T1.newsstand like '014%' or
+T1.newsstand like '023%' or
+T1.newsstand like '052%' or
+T1.newsstand like '018%')		)
+AND datefrom<=To_Date('20070304','yyyymmdd')
+AND dateuntil>=To_Date('20070304','yyyymmdd')
+AND t1.newsstand=t2.newsstand
+and t1.newsstand not in
+(select newsstand
+from fn3servicemodified
+where modifieddate=To_Date('20070304','yyyymmdd')
+);
+
+
+
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+	querys para GRANADA
+
+select newsstand
+from fn3node
+where substr(fathernode,1,6)='ANDGRA'
+and newsstand is not null
+
+
+
+
+select operationdate,count(*)
+from fn3operation ope
+where
+header='MARCA' and product='DIARIO' and
+operationdate
+in(to_date('20080211','yyyymmdd'),to_date('20080212','yyyymmdd'),to_date('20080216','yyyymmdd'),
+to_date('20080217','yyyymmdd'),to_date('20080219','yyyymmdd'),to_date('20080220','yyyymmdd')
+,to_date('20080223','yyyymmdd'),to_date('20080224','yyyymmdd'),to_date('20080225','yyyymmdd'))
+and newsstand in
+(select newsstand
+from fn3node
+where substr(fathernode,1,6)='ANDGRA'
+and newsstand is not null)
+group by operationdate
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+
+delete
+from fn3operation ope
+where
+header='MARCA' and product='DIARIO' and
+operationdate
+in(to_date('20080211','yyyymmdd'),to_date('20080212','yyyymmdd'),to_date('20080216','yyyymmdd'),
+to_date('20080217','yyyymmdd'),to_date('20080219','yyyymmdd'),to_date('20080220','yyyymmdd')
+,to_date('20080223','yyyymmdd'),to_date('20080224','yyyymmdd'),to_date('20080225','yyyymmdd'))
+and newsstand in
+(select newsstand
+from fn3node
+where substr(fathernode,1,6)='ANDGRA'
+and newsstand is not null)
+
+
+
+
+
+
+

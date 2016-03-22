@@ -1,0 +1,225 @@
+  select newsstand, num
+  from
+  (
+  select newsstand, count(*) as num
+  from
+  (
+  select ope.operationdate, ope.newsstand as newsstand,
+/*
+         decode(greatest(ope.service+ope.incidence-ope.return, pridet.decision+pridet.increasedec),
+                ope.service+ope.incidence-ope.return, 1, 0) indAgot
+         decode(greatest(ope.service+ope.incidence, 0), service+incidence, 1, 0) indOpen,
+         ((pridet.decision+pridet.increasedec) - (ope.service+ope.incidence-ope.return))*
+         greatest(ope.service+ope.incidence, 0) Devolucion,
+         (pridet.decision+pridet.increasedec)*greatest(ope.service+ope.incidence, 0) Servicio
+*/
+  from fn3operation ope, fn3printing pri, fn3printingdetail pridet
+  where (ope.service+ope.incidence-ope.return)-(pridet.decision+pridet.increasedec) >= 0 and
+        ope.operationdate >= to_date('20020314', 'YYYYMMDD') and
+        ope.operationdate <= to_date('20020314', 'YYYYMMDD') and
+        pri.header         = 'MARCA'          and
+        pri.product        = 'DIARIO'         and
+        pri.node           = 'CAVCMU'         and
+        pri.used           = 'Y'              and
+        ope.newsstand      = pridet.newsstand and
+        ope.header         = pri.header       and
+        pri.header         = pridet.header    and
+        ope.product        = pri.product      and
+        pri.product        = pridet.product   and
+        pri.node           = pridet.node      and
+        ope.operationdate  = pridet.dateprint and
+        pri.dateprint      = pridet.dateprint and
+        pri.orderf         = pridet.orderf
+  )
+  group by newsstand
+  )
+  where num >= 6
+  order by num desc;
+
+-- 1.- Pv, NumAgot
+-- 21 segundos para 22 dias
+  set newpage none;
+  set hea on
+  set linesize 50;
+  set colsep ';';
+  set pagesize 50000;
+  spool F:\fn3\sqlldr\rpt\numagotado20020301_22ivan.rpt;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  select newsstand, num
+  from
+  (
+  select newsstand, count(*) as num
+  from
+  (
+  select ope.operationdate, ope.newsstand as newsstand
+  from fn3operation ope, fn3printing pri, fn3printingdetail pridet
+  where (ope.service+ope.incidence-ope.return)-(pridet.decision+pridet.increasedec) >= 0 and
+        ope.operationdate >= to_date('20020301', 'YYYYMMDD') and
+        ope.operationdate <= to_date('20020322', 'YYYYMMDD') and
+        pri.header         = 'MARCA'          and
+        pri.product        = 'DIARIO'         and
+        pri.node           = 'CAVCMU'         and
+        pri.used           = 'Y'              and
+        ope.newsstand      = pridet.newsstand and
+        ope.header         = pri.header       and
+        pri.header         = pridet.header    and
+        ope.product        = pri.product      and
+        pri.product        = pridet.product   and
+        pri.node           = pridet.node      and
+        ope.operationdate  = pridet.dateprint and
+        pri.dateprint      = pridet.dateprint and
+        pri.orderf         = pridet.orderf
+  )
+  group by newsstand
+  )
+--  where num >= 6
+  order by num desc;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  spool off;
+
+
+-- 2.- Pv, NodoPadre, NumAgot
+-- 21 segundos para 22 dias (igual que la de arriba)
+  set newpage none;
+  set hea on
+  set linesize 50;
+  set colsep ';';
+  set pagesize 50000;
+  spool F:\fn3\sqlldr\rpt\numagotado20020301_22ivan.rpt;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  select newsstand, fathernode, num
+  from
+  (
+  select newsstand, fathernode, count(*) as num
+  from
+  (
+  select ope.operationdate, ope.newsstand newsstand, nod.fathernode
+  from fn3node nod, fn3operation ope, fn3printing pri, fn3printingdetail pridet
+  where (ope.service+ope.incidence-ope.return)-(pridet.decision+pridet.increasedec) >= 0 and
+        ope.operationdate >= to_date('20020301', 'YYYYMMDD') and
+        ope.operationdate <= to_date('20020322', 'YYYYMMDD') and
+        pri.header         = 'MARCA'          and
+        pri.product        = 'DIARIO'         and
+        pri.node           = 'CAVCMU'         and
+        pri.used           = 'Y'              and
+        nod.code           = ope.newsstand    and
+        ope.newsstand      = pridet.newsstand and
+        nod.header         = ope.header       and
+        ope.header         = pri.header       and
+        pri.header         = pridet.header    and
+        nod.product        = ope.product      and
+        ope.product        = pri.product      and
+        pri.product        = pridet.product   and
+        pri.node           = pridet.node      and
+        ope.operationdate  = pridet.dateprint and
+        pri.dateprint      = pridet.dateprint and
+        pri.orderf         = pridet.orderf
+  )
+  group by newsstand, fathernode
+  )
+--  where num >= 6
+  order by num desc;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  spool off;
+
+-- 3.- Pv, NodoPadre, NumAgot, NumOpen, PorcAgot
+-- 35 segundos para 22 dias
+  set newpage none;
+  set hea on
+  set linesize 50;
+  set colsep ';';
+  set pagesize 50000;
+  spool F:\fn3\sqlldr\rpt\numagotado20020301_22ivan.rpt;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  select newsstand, fathernode, substr(numAgot, 1, 7), substr(numOpen, 1, 7),
+         substr(round(numAgot/numOpen, 4), 1, 8)  porcAgot
+  from
+  (
+  select newsstand, fathernode, sum(indAgot) as numAgot, sum(indOpen) as numOpen
+  from
+  (
+  select ope.operationdate, ope.newsstand newsstand, nod.fathernode,
+         decode(greatest(ope.service+ope.incidence-ope.return, pridet.decision+pridet.increasedec),
+                ope.service+ope.incidence-ope.return, 1, 0) indAgot,
+         decode(greatest(ope.service+ope.incidence, 0), service+incidence, 1, 0) indOpen
+  from fn3node nod, fn3operation ope, fn3printing pri, fn3printingdetail pridet
+  where ope.operationdate >= to_date('20020301', 'YYYYMMDD') and
+        ope.operationdate <= to_date('20020322', 'YYYYMMDD') and
+        pri.header         = 'MARCA'          and
+        pri.product        = 'DIARIO'         and
+        pri.node           = 'CAVCMU'         and
+        pri.used           = 'Y'              and
+        nod.code           = ope.newsstand    and
+        ope.newsstand      = pridet.newsstand and
+        nod.header         = ope.header       and
+        ope.header         = pri.header       and
+        pri.header         = pridet.header    and
+        nod.product        = ope.product      and
+        ope.product        = pri.product      and
+        pri.product        = pridet.product   and
+        pri.node           = pridet.node      and
+        ope.operationdate  = pridet.dateprint and
+        pri.dateprint      = pridet.dateprint and
+        pri.orderf         = pridet.orderf
+  )
+  group by newsstand, fathernode
+  )
+--  where num >= 6
+  order by numAgot desc;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  spool off;
+
+
+-- 4.- Pv, NodoPadre, NumAgot, NumOpen, PorcAgot, Devolucion
+-- 35 segundos para 22 dias
+  set newpage none;
+  set hea on
+  set linesize 100;
+  set colsep ';';
+  set pagesize 50000;
+  spool F:\fn3\sqlldr\rpt\numagotado20020301_22paco.rpt;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  select newsstand, fathernode, substr(numAgot, 1, 7) numAgot, substr(numOpen, 1, 7) numOpen,
+         substr(round(numAgot/numOpen, 4), 1, 8) porcAgot, substr(devolucion, 1, 10) devolucion,
+         substr(servicio, 1, 8) servicio,
+         decode(servicio, 0, 0, nvl(servicio, 0), substr(round(devolucion/servicio, 4), 1, 7)) porcDev
+  from
+  (
+  select newsstand, fathernode, sum(indAgot) numAgot, sum(indOpen) numOpen,
+         sum(devolucion) devolucion, sum(servicio) servicio
+  from
+  (
+  select ope.operationdate, ope.newsstand newsstand, nod.fathernode,
+         decode(greatest(ope.service+ope.incidence-ope.return, pridet.decision+pridet.increasedec),
+                ope.service+ope.incidence-ope.return, 1, 0) indAgot,
+         decode(greatest(ope.service+ope.incidence, 0), service+incidence, 1, 0) indOpen,
+         -- Devolucion bruta * Indicador abierto * Indicador devolucion positiva
+         (pridet.decision+pridet.increasedec - ope.service+ope.incidence-ope.return) *
+         least(greatest(ope.service+ope.incidence, 0), 1) *         least(greatest(pridet.decision+pridet.increasedec-ope.service+ope.incidence-ope.return, 0), 1) devolucion,
+         (pridet.decision+pridet.increasedec) * least(greatest(ope.service+ope.incidence, 0), 1) servicio
+  from fn3node nod, fn3operation ope, fn3printing pri, fn3printingdetail pridet
+  where ope.operationdate >= to_date('20020301', 'YYYYMMDD') and
+        ope.operationdate <= to_date('20020321', 'YYYYMMDD') and
+        pri.header         = 'MARCA'          and
+        pri.product        = 'DIARIO'         and
+        pri.node           = 'CAM'            and
+        pri.used           = 'Y'              and
+        nod.code           = ope.newsstand    and
+        ope.newsstand      = pridet.newsstand and
+        nod.header         = ope.header       and
+        ope.header         = pri.header       and
+        pri.header         = pridet.header    and
+        nod.product        = ope.product      and
+        ope.product        = pri.product      and
+        pri.product        = pridet.product   and
+        pri.node           = pridet.node      and
+        ope.operationdate  = pridet.dateprint and
+        pri.dateprint      = pridet.dateprint and
+        pri.orderf         = pridet.orderf
+  )
+  group by newsstand, fathernode
+  )
+--  where servicio is null
+  order by to_number(numAgot) desc;
+select to_char(sysdate, 'yyyy/mm/dd hh24:mi:ss') from dual;
+  spool off;

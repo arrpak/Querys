@@ -1,0 +1,63 @@
+spool c:\llavCAN.txt
+select sysdate from dual;
+set colsep '|';
+set pagesize 4000;
+select    serie.out,
+serie.valuedate,
+'Llavero',
+f as filter,
+n as noise,
+input.ef
+from
+(select substr(estsession,1,20) as est,'Llavero',
+substr(output,1,20) as out,valuedate,
+      sum(effect) as ef
+from fn3estimationinputeffect
+where input like '%Llavero%' and
+estsession='20030507.PROV' and
+output in 
+('VentaMarcaCAN')
+group by valuedate,substr(estsession,1,20),substr(output,1,20)
+) input,
+(select substr(estsession,1,20) est,substr(output,1,20) as out,
+valuedate,to_number(filter) f ,to_number(noise) n
+from fn3estimationseries
+where estsession='20030507.PROV' and
+dating='Diario' and
+valuedate>to_date('20030301','yyyymmdd') and
+output in ('VentaMarcaCAN')) serie
+where 
+input.out=serie.out and
+input.valuedate=serie.valuedate and
+input.est=serie.est ;
+spool off;
+
+
+
+
+
+
+
+
+select substr(estsession,1,20) as est,'Llavero',
+substr(output,1,20) as out,valuedate,
+      sum(effect) as ef
+from fn3estimationinputeffect
+where input like '%Llavero%' and
+estsession='20030507.PROV' and
+output in 
+('VentaMarcaCAN')
+group by valuedate,substr(estsession,1,20),substr(output,1,20);
+
+
+
+
+
+
+select substr(estsession,1,30) est,substr(output,1,30) as out,
+valuedate,to_number(filter) f ,to_number(noise) n
+from fn3estimationseries
+where estsession='20030507.PROV' and
+dating='Diario' and
+valuedate>to_date('20030301','yyyymmdd') and
+output in ('VentaMarcaCAN');

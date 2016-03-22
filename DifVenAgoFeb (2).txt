@@ -1,0 +1,31 @@
+SELECT agos.newsstand,cod.distributorcode,newst.town,newst.province,Round(agos.med,2),Round(feb.med,2),Round(agos.med,2)-Round(feb.med,2)
+,Round(feb.ser,2),Round(agos.ser,2)
+from
+(SELECT newsstand,Avg(service+incidence-RETURN) AS med,Avg(service+incidence)as ser
+FROM fn3operation
+WHERE
+header='MARCA'
+AND product='DIARIO'
+AND operationdate>=To_Date('20070801','yyyymmdd')
+AND operationdate<=To_Date('20070831','yyyymmdd')
+AND service>0
+--To_Char(operationdate,'yyyymm')='200708'
+GROUP BY newsstand  )  agos,
+(SELECT newsstand,Avg(service+incidence-RETURN) AS med, AS med,Avg(service+incidence)as ser
+FROM fn3operation
+WHERE
+header='MARCA'
+AND product='DIARIO'
+AND operationdate>=To_Date('20080201','yyyymmdd')
+AND operationdate<=To_Date('20080229','yyyymmdd')
+AND service>0
+--To_Char(operationdate,'yyyymm')='200708'
+GROUP BY newsstand  )  feb  ,fn3newsstand  newst,fn3codification cod
+WHERE
+Round(feb.med,2)>0
+AND Round(agos.med,2)>0
+AND feb.newsstand=agos.newsstand
+AND newst.code=feb.newsstand
+AND newst.code=cod.newsstand
+ORDER BY Round(agos.med,2)-Round(feb.med,2)
+

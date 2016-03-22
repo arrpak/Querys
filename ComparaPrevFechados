@@ -1,0 +1,11 @@
+SELECT f1.output,f1.valuedate,f1.forecast AS prevdiario,f1.decision AS decdiario,f1.Variance AS variandiario,f1.filter AS filterdiario,
+                              f2.forecast AS prevfechados,f2.decision AS decfechados,f2.Variance AS varianfechados,f2.filter AS filterfechados
+FROM fn3forecastseries f1,fn3forecastseries f2
+WHERE
+f1.forsession='2005102703.MG' AND
+f1.output='VentaMarcaANDHUEPLA' AND
+f1.dating='Diario' AND
+(f2.dating='CtLV' OR f2.dating='CtSab' OR f2.dating='CtDom') AND
+f1.output=f2.output AND
+f1.forsession=f2.forsession AND
+f1.valuedate=f2.valuedate;

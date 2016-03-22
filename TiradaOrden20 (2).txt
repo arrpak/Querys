@@ -1,0 +1,123 @@
+CREATE OR REPLACE PROCEDURE CrearTiradas
+(v_heade IN VARCHAR2,v_datep IN DATE,v_orden IN INTEGER )
+IS
+CURSOR c IS
+SELECT DISTINCT(node)
+FROM fn3printing
+WHERE dateprint=v_datep;
+v_count NUMBER := 0;
+BEGIN
+  FOR i IN c LOOP
+    BEGIN
+INSERT INTO FN3PRINTING
+SELECT header,product,node,dateprint,20,'N',comunicationdate,origdate,description
+FROM FN3PRINTING
+WHERE
+HEADER=v_heade
+AND Product='DIARIO'
+AND node=i.node
+AND orderf=v_orden AND dateprint=v_datep;
+INSERT INTO FN3PRINTINGNODEFORSESSION
+SELECT header,product,node,dateprint,20,sonnode,forsession,increaseporc,increasetab
+FROM FN3PRINTINGNODEFORSESSION
+WHERE
+HEADER=v_heade
+AND Product='DIARIO'
+AND node=i.node
+AND orderf=v_orden AND dateprint=v_datep;
+INSERT INTO FN3PRINTINGDETAIL
+SELECT header,product,node,dateprint,20,newsstand,forsession,decision,increasedec,decsession,decsys
+FROM FN3PRINTINGDETAIL
+WHERE
+HEADER=v_heade
+AND Product='DIARIO'
+AND node=i.node
+AND orderf=v_orden AND dateprint=v_datep;
+    EXCEPTION
+      WHEN OTHERS THEN  Dbms_Output.Put_Line('error '|| i.node);
+    END;
+--    COMMIT;
+END LOOP;
+  --Dbms_Output.Put_Line('total: '|| v_count);
+ END;
+/
+
+
+
+BEGIN
+CrearTiradas('MARCA',DAT('20080731'),1);
+END;
+
+
+
+
+SELECT Count(*),dateprint
+FROM fn3printing
+WHERE orderf=20
+and dateprint>sysdate-15
+GROUP BY dateprint
+ORDER BY dateprint
+
+
+delete fn3printing
+where dateprint=DAT('20080728') and orderf=20;
+
+
+
+
+
+
+update fn3printingdetail
+set
+decision=decision*1.09,increasedec=increasedec*1.09
+where dateprint=dat('20080727') and node='EXT' and orderf=1 and forsession<>'ServicioFijo'
+
+
+update fn3printingdetail
+set
+decision=decision*1.091,increasedec=increasedec*1.091
+where dateprint=dat('20080727') and node='AND' and orderf=1 and forsession<>'ServicioFijo'
+
+
+update fn3printingdetail
+set
+decision=decision*1.055,increasedec=increasedec*1.055
+where dateprint=dat('20080726') and node='CAVCMU' and orderf=1 and forsession<>'ServicioFijo'
+
+
+
+
+
+
+BEGIN
+CrearTiradas('MARCA',DAT('20080921'),1);
+END;
+
+
+
+
+
+
+
+
+
+DELETE FN3PRINTINGNODEFORSESSION
+WHERE
+HEADER='MARCA' AND
+ORDERF='20' AND
+DATEPRINT=DAT('20080901')
+AND NODE='CYLSOR2';
+
+DELETE FN3PRINTINGDETAIL
+WHERE
+HEADER='MARCA' AND
+ORDERF='20' AND
+DATEPRINT=DAT('20080901')
+AND NODE='CYLSOR2';
+
+DELETE FN3PRINTING
+WHERE
+HEADER='MARCA' AND
+ORDERF='20' AND
+DATEPRINT=DAT('20080901')
+AND NODE='CYLSOR2';

@@ -1,0 +1,149 @@
+SELECT *
+FROM emuoperationcompetence
+WHERE header='ELMUNDO'
+--order BY fecha
+intersect
+SELECT fecha
+FROM EmuSaleHeaderCM
+WHERE header='ELMUNDO'
+--order BY fecha
+
+
+      SELECT header, fecha, comunicationdate, venta, promoeffect, newseffect, promoinfo
+FROM emupromogelesa
+WHERE (header, fecha, comunicationdate) IN
+(SELECT header, fecha, Max(comunicationdate)
+FROM emupromogelesa
+GROUP BY header, fecha)
+ORDER BY header, fecha DESC
+
+
+SELECT distinct header
+FROM emuoperationcompetence
+
+
+
+
+
+select *
+from ezcproducto
+where producto='ElMundo'
+
+--select 	cabecera,producto,edicion,fecha,servicio,devolucion,venta,porcdev,descripcion
+
+--INSERT INTO ezcproductoinformacion
+select  header  ,'Diario','Madrid',fecha,servicio,devolucion,venta,devolucion/servicio, agotporc
+from emuoperationcompetence
+where
+header in ('ELPAIS','LARAZON','ABC','PUBLICO');
+
+
+insert into ezcproducto values ( 'DIARIO','DIARIO');
+
+
+update ezcproductoinformacion
+set producto='DIARIO'
+where
+cabecera in ('ELPAIS','LARAZON','ABC','PUBLICO');
+
+
+select *
+from  ezcproductoinformacion
+where
+cabecera in ('ABC');
+
+
+update ezcproductoinformacion
+set descripcion=''
+where
+cabecera in ('ELPAIS','LARAZON','ABC','PUBLICO');
+
+
+
+
+INSERT INTO ezcproductoinformacion
+select header,'DIARIO','Madrid',fecha,to_number(null),to_number(null),venta,to_number(null),null
+--SELECT header, fecha, comunicationdate, venta, promoeffect, newseffect, promoinfo
+FROM emupromogelesa
+WHERE
+header='ABC' and fecha<to_date('20070326','yyyymmdd') and
+(header, fecha, comunicationdate) IN
+(SELECT header, fecha, Max(comunicationdate)
+FROM emupromogelesa
+GROUP BY header, fecha)
+ORDER BY header, fecha DESC;
+
+
+select *
+from  ezcproductoinformacion
+where
+cabecera='ABC'
+
+
+ INSERT INTO ezcproductoinformacion
+select header,'DIARIO','Madrid',fecha,to_number(null),to_number(null),venta,to_number(null),null
+--SELECT header, fecha, comunicationdate, venta, promoeffect, newseffect, promoinfo
+FROM emupromogelesa
+WHERE
+header='LARAZON' and fecha<to_date('20070326','yyyymmdd') and
+(header, fecha, comunicationdate) IN
+(SELECT header, fecha, Max(comunicationdate)
+FROM emupromogelesa
+GROUP BY header, fecha)
+ORDER BY header, fecha DESC;
+
+
+select *
+from  ezcproductoinformacion
+where
+cabecera='LARAZON'
+
+select distinct cabecera
+from  ezcproductoinformacion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+where producto='Diario'
+
+
+
+
+
+
+
+  select header, count(*)
+from    EmuOperationCompetence
+group by header

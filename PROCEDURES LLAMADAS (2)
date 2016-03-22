@@ -1,0 +1,172 @@
+--EXTREMADURA
+
+BEGIN
+   SERVICIOMIN4('MARCA','EXT',Dat('20070809'),1,Dat('20070801'),Dat('20070802'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+BEGIN
+   ServicioMax('MARCA','EXT',Dat('20070809'),1,Dat('20070801'),Dat('20070802'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+--ANDALUCIA
+BEGIN
+   SERVICIOMIN4('MARCA','AND',Dat('20070809'),1,Dat('20070801'),Dat('20070802'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+BEGIN
+   ServicioMax('MARCA','AND',Dat('20070809'),1,Dat('20070801'),Dat('20070802'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+--VALENCIA
+BEGIN
+   SERVICIOMIN4('MARCA','CAVCMU',Dat('20070810'),1,Dat('20070803'),Dat('20070802'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+BEGIN
+        ServicioMax2('MARCA','CAVCMU',Dat('20070810'),1,Dat('20070803'),Dat('20070802'),Dat('20060808'),Dat('20060810'),1.3,1.1);
+END;
+/
+
+
+
+BEGIN
+   ServicioMax('MARCA','CAVCMU',Dat('20070810'),1,Dat('20070803'),Dat('20070802'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+--MADRID
+
+BEGIN
+   SERVICIOMIN4('MARCA','CAM',Dat('20070809'),1,Dat('20070731'),Dat('20070724'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+BEGIN
+   ServicioMax('MARCA','CAM',Dat('20070809'),1,Dat('20070731'),Dat('20070724'),Dat('20060808'),Dat('20060810'));
+END;
+/
+
+
+BEGIN
+   ServicioMaxExp('EXPANSION','CAM',Dat('20070715'),1,Dat('20070708'),Dat('20070630'),Dat('20070519'),Dat('20070609'));
+END;
+/
+
+BEGIN
+   SERVICIOMIN('EXPANSION','CAM',Dat('20070709'),1,Dat('20070702'),Dat('20070623'));
+END;
+/
+
+
+
+
+---------------
+
+
+
+
+
+BEGIN
+   SERVICIOMINEXP('EXPANSION','CAM',Dat('20070708'),1,Dat('20070630'),Dat('20070623'));
+END;
+/
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------
+Define dateprint='20070827';
+
+--BARCELONA
+
+BEGIN
+   SERVICIOMIN4('MARCA','CATBAR',Dat('&dateprint'),1,Dat('20070820'),Dat('20070813'),Dat('20070813'),Dat('20070806'));
+END;
+/
+
+BEGIN
+   ServicioMax('MARCA','CATBAR',Dat('&dateprint'),1,Dat('20070820'),Dat('20070813'),Dat('20070813'),Dat('20070806'));
+END;
+/
+
+BEGIN
+serviciominventa('MARCA','CATBAR',Dat('&dateprint'),1,Dat('20070820'));
+END;
+/
+
+
+--ANDALUCIA
+BEGIN
+   SERVICIOMIN4('MARCA','AND',Dat('&dateprint'),1,Dat('20070818'),Dat('20070811'),Dat('20070811'),Dat('20070804'));
+END;
+/
+
+BEGIN
+   ServicioMax('MARCA','AND',Dat('&dateprint'),1,Dat('20070818'),Dat('20070811'),Dat('20070811'),Dat('20070804'));
+END;
+/
+
+BEGIN
+serviciominventa('MARCA','AND',Dat('&dateprint'),1,Dat('20070818'));
+END;
+/
+
+
+
+--LEVANTE
+
+Define  dateprint='20070827';
+
+BEGIN
+   SERVICIOMIN4('MARCA','CAVCMU',Dat('&dateprint'),1,Dat('20070820'),Dat('20070813'),Dat('20070813'),Dat('20070806'));
+END;
+/
+/*
+BEGIN
+   ServicioMax('MARCA','CAVCMU',Dat('20070814'),1,Dat('20070806'),Dat('20070801'),Dat('20070802'),Dat('20060814'));
+END;
+/
+*/
+BEGIN
+        ServicioMax2('MARCA','CAVCMU',Dat('&dateprint'),1,Dat('20070820'),Dat('20070813'),Dat('20070813'),Dat('20070806'),1.3,1.1);
+END;
+/
+
+BEGIN
+serviciominventa('MARCA','CAVCMU',Dat('&dateprint'),1,Dat('20070820'));
+END;
+
+
+
+
+--Madrid
+
+
+BEGIN
+   SERVICIOMIN4('MARCA','CAM',Dat('20070825'),1,Dat('20070811'),Dat('20060826'),Dat('20060819'),Dat('20070804'));
+END;
+/
+
+BEGIN
+   ServicioMax('MARCA','CAM',Dat('20070825'),1,Dat('20070811'),Dat('20060826'),Dat('20060819'),Dat('20070804'));
+END;
+/
+
+BEGIN
+serviciominventa('MARCA','CAM',Dat('20070825'),1,Dat('20060826'));
+END;
+/
+
+
+BEGIN
+serviciominventa('EXPANSION','CAM',Dat('20070825'),1,Dat('20060826'));
+END;
+/

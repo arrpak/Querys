@@ -1,0 +1,31 @@
+update opemarca
+    set    incremdecision = round(decision*("+ porcTxt +"/100))
+    where  dia = "+ SqlFormatDate(fechaAct) +" and
+           ruta||punto IN (
+             select puntoventa
+             from   fn2grupopuntoventa
+             where  fn2grupopuntoventa.grupo = '"+ GrupoPuntoVenta +"')
+
+
+select  fecha,puntoventa,servicio+incidencia,servicio-devolucion as venta
+from fn2operacion
+where fecha=to_date('2000/12/17','yyyy/mm/dd')  
+            and puntoventa IN
+( select puntoventa
+             from   fn2grupopuntoventa
+             where  fn2grupopuntoventa.grupo = 'GranSuperficieLS')
+order by devolucion as 20001712
+
+
+
+select for02.servicio-for01.servicio,for03.puntoventa
+from fn2operacion for01, fn2operacion for02 , fn2grupopuntoventa for03
+where for01.fecha=to_date('2000/12/10','yyyy/mm/dd')  and
+             for01.puntoventa=for02.puntoventa and
+	for02.puntoventa=for03.puntoventa and	
+                for02.fecha=to_date('2000/12/17','yyyy/mm/dd') 
+                and for03.puntoventa  IN
+                 ( select puntoventa
+            from   fn2grupopuntoventa
+             where  fn2grupopuntoventa.grupo = 'GranSuperficieLS')
+

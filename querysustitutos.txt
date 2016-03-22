@@ -1,0 +1,10 @@
+select *
+from (select substr(output,11,12),substr(input,6,12),value,
+      row_number() over (partition by output order by value desc) as rn
+from fn3estimationinput
+where 
+estsession='20041013.PV' and
+value>0 and
+input like 'Sus%')
+where rn<=5;
+

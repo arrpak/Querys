@@ -1,0 +1,38 @@
+SELECT t1.newsstand,sum(service+incidence-RETURN) AS ven
+FROM fn3operation t1,
+(SELECT DISTINCT(NEWSSTAND)
+FROM FN3PRINTINGDETAIL
+WHERE
+header='EXPANSION' AND product='DIARIO'
+AND NODE='CAM'
+AND DATEPRINT>=DAT('20090413')
+AND DATEPRINT<=DAT('20090418')
+and decision>0) T2
+WHERE
+header='EXPANSION' AND product='DIARIO'
+AND OPERATIONDATE>DAT('20090101')
+AND t1.newsstand=t2.newsstand
+AND to_char(operationdate,'DY')<> 'SÁB'
+GROUP BY t1.newsstand
+ORDER BY 2
+
+
+
+
+SELECT t1.newsstand,sum(service+incidence-RETURN) AS ven
+FROM fn3operation t1,
+(SELECT DISTINCT(NEWSSTAND)
+FROM FN3PRINTINGDETAIL
+WHERE
+header='EXPANSION' AND product='DIARIO'
+AND NODE='CAM'
+AND DATEPRINT>=DAT('20090413')
+AND DATEPRINT<=DAT('20090419')
+and decision>0) T2
+WHERE
+header='EXPANSION' AND product='DIARIO'
+AND OPERATIONDATE>DAT('20090101')
+AND t1.newsstand=t2.newsstand
+AND to_char(operationdate,'DY')='SÁB'
+GROUP BY t1.newsstand
+ORDER BY 2

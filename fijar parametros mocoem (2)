@@ -1,0 +1,346 @@
+
+-------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+
+SELECT 'update bsr_d_parameter set co_fixed=''Y'', vl_ini='||To_char(Value,'0.999999')||'
+where co_model=''InformeMarketingComPublicoCAM'' and co_node=''Obs.ComPublicoCAM'' and co_parameter='''||input||''';'
+FROM ezcestimationinput e
+WHERE estsession='e20100131Com.02'
+AND output='ComABCCAM'
+AND (input LIKE '%2008%')
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+
+SELECT * FROM  bsr_d_parameter
+--UPDATE bsr_d_parameter set co_fixed='N'
+WHERE co_node='Obs.ComElPaisCAM'
+AND co_model='InformeMarketingComElPaisCAM'
+AND co_fixed='Y'
+AND co_parameter LIKE '%2008%'
+
+
+
+
+
+
+(
+SELECT co_parameter
+FROM  bsr_d_parameter
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_parameter  LIKE '%2008%'
+INTERSECT
+
+SET hea OFF:
+
+
+
+UPDATE bsr_d_parameter
+SET vl_ini=NULL,co_fixed='N'
+WHERE
+co_node='Obs.ComABCCAM'
+--AND co_parameter LIKE '%2009%'
+AND co_fixed='Y'
+
+
+
+
+
+
+
+SELECT *
+FROM  bsr_d_parameter
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_parameter  LIKE '%2007%'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UPDATE  bsr_d_parameter
+SET co_fixed='Y'
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_parameter  LIKE '%2007%'
+AND co_parameter IN
+(SELECT input
+FROM ezcestimationinput e
+WHERE estsession='e20100103Com.01'
+AND output='ComPublicoCAM'
+AND input LIKE '%2007%'
+)
+
+
+
+
+
+
+update
+bsr_d_parameter
+
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+
+UPDATE  bsr_d_parameter b
+SET vl_ini=
+(SELECT Value
+FROM ezcestimationinput e
+WHERE estsession='e20100117Com.01'
+AND output='ComElCAM'
+AND input LIKE '%CinePublico%'
+AND e.input = b.co_parameter
+--AND 'InformeMarketing'||output=co_model
+)
+WHERE
+co_model='InformeMarketingComPublicoCAM' and
+b.co_parameter IN
+(
+SELECT co_parameter
+FROM  bsr_d_parameter
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_parameter  LIKE '%CinePublico%'
+  )
+AND co_parameter IN
+(SELECT input
+FROM ezcestimationinput e
+WHERE estsession='e20100110Com.01'
+AND output='ComPublicoCAM'
+AND input LIKE '%CinePublico%'
+)
+
+
+
+
+
+-- select
+(SELECT Value
+FROM ezcestimationinput e
+WHERE estsession='e20100103Com.01'
+AND output='ComPublicoCAM'
+AND input LIKE '%2007%'
+--AND e.input = co_parameter
+and
+e.input IN
+(
+
+
+
+SELECT *
+FROM  bsr_d_parameter
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_fixed='Y'
+
+
+--AND
+Vl_ini >999
+
+
+
+
+AND co_parameter  LIKE '%2007%'
+  )
+
+
+
+
+
+
+
+
+e.value
+WHERE
+co_model='InformeMarketingComPublicoCAM'
+AND co_parameter=e.input
+AND co_parameter IN
+(SELECT input,Value
+FROM ezcestimationinput e
+WHERE estsession='e20100103Com.02'
+AND output='ComPublicoCAM'
+AND input IN
+(
+SELECT co_parameter
+FROM  bsr_d_parameter
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_parameter  LIKE '%2007%'
+))
+
+
+
+
+
+WHERE co_model='InformeMarketingComPublicoCAM'
+AND co_parameter  LIKE '%2007%'
+
+
+
+
+
+
+SELECT distinct co_model
+FROM  bsr_d_parameter
+
+
+
+
+
+UPDATE bsr_d_parameter
+SET vl_min=0,vl_ini=0
+WHERE
+co_parameter IN ('DVDCinePublico2008.Ini','DVDCinePublico2008.iv')
+AND co_model='InformeMarketingComPublicoCAM'
+
+
+
+INSERT INTO   bsr_d_parameter
+SELECT   co_model, 'FestivalCinePublico2009Jueves.iv', co_node, id_level, co_active, co_fixed, vl_ini, vl_min, vl_max, vl_muprior, vl_sigmaprior, vl_sigmapriorweight, ds_parameter
+FROM     bsr_d_parameter
+WHERE
+co_parameter='FestivalCinePublico2009.iv'
+
+
+
+--SELECT * FROM  bsr_d_parameter
+--UPDATE bsr_d_parameter SET vl_ini=null,vl_min=0
+WHERE
+co_model='InformeMarketingComPublicoCAM'
+AND co_parameter LIKE 'DVDCine%'
+AND co_parameter NOT LIKE '%Ten%'
+AND co_parameter NOT LIKE '%Vie%'
+AND co_parameter <>'DVDCinePublico2008.IntervencionNeg'
+AND co_parameter <>'DVDCinePublicoIII2008.Ini'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

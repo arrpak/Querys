@@ -1,0 +1,12 @@
+SELECT operationdate AS Fecha ,Count(*) AS NumPV,delegate,Sum(service) AS Servicio,
+       Sum(RETURN) AS Dev,
+       Sum(service+incidence-RETURN) AS Venta
+FROM fn3operation ope,fn3codification cod
+WHERE
+ope.header='MARCA'
+AND ope.product='DIARIO'
+AND cod.distributor='DISTRIMEDIOS'
+AND ope.operationdate>=To_Date('20080401','yyyymmdd')
+AND ope.newsstand=cod.newsstand
+GROUP BY delegate,operationdate
+ORDER BY delegate

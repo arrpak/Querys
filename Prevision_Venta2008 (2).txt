@@ -1,0 +1,21 @@
+SELECT *
+from
+(SELECT t1.node,t1.sonnode,REPLACE(t1.forsession,'PV','MG') AS forsession,t1.dateprint
+FROM fn3printingnodeforsession t1,fn3printing t2
+WHERE
+t2.used='Y'
+AND t1.dateprint>SYSDATE-365
+AND t1.header='MARCA' AND t1.product='DIARIO'
+AND t1.dateprint=t2.dateprint
+AND t1.product=t2.product
+AND t1.header=t2.header
+AND t1.orderf=t2.orderf
+AND t1.node=t2.node) t1,
+(SELECT REPLACE(output,'VentaMarca','') AS node,forsession,valuedate,forecast
+FROM fn3forecastseries
+WHERE
+valuedate >SYSDATE-365 AND
+forsession LIKE  '%MG%' ) t2
+WHERE t1.forsession=t2.forsession
+AND t1.sonnode=t2.node
+AND t1.dateprint=t2.valuedate

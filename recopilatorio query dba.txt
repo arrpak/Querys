@@ -1,0 +1,1056 @@
+•• Consulta Oracle SQL sobre la vista que muestra el estado de la base de datos:
+select * from v$instance
+
+•• Consulta Oracle SQL que muestra si la base de datos está abierta
+select status from v$instance
+
+•• Consulta Oracle SQL sobre la vista que muestra los parámetros generales de Oracle
+select * from v$system_parameter
+
+•• Consulta Oracle SQL para conocer la Versión de Oracle
+select value from v$system_parameter where name = 'compatible'
+
+•• Consulta Oracle SQL para conocer la Ubicación y nombre del fichero spfile
+select value from v$system_parameter where name = 'spfile'
+
+•• Consulta Oracle SQL para conocer la Ubicación y número de ficheros de control
+select value from v$system_parameter where name = 'control_files'
+
+•• Consulta Oracle SQL para conocer el Nombre de la base de datos
+select value from v$system_parameter where name = 'db_name'
+
+•• Consulta Oracle SQL sobre la vista que muestra las conexiones actuales a Oracle Para visualizarla es necesario entrar con privilegios de administrador
+select osuser, username, machine, program
+from v$session
+order by osuser
+
+•• Consulta Oracle SQL que muestra el número de conexiones actuales a Oracle agrupado por aplicación que realiza la conexión
+select program Aplicacion, count(program) Numero_Sesiones
+from v$session
+group by program
+order by Numero_Sesiones desc
+
+•• Consulta Oracle SQL que muestra los usuarios de Oracle conectados y el número de sesiones por usuario
+select username Usuario_Oracle, count(username) Numero_Sesiones
+from v$session
+group by username
+order by Numero_Sesiones desc
+Propietarios de objetos y número de objetos por propietario
+select owner, count(owner) Numero
+from dba_objects
+group by owner
+order by Numero desc
+
+•• Consulta Oracle SQL sobre el Diccionario de datos (incluye todas las vistas y tablas de la Base de Datos)
+select * from dictionary
+
+•• Consulta Oracle SQL que muestra los datos de una tabla especificada (en este caso todas las tablas que lleven la cadena "XXX"
+select * from ALL_ALL_TABLES where upper(table_name) like '%XXX%'
+
+•• Consulta Oracle SQL para conocer las tablas propiedad del usuario actual
+select * from user_tables
+
+•• Consulta Oracle SQL para conocer todos los objetos propiedad del usuario conectado a Oracle
+select * from user_catalog
+
+•• Consulta Oracle SQL para el DBA de Oracle que muestra los tablespaces, el espacio utilizado, el espacio libre y los ficheros de datos de los mismos:
+Select t.tablespace_name "Tablespace", t.status "Estado",
+ROUND(MAX(d.bytes)/1024/1024,2) "MB Tamaño",
+ROUND((MAX(d.bytes)/1024/1024) -
+(SUM(decode(f.bytes, NULL,0, f.bytes))/1024/1024),2) "MB Usados",
+ROUND(SUM(decode(f.bytes, NULL,0, f.bytes))/1024/1024,2) "MB Libres",
+t.pct_increase "% incremento",
+SUBSTR(d.file_name,1,80) "Fichero de datos"
+FROM DBA_FREE_SPACE f, DBA_DATA_FILES d, DBA_TABLESPACES t
+WHERE t.tablespace_name = d.tablespace_name AND
+f.tablespace_name(+) = d.tablespace_name
+AND f.file_id(+) = d.file_id GROUP BY t.tablespace_name,
+d.file_name, t.pct_increase, t.status ORDER BY 1,3 DESC
+
+•• Consulta Oracle SQL para conocer los productos Oracle instalados y la versión:
+select * from product_component_version
+
+•• Consulta Oracle SQL para conocer los roles y privilegios por roles:
+select * from role_sys_privs
+
+•• Consulta Oracle SQL para conocer las reglas de integridad y columna a la que afectan:
+select constraint_name, column_name from sys.all_cons_columns
+
+•• Consulta Oracle SQL para conocer las tablas de las que es propietario un usuario, en este caso "xxx":
+SELECT table_owner, table_name from sys.all_synonyms where table_owner like 'xxx'
+
+•• Consulta Oracle SQL como la anterior, pero de otra forma más efectiva (tablas de las que es propietario un usuario):
+SELECT DISTINCT TABLE_NAME
+FROM ALL_ALL_TABLES
+WHERE OWNER LIKE 'HR'
+
+•• Parámetros de Oracle, valor actual y su descripción:
+SELECT v.name, v.value value, decode(ISSYS_MODIFIABLE, 'DEFERRED',
+'TRUE', 'FALSE') ISSYS_MODIFIABLE, decode(v.isDefault, 'TRUE', 'YES',
+'FALSE', 'NO') "DEFAULT", DECODE(ISSES_MODIFIABLE, 'IMMEDIATE',
+'YES','FALSE', 'NO', 'DEFERRED', 'NO', 'YES') SES_MODIFIABLE,
+DECODE(ISSYS_MODIFIABLE, 'IMMEDIATE', 'YES', 'FALSE', 'NO',
+'DEFERRED', 'YES','YES') SYS_MODIFIABLE , v.description
+FROM V$PARAMETER v
+WHERE name not like 'nls%' ORDER BY 1
+
+•• Consulta Oracle SQL que muestra los usuarios de Oracle y datos suyos (fecha de creación, estado, id, nombre, tablespace temporal,...):
+Select * FROM dba_users
+
+•• Consulta Oracle SQL para conocer tablespaces y propietarios de los mismos:
+select owner, decode(partition_name, null, segment_name,
+segment_name || ':' || partition_name) name,
+segment_type, tablespace_name,bytes,initial_extent,
+next_extent, PCT_INCREASE, extents, max_extents
+from dba_segments
+Where 1=1 And extents > 1 order by 9 desc, 3
+
+•• Últimas consultas SQL ejecutadas en Oracle y usuario que las ejecutó:
+select distinct vs.sql_text, vs.sharable_mem,
+vs.persistent_mem, vs.runtime_mem, vs.sorts,
+vs.executions, vs.parse_calls, vs.module,
+vs.buffer_gets, vs.disk_reads, vs.version_count,
+vs.users_opening, vs.loads,
+to_char(to_date(vs.first_load_time,
+'YYYY-MM-DD/HH24:MI:SS'),'MM/DD HH24:MI:SS') first_load_time,
+rawtohex(vs.address) address, vs.hash_value hash_value ,
+rows_processed , vs.command_type, vs.parsing_user_id ,
+OPTIMIZER_MODE , au.USERNAME parseuser
+from v$sqlarea vs , all_users au
+where (parsing_user_id != 0) AND
+(au.user_id(+)=vs.parsing_user_id)
+and (executions >= 1) order by buffer_gets/executions desc
+
+•• Consulta Oracle SQL para conocer todos los tablespaces:
+select * from V$TABLESPACE
+
+•• Consulta Oracle SQL para conocer la memoria Share_Pool libre y usada
+select name,to_number(value) bytes
+from v$parameter where name ='shared_pool_size'
+union all
+select name,bytes
+from v$sgastat where pool = 'shared pool' and name = 'free memory'
+
+•• Cursores abiertos por usuario
+select b.sid, a.username, b.value Cursores_Abiertos
+from v$session a,
+v$sesstat b,
+v$statname c
+where c.name in ('opened cursors current')
+and b.statistic# = c.statistic#
+and a.sid = b.sid
+and a.username is not null
+and b.value >0
+order by 3
+
+•• Consulta Oracle SQL para conocer los aciertos de la caché (no debería superar el 1 por ciento)
+select sum(pins) Ejecuciones, sum(reloads) Fallos_cache,
+trunc(sum(reloads)/sum(pins)*100,2) Porcentaje_aciertos
+from v$librarycache
+where namespace in ('TABLE/PROCEDURE','SQL AREA','BODY','TRIGGER');
+
+•• Sentencias SQL completas ejecutadas con un texto determinado en el SQL
+SELECT c.sid, d.piece, c.serial#, c.username, d.sql_text
+FROM v$session c, v$sqltext d
+WHERE c.sql_hash_value = d.hash_value
+and upper(d.sql_text) like '%WHERE CAMPO LIKE%'
+ORDER BY c.sid, d.piece
+
+•• Una sentencia SQL concreta (filtrado por sid)
+SELECT c.sid, d.piece, c.serial#, c.username, d.sql_text
+FROM v$session c, v$sqltext d
+WHERE c.sql_hash_value = d.hash_value
+and sid = 105
+ORDER BY c.sid, d.piece
+
+•• Consulta Oracle SQL para conocer el tamaño ocupado por la base de datos
+select sum(BYTES)/1024/1024 MB from DBA_EXTENTS
+
+•• Consulta Oracle SQL para conocer el tamaño de los ficheros de datos de la base de datos
+select sum(bytes)/1024/1024 MB from dba_data_files
+
+•• Consulta Oracle SQL para conocer el tamaño ocupado por una tabla concreta sin incluir los índices de la misma
+select sum(bytes)/1024/1024 MB from user_segments
+where segment_type='TABLE' and segment_name='NOMBRETABLA'
+
+•• Consulta Oracle SQL para conocer el tamaño ocupado por una tabla concreta incluyendo los índices de la misma
+select sum(bytes)/1024/1024 Table_Allocation_MB from user_segments
+where segment_type in ('TABLE','INDEX') and
+(segment_name='NOMBRETABLA' or segment_name in
+(select index_name from user_indexes where table_name='NOMBRETABLA'))
+
+•• Consulta Oracle SQL para conocer el tamaño ocupado por una columna de una tabla
+select sum(vsize('NOMBRECOLUMNA'))/1024/1024 MB from NOMBRETABLA
+
+•• Consulta Oracle SQL para conocer el espacio ocupado por usuario
+SELECT owner, SUM(BYTES)/1024/1024 MB FROM DBA_EXTENTS
+group by owner
+
+•• Consulta Oracle SQL para conocer el espacio ocupado por los diferentes segmentos (tablas, índices, undo, rollback, cluster, ...)
+SELECT SEGMENT_TYPE, SUM(BYTES)/1024/1024 MB FROM DBA_EXTENTS
+group by SEGMENT_TYPE
+
+•• Consulta Oracle SQL para obtener todas las funciones de Oracle: NVL, ABS, LTRIM, ...
+SELECT distinct object_name
+FROM all_arguments
+WHERE package_name = 'STANDARD'
+order by object_name
+
+•• Consulta Oracle SQL para conocer el espacio ocupado por todos los objetos de la base de datos, muestra los objetos que más ocupan primero
+SELECT SEGMENT_NAME, SUM(BYTES)/1024/1024 MB FROM DBA_EXTENTS
+group by SEGMENT_NAME
+order by 2 desc
+
+‹ Oracle 10g: Posible optimización de volcado masivo de datos arriba SSRS: #Error en una celda de importe decimal de reporte que tira de Oracle ›
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+24 March, 2007 - 23:41
+#1
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+Para comparar dentro de un DECODE con parte de un texto del contenido de un campo, es decir, para poder utilizar un like u otras funciones en lugar de la igualdad que toma por defecto el DECODE se puede hacer lo siguiente:
+
+SELECT DECODE(CAMPO, 
+              (select CAMPO from dual where CAMPO like 'A%'), 
+              'Campo comienza por A', 
+              (select name from dual where name like 'B%'), 
+              'Campo comienza por B', 
+              'Campo no comienza ni por A ni por B') 
+FROM TABLA;
+
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+2 November, 2007 - 12:21
+#2
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+Cuando un tablespace se queda sin espacio se puede ampliar creando un nuevo fichero de datos, o ampliando uno de los existentes.
+
+Para consultar el espacio ocupado por cada datafile se puede utilizar la consulta de la lista anterior:
+
+•• Consulta Oracle SQL para el DBA de Oracle que muestra los tablespaces, el espacio utilizado, el espacio libre y los ficheros de datos de los mismos:
+SELECT t.tablespace_name "Tablespace", t.status "Estado",
+ROUND(MAX(d.bytes)/1024/1024,2) "MB Tamaño",
+ROUND((MAX(d.bytes)/1024/1024) -
+(SUM(decode(f.bytes, NULL,0, f.bytes))/1024/1024),2) "MB Usados",
+ROUND(SUM(decode(f.bytes, NULL,0, f.bytes))/1024/1024,2) "MB Libres",
+t.pct_increase "% incremento",
+SUBSTR(d.file_name,1,80) "Fichero de datos"
+FROM DBA_FREE_SPACE f, DBA_DATA_FILES d, DBA_TABLESPACES t
+WHERE t.tablespace_name = d.tablespace_name AND
+f.tablespace_name(+) = d.tablespace_name
+AND f.file_id(+) = d.file_id GROUP BY t.tablespace_name,
+d.file_name, t.pct_increase, t.status ORDER BY 1,3 DESC
+
+Una vez que localizamos el datafile que podríamos ampliar ejecutaremos la siguiente sentencia para hacerlo:
+
+ALTER DATABASE
+DATAFILE '/db/oradata/datafiles/datafile_n.dbf' AUTOEXTEND
+ON NEXT 1M MAXSIZE 4000M
+
+Con esta sentencia, el datafile continuaría ampliándose hasta llegar a un máximo de 4Gb.
+
+Si preferimos crear un nuevo datafile porque los que tenemos ya son demasido grandes, una sentencia que podríamos utilizar es la siguiente:
+
+ALTER TABLESPACE "MiTablespace"
+ADD
+DATAFILE '/db/oradata/datafiles/datafile_m.dbf' SIZE
+100M AUTOEXTEND
+ON NEXT 1M MAXSIZE 1000M
+
+Crearíamos un nuevo fichero de datos de 100 Mb, y en modo autoextensible hasta 1000 Mb. Por supuesto, el path especificado debe ser el específico de cada base de datos, y se debe utilizar para todo el proceso un usuario con privilegios de DBA.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+14 November, 2007 - 14:28
+#3
+cfb
+does not have a status.
+Imagen de cfb
+User offline. Last seen 8 semanas 2 días ago. Offline
+Joined: 28/12/2005
+puntos: 3
+
+Para matar una sesión de Oracle hay que utilizar, con un usuario con permisos de DBA, el comando
+
+ALTER SYSTEM KILL SESSION 'SID,SERIAL#';
+
+Para obtener el SID y el SERIAL# que necesitamos se puede utilizar la consulta:
+
+SELECT p.*, s.*
+FROM v$session s, v$process p
+WHERE p.addr(+)=s.paddr
+ORDER BY SID
+
+Esta consulta devolvería los datos de todas las sesiones abiertas, se pueden restringir los resultados a las sesiones que interesen añadiendo condiciones en el where.
+
+Si el número de sesiones que hay que eliminar es elevado, se puede utilizar esta misma consulta para crear las sentencias necesarias dinámicamente:
+
+SELECT 'alter system kill session '''||s.sid||','||p.serial#||''';'
+FROM v$session s, v$process p
+WHERE p.addr(+)=s.paddr
+AND s.username='USER'; (por ejemplo)
+
+Sobretodo cuidado con la condición que se incluye en el where, ya que si no se especificara nada, por ejemplo, se matarían todas las sesiones de la base de datos.
+
+Para crear un script con estas sentencias consultar Construcción de scripts con ayuda del diccionario
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+21 April, 2008 - 23:31
+#4
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+Si hiciste las consultas hace tiempo y no tenías activada la auditoría de Oracle sobre el usuario que las ejecutó no creo que las puedas recuperar.
+ 
+Para poder saber las sentencias SQL que ha ejecutado un usuario tienes
+que decir previamente a la base de datos que haga un seguimiento de las mismas, se ha de auditar al usuario.
+Es una medida de seguridad, y si se abusa de ella puede llegar a afectar negativamente al rendimiento de la base de datos, por lo que deberías aplicarla sólo si es necesario. Por supuesto, necesitarás un usuario con privilegios de DBA para poder hacerlo.
+ 
+En el documento Guide to auditing in Oracle applications, elaborado por www.integrigry.com, se explica bastante bien cómo activar la auditoría en bases de datos Oracle y las diferentes opciones que hay.
+ 
+
+A partir de la versión 10g, con la consola web de administración (Enterprise Manager Console) también tienes la opción de consultar sentencias SQL ejecutadas durante las últimas 24 horas. Seguramente no te solucionará tu actual problema, pero para analizar ejecuciones y problemas más recientes siempre va bien.
+
+ 
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+17 July, 2008 - 22:37
+#5
+betorey_24 (no verificado)
+does not have a status.
+
+Gente, capas que hay gente que ya sabia de estas funciones pero bueno simplemente para dejarlo plasmado en alguna pagina y le pueda llegar a ser de gran utilidad a todo el mundo. Lo que voy a postear me llevo un tiempo encontrarlo y la idea con esto es lograr que sea mas facil encontrarlo y ademas que funcione porque hay mucha basura dando vueltas en la internet.
+
+una funcion muy util que recien encontre hoy dia es: SYS_CONTEXT.
+
+NOTA: USERENV es un nombre que describe la sesion actual y con ella y la funcion sys_context se puede conseguir:
+
+•• identificador del cliente
+  SELECT sys_context('USERENV', 'CLIENT_IDENTIFIER') FROM dual;
+
+•• nombre del esquema donde uno esta conectado
+     SELECT sys_context('userenv', 'CURRENT_SCHEMA') FROM dual;
+
+•• ID del esquema donde uno se encuentra conectado
+     SELECT sys_context('USERENV', 'CURRENT_SCHEMAID') FROM dual;
+
+•• nombre de la base de datos.
+     SELECT sys_context('USERENV', 'DB_NAME') FROM dual;
+
+•• nombre del host
+     SELECT sys_context('USERENV', 'HOST') FROM dual;
+
+•• nombre de la instancia
+     SELECT sys_context('USERENV', 'INSTANCE_NAME') FROM dual;
+
+••los formatos de moneda, fechas.
+    SELECT sys_context('USERENV', 'NLS_CURRENCY') FROM dual;   SELECT sys_context('USERENV', 'NLS_DATE_FORMAT') FROM dual;
+
+•• nombre del territorio. ejemplo : 'AMERICA';
+    SELECT sys_context('USERENV', 'NLS_TERRITORY') FROM dual;
+
+•• server host nome
+     SELECT sys_context('USERENV', 'SERVER_HOST') FROM dual;
+
+•• ID de la session del usuario
+     SELECT sys_context('USERENV', 'SESSION_USERID') FROM dual;
+
+•• SID (session number) util para matar sesiones luego con el numero.
+     SELECT sys_context('USERENV', 'SID') FROM dual;
+
+•• LISTA DE PAQUETES UTL (utilidades de oracle, envio de mails mediante SMTP entre otros)
+
+     SELECT * FROM ALL_OBJECTS
+     WHERE OBJECT_NAME LIKE '%UTL_%'
+         AND OBJECT_TYPE = 'PACKAGE'
+
+•• LISTA DE PAQUETES DBMS (otras utilidades del Data Base Manager System)
+
+     SELECT * FROM ALL_OBJECTS
+      WHERE OBJECT_NAME LIKE '%DBMS_%'
+          AND OBJECT_TYPE = 'PACKAGE'
+
+ estas dos listas digamos son utiles como para ver las que hay y luego investigar un poco mas como se utilizan en internet.
+
+•• Envio de e-mail a multiples usuarios mediante la utilidad UTL_SMTP.
+
+Otra cosa que me costo mucho encontrar y en definitiva me lo termino contando un amigo del trabajo es como utilizar el paquete UTL_SMPT para mandar un mail a multiples recipientes. (a varias personas)
+
+Mi idea es unicamente explicar este problema, como usarlo se los dejo para que lo investiguen que no es muy dificil.
+
+si se tiene los mails en un VARCHAR de la siguiente manera
+
+alguien@xxx.com;alguien1@xxx.com;alguien2@xxx.com;alguien3@xxx.com;alguien4@xxx.com
+
+una vez hecho los pasos :
+
+   g_mail_conn := utl_smtp.open_connection (p_mailhost,p_mailport);   -- <-- apertura de conexion.
+   utl_smtp.helo(g_mail_conn,p_mailhost);
+   utl_smtp.mail(g_mail_conn,p_sender);
+
+hay que definir el recipiente con la funcion utl_smtp.rcpt(); tener en cuenta que este recipiente se va a instanciar en nuestro caso 5 veces (una vez por cada e-mail y no todos en uno solo OJO!)
+
+osea : utl_smtp.rcpt( p_mail_conn , alguien@xxx.com );
+          utl_smtp.rcpt( p_mail_conn , alguien@xxx.com1 );
+          utl_smtp.rcpt( p_mail_conn , alguien@xxx.com 2);
+          utl_smtp.rcpt( p_mail_conn , alguien@xxx.com 3);
+          utl_smtp.rcpt( p_mail_conn , alguien@xxx.com4 );
+
+para cortar los mails concatenados en un VARCHAR y cumplir el proposito anterior pueden usar este procesos que me toco hacer que hace lo anteriormente descrito.
+
+PROCEDURE Pi_Prepare_Recip_Mail ( p_mail_conn IN OUT utl_smtp.connection,
+                                                      p_rec_mails IN VARCHAR2)
+  IS 
+       MAILS      VARCHAR2(1000)  := p_rec_mails;
+       SingleMail VARCHAR2(255);
+       --
+       NO_MORE_MAILS BOOLEAN := FALSE;
+       EOM           NUMBER;          -- end of mail.
+       BOM           NUMBER := 1;     -- begin of mail.
+       COC           NUMBER ;         -- number of characters.
+       MAIL_NUMBER   NUMBER := 1;       
+ BEGIN        
+       LOOP
+           EOM := INSTR(MAILS,';',1,MAIL_NUMBER);   
+           IF EOM = 0 THEN   
+               EOM := LENGTH(MAILS) + 1;
+               NO_MORE_MAILS := TRUE;
+           END IF;
+           COC := (EOM) - BOM;
+           SingleMail := SUBSTR(MAILS,BOM,COC);
+           utl_smtp.rcpt( p_mail_conn , SingleMail );   -- <-- recipiente de salida.        
+           EXIT WHEN NO_MORE_MAILS;
+           MAIL_NUMBER := MAIL_NUMBER + 1 ;
+           BOM := EOM + 1;
+         END LOOP;
+ END Pi_Prepare_Recip_Mail;
+
+se instancia este procesos pasandole la conexion de mail y la lista de mails osea:
+
+p_rec_mail VARCHAR2(300) := alguien@xxx.com;alguien1@xxx.com;alguien2@xxx.com;alguien3@xxx.com;alguien4@xxx.com;
+
+ instancia -->   Pi_Prepare_Recip_Mail( g_mail_conn , p_rec_mail );
+
+En si es dificil de entender y mas de explicar, trate de ser lo mas claro posible. Cualquier duda sobre este tema escriban.
+
+•• cambiar el lenguaje de la fecha.
+select to_char(sysdate,'day', 'NLS_DATE_LANGUAGE=Spanish') from dual
+select to_char(sysdate,'month', 'NLS_DATE_LANGUAGE=Spanish') from dual
+
+•• correr las estadisticas para una determinada tabla (esto aumenta la velocidad de respuesta de las tablas en 
+   aquellos casos donde el volumen de registros es considerablemente grande)
+     ANALIZE TABLE <nombre de la tabla> COMPUTE STATISTICS;
+     -- realizarlo en un porcentaje (en un 25 %)
+     ANALIZE TABLE <nombre de la tabla> COMPUTE STATISTICS SAMPLE 25 percent;
+     -- realizarlo solo para una determinada cantidad de registros)
+     ANALIZE TABLE <nombre de la tabla> COMPUTE STATISTICS SAMPLE 1000 rows;
+
+•• ponerle comentarios a las tablas y a sus columnas para que el significado de cada campo tenga mayor
+   comprencion.
+     COMMENT ON TABLE <table_name> IS 'comentario a escribir';
+     COMMENT ON COLUMN <table_name>.<column_name> IS 'comentario a escribir aca';
+
+Con esto hay para divertirse un buen rato..... nunca termina de sorprenderme Oracle...
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+9 October, 2008 - 18:26
+#6
+eliviced (no verificado)
+does not have a status.
+
+Hola,
+
+solo queria compartir esta pagina que me parece muy interesante sobre como enviar mail desde Oracle
+
+http://www.dba-oracle.com/t_email_mailing_messages_plsql.htm
+
+:-D
+
+ 
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+15 October, 2008 - 20:53
+#7
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+Gracias por la aportación, pero más arriba betorey_24 ya nos explica cómo enviar mails con Oracle, y en castellano ;)
+
+http://www.dataprix.com/es/oracle_decode_con_like#comment-537
+
+De todas maneras la página de BC que enlazas es una buena referencia, muchas veces he acabado en ella buscando cómo solucionar algún tema de Oracle.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+4 December, 2008 - 01:46
+#8
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+Para hacer que nuestra consulta nos devuelva sólo los n primeros registros, y no saturar ni servidores ni aplicaciones cliente cuando trabajamos con tablas grandes, en Oracle tan sólo hay que añadir la condición where rownum < n a la sentencia SQL.
+
+Por ejemplo:
+
+SELECT * FROM tabla_ventas
+WHERE rownum < 100;
+
+Aunque nuestra tabla de ventas tenga 10.000.000 de registros, esta consulta sólo nos devolverá los primeros 99 que encuentre.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+21 December, 2009 - 19:03
+#9
+isunza
+does not have a status.
+User offline. Last seen 1 semana 5 días ago. Offline
+Joined: 21/12/2009
+puntos: 4
+
+Hola Carlos, he encontrado cosas muy interesnates aqui y tambien veo que mucha ayuda, espero me puedas ayudar con un problemita que tengo. Ya tengo listo el proceso que me manda el correo desde oracle a varias persona y con un texto fijo que mando como parametro, pero me falta saber como mandar el resultado de una consulta por el mismo correo ¿Me puedes ayudar?
+
+ 
+
+Gracias.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+2 March, 2010 - 03:07
+#10
+estyom (no verificado)
+does not have a status.
+
+Saludos a todos.. Tengo una pregunta, en esta página se indica como ver
+
+los datos de un tablespace desde Oracle Enterprise Manager,
+
+pero ¿Se lo puede hacer via comandos desde SQL * Plus?..
+
+ 
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+4 March, 2010 - 01:24
+#11
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+ En este mismo tema tienes la respuesta. Entre las consultas SQL de la entrada inicial hay varios que consultan datos de tablespaces, que se encuentran en vista dba_tablespaces.
+
+Otro ejemplo podría ser una query como esta:
+
+
+select TABLESPACE_NAME, INITIAL_EXTENT, NEXT_EXTENT, MIN_EXTENTS, MAX_EXTENTS, PCT_INCREASE, STATUS, CONTENTS, LOGGING, FORCE_LOGGING
+from dba_tablespaces
+where TABLESPACE_NAME like 'mitablespace%';
+
+ 
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+9 March, 2010 - 00:14
+#12
+oquiroz (no verificado)
+does not have a status.
+
+Estimado, una pregunta, existira alguna vista o consulta en Oracle que ayude a Saber dentro de las sesiones activas o inactivas cuales son o fueron los ultimos procesos que se ejecutaron (updates, select, delete, etc)? Gracias por tu pronta respuesta! Saludos!
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+10 March, 2010 - 23:26
+#13
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 36 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+ Las sesiones actuales las puedes consultar con la vista v$session y las sentencias SQL que se ejecutan con v$sqltext.
+Para enlazar estas dos vistas has de utilizar el campo sql_hash_value de la primera y hash_value de la segunda, y luego aplica las condiciones que te interesen.
+
+En los scripts anteriores hay algún ejemplo de consulta de sentencias. Para sacar las sentencias que se están ejecutando podrías hacer algo así:
+
+
+SELECT c.sid, c.status, d.piece, c.serial#, c.username, d.sql_text
+FROM v$session c, v$sqltext d
+WHERE c.sql_hash_value = d.hash_value
+ORDER BY c.sid, d.piece
+
+La ordenación por los campos sid y piece es importante porque las sentencias están 'troceadas' en diferentes registros.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 May, 2010 - 01:06
+#14
+eliviced
+does not have a status.
+User offline. Last seen 49 semanas 5 días ago. Offline
+Joined: 05/05/2010
+puntos: 4
+
+ Hola Carlos,
+
+Una consulta. Estoy queriendo subir a memoria(buffer_pool keep) ciertas tablas, pero quiero saber que tablas podrian ser, me han dicho que pueden ser las que mas se utilizan, y que sean pequeñas. Por eso queria saber si existe un query para sacar las tablas mas consultadas. O si tu tienes alguna regla de buena practica para subir las tablas a memoria. Muchas gracias de antemano por la respuesta.
+
+Saludos,
+
+Elizabeth
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 May, 2010 - 10:26
+#15
+drakoniano
+does not have a status.
+User offline. Last seen 1 semana 3 días ago. Offline
+Joined: 03/05/2010
+puntos: 22
+
+Hola Elizabeth,
+
+ 
+
+Lo que pides si que se puede hacer porque lo hice hace tiempo, pero no encuentro el script que usé :S
+
+Por si te sirve de ayuda era algo relacionado con el LRU(Menos Recientemente Usada) y con el MRU (Mas Recientemente Usada) ambos del Buffer Caché, ya que es aconsejable para tablas pequeñas y consultadas muy frecuentemente y pocas veces modificadas.
+
+Saludos
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 May, 2010 - 11:29
+#16
+carlos
+Como publicar en el muro de Facebook desde Pentaho Data Integrator - http://is.gd/D5ay0J -
+Imagen de carlos
+User offline. Last seen 42 mins 37 segs ago. Offline
+Joined: 28/12/2005
+puntos: 913
+
+Las recomendaciones que te han dado me parecen correctas, Elizabeth. Sólo comentarte que controles bien la memoria utilizada y esas cosas, todo lo que se haga en memoria es delicado.
+
+Gracias por la aportación, drakoniano, tiene pinta de ser un buen método. A ver si hay suerte y localizas el script..
+
+En la entrada de blog Cómo obtener la lista de tablas con más movimiento (insert, update) en Oracle, il_masacratore publica un script que creo que también puede servir para tus propósitos, sólo te falta sacar también el tamaño de las tablas, y quedarte con las más pequeñas..
+
+ 
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+6 May, 2010 - 01:49
+#17
+eliviced
+does not have a status.
+User offline. Last seen 49 semanas 5 días ago. Offline
+Joined: 05/05/2010
+puntos: 4
+
+ Hola,
+
+muchas gracias drakoniano, y Carlos, ya les cuento como me fue, pero si logras encontrar el script seria genial!!!
+
+Gracias
+
+Elizabeth
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+20 October, 2010 - 17:03
+#18
+Sergio Aguirre (no verificado)
+does not have a status.
+
+Hola eliviced, has encontrado algo al respecto sobre tu pregunta. Gracias. Saludos
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 November, 2010 - 07:57
+#19
+Anonim. (no verificado)
+does not have a status.
+
+Hola amigos, alguien sabe que software se puede usar para ver graficamente el contenido de un paquete es decir :
+el paqueteI tiene dos procesos: "proceso1","proceso2"; el proceso1 contiene: 3 Cursores y presenta 3 funciones o algo asi, cuando de un click a cada objeto que compone el paquete desplegar el cuerpo del codigo.
+
+help me pls.
+
+saludos
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 November, 2010 - 16:45
+#20
+Luiyie (no verificado)
+does not have a status.
+
+Hola, el PL/SQL Developer, te puede servir, no es gratuito, pero te lo puedes bajar de taringa.com
+
+Saludos.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+12 November, 2010 - 12:40
+#21
+drakoniano
+does not have a status.
+User offline. Last seen 1 semana 3 días ago. Offline
+Joined: 03/05/2010
+puntos: 22
+
+ Usa SQL Developer, es gratuito y te lo puedes descargar desde la página de oracle.
+
+Yo lo uso y la verdad es que le veo algunos errores bastante considerables como por ejemplo
+
+que no se pueda abrir dos sesiones a la vez o que aunque canceles una consulta, a veces,
+
+no se cancela pero para lo que quieres te vale de sobra.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+8 December, 2010 - 18:07
+#22
+OMARE
+does not have a status.
+User offline. Last seen 23 semanas 2 días ago. Offline
+Joined: 07/12/2010
+puntos: 7
+
+Complementando un poco la información espero les sirva esto.
+
+MUESTRA LOS ROLES ASIGNADOS AL USUARIO ACTUAL
+
+SELECT granted_role "Rol", admin_option "Admin" FROM user_role_privs;
+
+ 
+
+MUESTRA LOS PRIVILEGIOS A NIVEL SISTEMA DEL USUARIO ACTUAL 
+
+SELECT privilege "Privilegio", admin_option "Admin" FROM user_sys_privs;
+
+ 
+
+VERIFICAR LOS ROLES DE CUALQUIER USUARIO DE LA DB, CONECTADO COMO SYS O DBA
+
+SELECT * FROM DBA_ROLE_PRIVS
+
+ 
+
+Saludos
+
+ 
+
+ 
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+3 February, 2011 - 23:57
+#23
+ABEL
+does not have a status.
+User offline. Last seen 23 semanas 2 días ago. Offline
+Joined: 03/02/2011
+puntos: 1
+
+Hola Carlos.. A lo mejor tu me puedes ayudar, se que hay una combinacion de memoria para que el porcentaje de aciertos de una base de datos oracle 9i no este muy baja, pero he manejado muchas hipotesis y no he podido rendir mi base de datos a un nivel optimo ( que no baje del 90% del porcentaje de aciertos) actualmente la tengo como en 60%, que puedo hacer para que el porcentaje de aciertos no sea tan bajo..
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+3 March, 2011 - 14:08
+#24
+drakoniano
+does not have a status.
+User offline. Last seen 1 semana 3 días ago. Offline
+Joined: 03/05/2010
+puntos: 22
+
+Te recomiendo aumentar el database buffer cache. El criterio que sigue para los aciertos es:
+
+Cache Hit Ratio = 1 - (physical reads / (db block gets + consistent gets))
+
+Para saber como esta configurada tu base de datos :
+
+ select physical_reads, db_block_gets, consistent_gets name
+
+from v$buffer_pool_statistics;
+
+ 
+
+Si no funciona:
+
+ La relación entre paradas para acceder al redo log y accesos en caché.
+
+ 
+
+select name, value
+
+from v$sysstat
+
+where name='redo entries' OR
+
+           name = 'redo log space requests';S
+
+ 
+
+Con una relación superior a 1:5.000 es necesario ampliar el tamaño del buffer de redo.
+
+Los aciertos de Library Cache:
+
+ 
+
+select sum(pins-reloads) / sum(pins) from v$librarycache;
+
+ 
+
+Con un valor menor a 95% se recomienda aumentar el tamaño de la Shared Pool.
+
+Los aciertos en el diccionario de datos
+
+ 
+
+select sum(gets), sum(getmisses), (sum(getmisses)/sum(gets))*100
+
+from v$rowcache;
+
+ 
+
+Con un porcentaje de fallos (getmisses) frente al de aciertos (gets) mayor de 10-15% es necesario aumentar la Shared Pool y estudiar las consultas lanzadas para asegurarse de que usan parámetros.
+
+ 
+
+Espero que te sirva
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+19 April, 2011 - 22:36
+#25
+temporal
+does not have a status.
+User offline. Last seen 12 semanas 5 días ago. Offline
+Joined: 19/04/2011
+puntos: 1
+
+me podrian ayudar con el siguiene scrip en oracle.....
+
+necesito obtener el nombre del primary key y los campos que lo conforman
+
+ 
+
+select constraint_name,
+(select column_name from all_cons_columns where constraint_name=p.constraint_name)columna
+
+from all_constraints p
+where owner = 'SYS' and
+      table_name = 'RULE_SET_IEUAC$' and
+      constraint_type = 'P'
+
+ 
+
+me genera un error cuando la subconsulta genera dos campos
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+31 May, 2011 - 09:23
+#26
+Juan Vidal
+does not have a status.
+Imagen de Juan Vidal
+User offline. Last seen 20 mins 36 segs ago. Offline
+Joined: 27/05/2011
+puntos: 65
+
+Muy útiles estos scripts.
+
+Añado uno relativo a consulta de espacio disponible, ya habeís listado alguno, pero este me parece sencillo y de utilidad también: 
+
+SELECT
+   SYSDATE AS FECHA_ACT, DEDICADO.TABLESPACE "TABLESPACE",
+   ROUND (DEDICADO.ESPACIO, 2) "ESPACIO DEDICADO (GB)",
+   ROUND (LIBRE.ESPACIO, 2) "ESPACIO LIBRE (GB)",
+   ROUND (DEDICADO.ESPACIO - LIBRE.ESPACIO, 2) "ESPACIO USADO (GB)",
+   LPAD (ROUND ((LIBRE.ESPACIO / DEDICADO.ESPACIO) * 100, 2) || '%', 6, ' ') "% ESPACIO LIBRE"
+FROM
+   (SELECT
+       DDF.TABLESPACE_NAME "TABLESPACE",
+       SUM (DDF.BYTES) / 1024 / 1024 / 1024 "ESPACIO"
+    FROM
+       DBA_DATA_FILES DDF
+    WHERE
+       DDF.TABLESPACE_NAME IN ('tablespace1', ' tablespace2')
+    GROUP BY
+       DDF.TABLESPACE_NAME) DEDICADO,
+   (SELECT
+       DFS.TABLESPACE_NAME "TABLESPACE",
+       SUM (DFS.BYTES) / 1024 / 1024 / 1024 "ESPACIO"
+    FROM
+       DBA_FREE_SPACE DFS
+    WHERE
+       DFS.TABLESPACE_NAME IN ('tablespace1', ' tablespace2')
+    GROUP BY
+       DFS.TABLESPACE_NAME) LIBRE
+WHERE
+   DEDICADO.TABLESPACE = LIBRE.TABLESPACE
+ORDER BY
+   LIBRE.ESPACIO / DEDICADO.ESPACIO ASC
+
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 July, 2011 - 20:34
+#27
+carlos.a.zambrano
+does not have a status.
+User offline. Last seen 1 semana 5 días ago. Offline
+Joined: 05/07/2011
+puntos: 1
+
+Hola,
+
+hay alguna manera de modificar el numero maximo de sesiones de Oracle ??
+
+ 
+
+saludos.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 July, 2011 - 20:54
+#28
+isunza
+does not have a status.
+User offline. Last seen 1 semana 5 días ago. Offline
+Joined: 21/12/2009
+puntos: 4
+
+Hola !!!
+
+     Tengo un problema que no se como resolver, tengo un procedimiento que le estoy mandando como parametro el nombre de una funcion, dentro del procedimiento quiero que se ejecute la funcion pero no se como ejecutarla, lo que tengo en el codigo es algo asi:
+
+ 
+
+              resultado_funcion := p_nombre_funcion;
+
+ 
+
+pero esto solo le asigna a la variable resultado_funcion el nombre de la funcion que tiene el parametro p_nombre_funcion.
+
+ 
+
+Como puedo hacer para que se ejecute la funcion ???
+
+ 
+
+Gracias y Saludos.
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+5 July, 2011 - 21:08
+#29
+drakoniano
+does not have a status.
+User offline. Last seen 1 semana 3 días ago. Offline
+Joined: 03/05/2010
+puntos: 22
+
+Puedes hacerlo de dos formas: Modificando el parámetro MAX_SESSIONS vía SQL o en el spfile
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+8 July, 2011 - 17:02
+#30
+zen719
+Aprendiz
+User offline. Last seen 1 semana 2 días ago. Offline
+Joined: 08/07/2011
+puntos: 1
+
+Muchas gracias , es muy util todo lo que han puesto.
+
+Una consulta, en mi servidor hay dos instancias y las consultas que han dado son a la instancia que
+
+se conecta (por balanceo), hay alguna manera de hacer una consulta que retorne los resultados de ambas instancias?
+
+O algun query para cambiar de instancia al instante sin hacer una nueva conexion? muchas gracias
+Top
+
+    Inicie sesión o regístrese para enviar comentarios
+
+11 July, 2011 - 21:02
+#31
+GEORGE_DF
+does not have a status.
+Imagen de GEORGE_DF
+User offline. Last seen 6 días 17 horas ago. Offline
+Joined: 31/03/2010
+puntos: 1
+
+ HOLA, 
+
+ 
+
+Alguien me puede decir como puedo debuguear unas consultas, me estoy iniciando en los scripts, pero me gustaria poder ir viendo como se van tomando los datos de mi consulta,
+
+ 
+
+Gracias.

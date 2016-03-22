@@ -1,0 +1,43 @@
+SELECT valuedate,Count(*),SubStr(output,11,3)
+FROM fn3forecastseries
+WHERE valuedate>=dat('20090101')
+AND used='Y'
+AND forsession LIKE '%EP0_NEW.PV%'
+GROUP BY valuedate,SubStr(output,11,3)
+ORDER BY SubStr(output,11,3),valuedate;
+
+SELECT valuedate,Count(*)--,SubStr(output,11,3)
+FROM fn3forecastseries
+WHERE valuedate>=dat('20090101')
+AND used='Y'
+--AND forsession LIKE '%EP0_NEW.PV%'
+AND forsession NOT LIKE '%EP0%'
+AND forsession LIKE '%PV%'
+GROUP BY valuedate--,SubStr(output,11,3)
+--ORDER BY SubStr(output,11,3),valuedate
+ORDER BY valuedate;
+
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+SELECT Count(*)
+--SELECT valuedate,forsession,count(*)
+FROM
+(
+SELECT newsstand,operationdate,service,service+incidence-RETURN AS venta,RETURN AS devolucion
+FROM fn3operation
+WHERE header='MARCA' AND product='DIARIO'
+AND operationdate>To_Date('20090101','yyyymmdd')) t1,
+(
+SELECT SubStr(output,11,12) AS newsstand,valuedate,forecast,decision,forsession
+FROM fn3forecastseries
+WHERE valuedate >To_Date('20090101','yyyymmdd')
+AND forsession LIKE '%.PV'
+AND forsession NOT LIKE '%EP%'
+AND used='Y'
+) t2--GROUP BY newsstand
+WHERE t1.newsstand=t2.newsstand
+AND t1.operationdate=t2.valuedate
+--GROUP BY valuedate,forsession
+;

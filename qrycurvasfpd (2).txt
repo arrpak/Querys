@@ -1,0 +1,12 @@
+SELECT t1.header AS cabecera ,node AS nodo,description AS zona,infodate AS fecha,service+incidence AS servicio,returncont AS devolucion,
+service+incidence-returncont AS venta,numopen AS PVServicio,numoutoff AS PVAgotado,servoutoffcont AS ServicioAgotados
+FROM fn3nodeinformation t1,fn3node t2
+WHERE
+t1.header='MARCA' AND t1.product='DIARIO'
+AND infodate>dat('20040101')
+AND node IN ('AND','ARA','CATBAR','CAV','CMU','CAM','EXT','BUR','CCA','VAS','NAV','AST','CYLSOR2')
+AND t1.node=t2.code
+AND t1.header=t2.header
+AND t1.product=t2.product
+and t1.service>0
+ORDER BY INFODATE

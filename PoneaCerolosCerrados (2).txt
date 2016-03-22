@@ -1,0 +1,22 @@
+UPDATE fn3printingdetail
+SET decision=0,increasedec=0
+--SELECT COUNT(*) FROM FN3PRINTINGDETAIL
+WHERE
+header='MARCA' AND product='DIARIO'AND
+dateprint=To_Date('20050803','yyyymmdd')
+AND node='AND'
+AND DECISION>0
+AND newsstand IN
+(
+SELECT DISTINCT(newsstand)
+FROM fn3closingfixed
+WHERE 
+--newsstand LIKE '028%'AND 
+datefrom<=To_Date('20050803','yyyymmdd')
+AND dateuntil>To_Date('20050803','yyyymmdd')
+AND newsstand IN
+(
+SELECT newsstand
+FROM fn3newsstandon
+WHERE dateoff IS NULL));
+COMMIT;

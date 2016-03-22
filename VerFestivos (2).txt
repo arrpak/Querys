@@ -1,0 +1,44 @@
+ -- NACIONAL
+ select code as Festivo, 'Nacional' as Tipo, null as Region,
+        null as Provincia, null as Municipio
+ from formarca.FN3FESTIVENATIONAL
+ where code in
+ (
+ select festive
+ from formarca.FN3FESTIVEDATE
+ where datefest = to_date('20030515','yyyymmdd')
+ )
+ union all
+ -- REGION
+ select code as Festivo, 'Regional' as Tipo, region as Region,
+        null as Provincia, null as Municipio
+ from formarca.FN3FESTIVEREGION
+ where code in
+ (
+ select festive
+ from formarca.FN3FESTIVEDATE
+ where datefest = to_date('20030515','yyyymmdd')
+ )
+ union all
+ -- MUNICIPIO
+ select code as Festivo, 'Municipal' as Tipo, region as Region,
+        province as Provincia, municipality as Municipio
+ from formarca.FN3FESTIVEMUNICIPALITY
+ where code in
+ (
+ select festive
+ from formarca.FN3FESTIVEDATE
+ where datefest = to_date('20030515','yyyymmdd')
+ )
+ union all
+ -- SUSTITUIBLE
+ select code as Festivo, 'Sustituible' as Tipo, region as Region,
+        null as Provincia, null as Municipio
+ from formarca.FN3FESTIVESUBSTITUTE
+ where code in
+ (
+ select festive
+ from formarca.FN3FESTIVEDATE
+ where datefest = to_date('20030515','yyyymmdd')
+ )
+ order by Festivo, Tipo, Region, Provincia, Municipio

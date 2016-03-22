@@ -1,0 +1,8 @@
+SELECT v.name, v.value value, decode(ISSYS_MODIFIABLE, 'DEFERRED',
+     'TRUE', 'FALSE') ISSYS_MODIFIABLE,  decode(v.isDefault, 'TRUE', 'YES',
+     'FALSE', 'NO') "DEFAULT",  DECODE(ISSES_MODIFIABLE,  'IMMEDIATE',
+     'YES','FALSE',  'NO',  'DEFERRED', 'NO', 'YES') SES_MODIFIABLE,
+     DECODE(ISSYS_MODIFIABLE, 'IMMEDIATE', 'YES',  'FALSE', 'NO',
+     'DEFERRED', 'YES','YES') SYS_MODIFIABLE ,  v.description
+FROM V$PARAMETER v
+WHERE name not like 'nls%'   ORDER BY 1

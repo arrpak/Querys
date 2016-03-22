@@ -1,0 +1,22 @@
+SELECT *
+from ezcEstimationSetInputEffect eif
+ where (eif.estSession='E20090916COM_Sep.MG')
+   and (eif.output='ComPublicoCAM')
+   AND valuedate IN
+   (
+SELECT valuedate
+ from ezcEstimationSetInputEffect eif
+ where (eif.estSession='E20090916COM_Sep.MG')
+   --and (eif.output='ComLaRazonCAM')
+   and (eif.setInput like 'PUBLICO_LibrosJungadoCon2008%'))         ;
+
+
+
+
+
+
+SELECT setinput,sum(effect)
+from ezcEstimationSetInputEffect eif
+   where (eif.estSession='E20090916COM_Sep.MG')   and (eif.output='ComPublicoCAM')
+   GROUP BY setinput
+   HAVING sum(effect)<0;

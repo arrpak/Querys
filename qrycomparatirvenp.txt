@@ -1,0 +1,83 @@
+
+--SELECT fathernode,Sum(service),Sum(decision+increasedec),Count(*)
+SELECT     ope.operationdate,
+            fathernode,
+            sum(service)                    service,
+           sum(incidence)                  incidence,
+           sum(return)                     return,
+           sum(service+incidence-return)   venta,
+           sum((case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end)) decision,
+           round(sum(((case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end)-(service+incidence-return))*
+                 least(service+incidence, 1)*
+                 decode(least((case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end)-
+                        (service+incidence-return),0),0,1,0))) devolDec,
+           sum(least(service+incidence, 1)) numOpen,
+           sum(least(service+incidence, 1)*
+               decode(least((service+incidence-return)-
+                          (case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end), 0), 0,1,0)) numAgotDec,
+         sum(least(service+incidence, 1)*
+             decode(least((service+incidence-return)-
+                       (case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end), 0), 0,1,0)) numAgotDecSinRound,
+           sum(least(service+incidence, 1)*decode(return, 0, 1, 0)) numAgotSer,
+           round(sum((case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end)*least(service+incidence, 1)*
+                 decode(least((service+incidence-return)-
+                        (case when (decision + increaseDec) <= 15
+                        then  ceil(decision + increaseDec)
+                        else  round(decision + increaseDec) end),0), 0, 1, 0))) servAgotDec,
+           round(sum((service+incidence)*least(service+incidence, 1)*
+                     decode(return,0,1,0))) servAgotSer
+from
+(SELECT  *
+         FROM fn3operation
+         WHERE
+         header='MARCA'
+         AND newsstand LIKE '028%'
+         AND operationdate >= to_date('2007/01/01', 'YYYY/MM/DD')
+         AND service>0
+UNION
+SELECT  *
+         FROM fn3operationnotcontrolled
+         WHERE
+         header='MARCA'
+         AND newsstand LIKE '028%'
+         AND operationdate >= to_date('2007/01/01', 'YYYY/MM/DD')
+         AND service>0
+         ) ope,
+         (SELECT *
+         FROM fn3printingdetail
+         WHERE
+         header='MARCA' and
+         node='CAM' and
+         dateprint >= to_date('2007/01/01', 'YYYY/MM/DD')
+         ) pri,
+         (SELECT *
+          FROM fn3node
+          WHERE header='MARCA' AND product='DIARIO') nod,
+         (SELECT orderf,dateprint
+         FROM fn3printing
+         WHERE node='CAM'
+         AND used='Y'
+         AND header='MARCA'
+         AND dateprint >= to_date('2007/01/01', 'YYYY/MM/DD'))  prused
+WHERE
+pri.newsstand(+)=ope.newsstand
+AND nod.newsstand=ope.newsstand
+AND pri.header=ope.header
+AND pri.product=ope.product
+AND prused.dateprint=operationdate
+AND pri.dateprint=operationdate
+AND prused.orderf=pri.orderf
+GROUP BY fathernode, pri.dateprint,ope.operationdate
+ORDER BY operationdate

@@ -1,0 +1,29 @@
+select stddev(service+incidence-return),
+        avg(service+incidence-return),
+       to_char(operationdate,'YYYY')
+from fn3operation
+where 
+header='MARCA' 
+and product='DIARIO'
+and operationdate>to_date('19980101','yyyymmdd')
+and substr(newsstand,1,3)='028'
+group by    to_char(operationdate,'YYYY');
+
+
+
+     
+
+
+
+select  to_char(operationdate,'YYYY')
+from fn3operation
+where 
+header='MARCA' 
+and product='DIARIO'
+--and newsstand='028000100002';
+and operatiodate>to_date('19980101','yyyymmdd)
+and substr(newsstand,1,3)='028'
+group by to_char(operationdate,'YYYY');
+
+
+     

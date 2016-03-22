@@ -1,0 +1,40 @@
+exp usuario/password@servicio owner=usuario file=usuario.dmp log=usuario.Log
+
+
+
+Exp formarca/formarca@formarca  FILE=c:\partido.dmp Log=c:\partido.Log tables=fn3partidofutbol
+
+
+
+
+Imp formarca/formarca@oraloc  FILE=c:\partido.dmp tables=fn3partidofutbol
+
+
+
+
+
+
+
+
+
+
+Exp formarca/formarca@formarca  FILE=c:\partidotmp.dmp Log=c:\partido.Log tables=fn3partidofutboltmp10
+
+Imp formarca/formarca@oraloc  FILE=c:\partidotmp.dmp tables=fn3partidofutboltmp10
+
+
+
+
+Exp formarca/formarca@oraloc  FILE=c:\noaa.dmp Log=c:\datosnoaa.Log tables=formarca.datosnooa
+
+Imp formarca/formarca@oraloc  FILE=c:\partido.dmp tables=fn3partidofutbol
+
+
+
+
+
+
+
+Exp emu/emu@vpnemu FILE=c:\partido.dmp Log=c:\partido.Log tables=emupromotiondate
+
+Imp formarca/formarca@formarca FILE=c:\partido.dmp Log=c:\partido.Log tables=emupromotiondate

@@ -1,0 +1,65 @@
+-COMPARATIVO DE LA DECISION Y SERVICIO CUANDO SERVICIO=0
+select fn3operation.newsstand,service,ROUND(decision+increasedec) as dec,service+incidence-return as ven
+from fn3operation,fn3printingdetail
+where fn3operation.header='MARCA' 
+      and fn3operation.product='DIARIO'
+      and operationdate=to_date('20030202','yyyymmdd')
+      and fn3printingdetail.node='CAM'
+      and dateprint=operationdate
+      and fn3operation.newsstand=fn3printingdetail.newsstand
+      and fn3operation.header=fn3printingdetail.header 
+      and fn3operation.product=fn3printingdetail.product
+      and abs(decision+increasedec-service)>1
+      and service=0
+      and orderf=1
+union
+(select fn3operationnotloaded.newsstand,service,ROUND(decision+increasedec) as dec,service+incidence-return as ven
+from fn3operationnotloaded,fn3printingdetail
+where fn3operationnotloaded.header='MARCA' 
+      and fn3operationnotloaded.product='DIARIO'
+      and operationdate=to_date('20030202','yyyymmdd')
+      and fn3printingdetail.node='CAM'
+      and dateprint=operationdate
+      and fn3operationnotloaded.newsstand=fn3printingdetail.newsstand
+      and fn3operationnotloaded.header=fn3printingdetail.header 
+      and fn3operationnotloaded.product=fn3printingdetail.product
+      and abs(decision+increasedec-service)>1
+      and service=0
+      and orderf=1);
+
+---------------------------------------------------------
+-COMPARATIVO DE LA DECISION Y SERVICIO CUANDO DECISION=0
+---------------------------------------------------------
+select fn3operation.newsstand,service,ROUND(decision+increasedec) as dec,service+incidence-return as ven
+from fn3operation,fn3printingdetail
+where fn3operation.header='MARCA' 
+      and fn3operation.product='DIARIO'
+      and operationdate=to_date('20030203','yyyymmdd')
+      and fn3printingdetail.node='CAM'
+      and dateprint=operationdate
+      and fn3operation.newsstand=fn3printingdetail.newsstand
+      and fn3operation.header=fn3printingdetail.header 
+      and fn3operation.product=fn3printingdetail.product
+      and abs(decision+increasedec-service)>1
+      and decision=0
+      and orderf=1
+union
+(select fn3operationnotloaded.newsstand,service,ROUND(decision+increasedec) as dec,service+incidence-return as ven
+from fn3operationnotloaded,fn3printingdetail
+where fn3operationnotloaded.header='MARCA' 
+      and fn3operationnotloaded.product='DIARIO'
+      and operationdate=to_date('20030203','yyyymmdd')
+      and fn3printingdetail.node='CAM'
+      and dateprint=operationdate
+      and fn3operationnotloaded.newsstand=fn3printingdetail.newsstand
+      and fn3operationnotloaded.header=fn3printingdetail.header 
+      and fn3operationnotloaded.product=fn3printingdetail.product
+      and abs(decision+increasedec-service)>1
+      and decision=0
+      and orderf=1);
+
+
+
+
+
+

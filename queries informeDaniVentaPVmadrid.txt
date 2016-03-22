@@ -1,0 +1,85 @@
+SELECT Count(*),Avg((to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) ),
+To_Char(operationdate,'yyyy'),
+case
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 011 then '[000 - 011]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 017 then '(011 - 017]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 022 then '(017 - 022]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 028 then '(022 - 028]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 034 then '(028 - 034]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 040 then '(034 - 040]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 048 then '(040 - 048]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 059 then '(048 - 059]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 078 then '(059 - 078]'
+       else '(78 o mas]' end  as Tramo
+
+FROM emuoperation
+WHERE
+--operationdate>To_Date('20100101','yyyymmdd')
+--AND 
+header='ELMUNDO' AND PRODUCT='DIARIO'
+group BY 
+case
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 011 then '[000 - 011]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 017 then '(011 - 017]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 022 then '(017 - 022]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 028 then '(022 - 028]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 034 then '(028 - 034]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 040 then '(034 - 040]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 048 then '(040 - 048]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 059 then '(048 - 059]'
+       when (to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',(SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) <= 078 then '(059 - 078]'
+       else '(78 o mas]' end ,To_Char(operationdate,'yyyy')
+ORDER BY 3,2
+
+
+
+
+
+
+
+SELECT distributorroute ,To_Char(operationdate,'yyyy'),avg(  to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',
+           (SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) as Venta,Count(t1.newsstand) 
+FROM emuoperation t1,emucodification t2
+WHERE 
+t1.header='ELMUNDO'
+AND t1.product='DIARIO'
+AND T1.NEWSSTAND=T2.NEWSSTAND
+AND (  to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',
+           (SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) >0
+--AND T1.OPERATIONDATE=<To_Date('20110301','YYYYMMDD')
+GROUP BY distributorroute ,To_Char(operationdate,'yyyy')
+
+
+
+
+
+
+
+
+
+
+SELECT postcode , fathernode ,To_Char(operationdate,'yyyy'),avg(  to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',
+           (SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) as Venta,Count(t1.newsstand) 
+FROM emuoperation t1,emunewsstand t2  ,emunode t3
+WHERE 
+t1.header='ELMUNDO'
+AND t1.product='DIARIO'
+AND T1.NEWSSTAND=T2.code
+AND T1.NEWSSTAND=T3.code
+AND t1.header=t3.header
+AND t1.product=t3.product
+AND (  to_number(decode((SERVICE+INCIDENCE+RETURN+ nvl(CHARGE, 0) - nvl(PAYMENT, 0)),0,'',
+           (SERVICE + INCIDENCE - RETURN + nvl(CHARGE, 0) - nvl(PAYMENT, 0))))) >0
+AND T1.OPERATIONDATE>=To_Date('20000315','YYYYMMDD')
+GROUP BY postcode ,fathernode,To_Char(operationdate,'yyyy')
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,10 @@
+select ad.node,saledate,ad.service-ad.return as Avance, 
+                       nod.service-nod.return as Real
+from fn3nodesaleadvance ad,fn3nodeinformation nod
+where ad.header='MARCA' and
+      ad.product='DIARIO' and
+      ad.node='CAMCAP' and
+      nod.header='MARCA' and
+      nod.product='DIARIO' and
+      nod.node='CAMCAP' and
+      saledate=infodate;

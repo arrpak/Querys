@@ -1,0 +1,122 @@
+
+	
+show create table <tu_tabla>;
+
+
+	
+select * from pg_indexes where tablename = '</tu_tabla>';
+
+
+delete from estimationseries
+where estsession <='E20140312.PV';
+
+Reindex index estimationseries_estsessionoutputdatingvaluedate;
+
+Reindex table estimationinputeffect
+
+Reindex table estimationsetinputeffect_estsessionoutputdatingsetinputvaluedate;
+
+vacuum table estimationseries
+
+
+drop index estimationseries_estsessionoutputdatingvaluedate;
+
+
+"CREATE UNIQUE INDEX estimationseries_estsessionoutputdatingvaluedate ON estimationseries USING btree (estsession, output, dating, valuedate)"
+
+
+ select distinct forsession
+from decisionseries;
+
+select * from pg_indexes where tablename = 'estimationseries'
+
+
+Reindex table dimadiformad.estimationsetinputeffect;
+
+
+drop index estimationsetinputeffect_estsessionoutputdatingsetinputvaluedat;
+
+CREATE UNIQUE INDEX estimationsetinputeffect_estsessionoutputdatingsetinputvaluedat ON estimationsetinputeffect USING btree (estsession, output, dating, setinput, valuedate);
+
+
+
+
+
+
+SELECT pg_size_pretty(pg_total_relation_size('dimadiformad.estimationsetinputeffect')) As tam_total_tabla, 
+       pg_size_pretty(pg_relation_size('dimadiformad.estimationsetinputeffect')) As tam_tabla;
+
+
+
+select estsession,count(*)
+from estimationseries
+group by estsession;
+
+
+
+
+
+
+       
+
+delete from estimationsetinputeffect
+where estsession <='E20140218.PV';
+
+
+
+delete from estimationinputeffect
+where estsession <='E20140218.PV';
+
+
+
+delete from estimationseries
+where estsession <='E20140123.PV';
+
+SELECT pg_size_pretty(pg_total_relation_size('dimadiformad.estimationseries')) As tam_total_tabla, 
+       pg_size_pretty(pg_relation_size('dimadiformad.estimationseries')) As tam_tabla;
+
+SELECT pg_size_pretty(pg_total_relation_size('dimadiformad.estimationsetinputeffect')) As tam_total_tabla, 
+       pg_size_pretty(pg_relation_size('dimadiformad.estimationsetinputeffect')) As tam_tabla;
+
+SELECT pg_size_pretty(pg_total_relation_size('dimadiformad.estimationinputeffect')) As tam_total_tabla, 
+       pg_size_pretty(pg_relation_size('dimadiformad.estimationinputeffect')) As tam_tabla;
+
+
+SELECT pg_size_pretty(pg_database_size('dimadiformad')) As tam_total;
+
+
+
+Reindex table dimadiformad.estimationinputeffect;
+
+
+
+select estsession,count(*)
+from estimationinputeffect
+group by estsession
+
+
+
+vacuum verbose  decisionseries;
+
+select estsession,count(*)
+from estimationinputeffect
+group by estsession;
+
+delete
+from estimationinputeffect
+where estsession <='E20140312.PV';
+
+select forsession,count(*)
+from decisionseries
+group by forsession
+
+
+
+
+
+
+
+
+
+
+

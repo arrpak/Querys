@@ -1,0 +1,52 @@
+ select '['||to_char(min(servicio))||','||to_char(max(servicio))||']' as tramo, (sum(devolucion)/sum(servicio))*100 as porcDev,
+        (sum(numAgot)/count(*))*100 as porcAgot
+ from
+   (
+   select servicio, devolucion, numAgot, Percent
+   from
+     ( 
+     select 1,  servicio, devolucion, numAgot,
+     Percent_Rank() over (Partition by 1 order by servicio) as Percent
+     from
+       (
+       SELECT NEWSSTAND, SERVICE as servicio, return as devolucion, decode(return, 0, 1, 0) as numAgot
+       FROM FN3OPERATION
+       WHERE HEADER     = 'MARCA'                         AND
+         PRODUCT        = 'DIARIO'                        AND
+         OPERATIONDATE >= TO_DATE('20000101', 'YYYYMMDD') AND
+         OPERATIONDATE <= TO_DATE('20040930', 'YYYYMMDD') AND
+         SERVICE+INCIDENCE>0                              AND
+         SERVICE+INCIDENCE-RETURN >0                      AND
+         SUBSTR(NEWSSTAND,1,3) IN ('028')
+       )
+     )
+   )
+ group by floor((Percent-0.00001*Percent)*30);
+
+
+
+
+ select '['||to_char(min(venta))||','||to_char(max(venta))||']' as tramo, (sum(devolucion)/sum(servido))*100 as porcDev,
+        (sum(numAgot)/count(*))*100 as porcAgot
+ from
+   (
+   select venta,servido, devolucion, numAgot, Percent
+   from
+     ( 
+     select venta,servido, devolucion, numAgot,
+     Percent_Rank() over (Partition by 1 order by venta) as Percent
+     from
+       (
+       SELECT NEWSSTAND, SERVICE+incidence-return as venta, service+incidence as servido,return as devolucion, decode(return, 0, 1, 0) as numAgot
+       FROM FN3OPERATION
+       WHERE HEADER     = 'MARCA'                         AND
+         PRODUCT        = 'DIARIO'                        AND
+         OPERATIONDATE >= TO_DATE('20040929', 'YYYYMMDD') AND
+         OPERATIONDATE <= TO_DATE('20040930', 'YYYYMMDD') AND
+         SERVICE+INCIDENCE>0                              AND
+         SERVICE+INCIDENCE-RETURN >0                      AND
+         SUBSTR(NEWSSTAND,1,3) IN ('028')
+       )
+     )
+   )
+ group by floor((Percent-0.00001*Percent)*50);

@@ -1,0 +1,24 @@
+select output,ser.forsession,valuedate,forecast,
+SUM(case when (ser.decision + increaseDec) <= 15
+              then  ceil(ser.decision + increaseDec)
+              else  ROUND(ser.decision + increaseDec) end) as DecSistema,
+SUM(case when (det.decision + increaseDec) <= 15
+              then  ceil(det.decision + increaseDec)
+              else  ROUND(det.decision + increaseDec) end) as tirada,
+service+incidence-return as venta
+from fn3forecastseries ser,fn3operation op,fn3printingdetail det
+where 
+--used='Y' and 
+ser.forsession='2004091825.PV'
+and output like 'VentaMarca028%' and valuedate=to_date('20040920','yyyymmdd')
+and operationdate=valuedate
+and op.header='MARCA' and op.product='DIARIO' 
+and det.header='MARCA' and det.product='DIARIO' and
+output='VentaMarca'||op.newsstand and
+dateprint=operationdate and 
+op.newsstand=det.newsstand and
+node='CAM' 
+group by output,ser.forsession,valuedate,forecast,ser.decision,service+incidence-return
+;
+
+

@@ -1,0 +1,65 @@
+ SELECT t1.output,t1.valuedate,t1.input,t1.effect AS oldvalue,t2.effect AS newvalue,t2.effect-t1.effect AS dif
+from
+(SELECT *
+FROM ezcestimationinputeffect
+WHERE estsession='e20100131Com.02'
+AND output='ComElPaisCAM'
+AND valuedate>SYSDATE-90
+AND input IN
+(SELECT INPUT
+ FROM ezcinputsetinput
+ WHERE setinput LIKE '%ELPAIS%')) t1,
+(SELECT *
+FROM ezcestimationinputeffect
+WHERE estsession='e20100124Com.IC'
+AND output='ComElPaisCAM'
+AND valuedate>SYSDATE-90
+AND input IN
+(SELECT input
+ FROM ezcinputsetinput
+ WHERE setinput LIKE '%ELPAIS%')) t2
+WHERE
+t1.input=t2.input
+AND t1.output=t2.output
+AND t1.valuedate=t2.valuedate
+ORDER BY output,valuedate,input
+
+
+
+
+////////////////////////////////////////////////////////////
+
+
+
+
+ SELECT t1.output,t1.valuedate,t1.input,t1.effect AS oldvalue,t2.effect AS newvalue,t2.effect-t1.effect AS dif
+from
+(SELECT *
+FROM ezcestimationinputeffect
+WHERE estsession='e20100131Com.02'
+AND output='ComABCCAM'
+AND valuedate>SYSDATE-90
+AND input IN
+(SELECT INPUT
+ FROM ezcinputsetinput
+ WHERE setinput LIKE '%ABC%')) t1,
+(SELECT *
+FROM ezcestimationinputeffect
+WHERE estsession='e20100124Com.IC'
+AND output='ComABCCAM'
+
+AND valuedate>SYSDATE-90
+AND input IN
+(SELECT input
+ FROM ezcinputsetinput
+ WHERE setinput LIKE '%ABC%')) t2
+WHERE
+t1.input=t2.input
+AND t1.output=t2.output
+AND t1.valuedate=t2.valuedate
+ORDER BY output,valuedate,input
+
+
+
+
+

@@ -1,0 +1,27 @@
+fn3node
+
+
+--DROP TABLE fn3objetivosdifusion
+CREATE TABLE fn3objetivosdifusion
+(
+header VARCHAR(12) NOT NULL,
+product VARCHAR(12) NOT NULL,
+inidate DATE,
+enddate DATE,
+weekday NUMBER,
+RETURN  NUMBER,
+percoutoff  number );
+
+
+
+ALTER  TABLE fn3objetivosdifusion
+DROP CONSTRAINT  SYS_C0014511;
+
+
+ALTER  TABLE fn3objetivosdifusion
+ADD PRIMARY KEY (HEADER,PRODUCT,INIDATE,WEEKDAY);
+
+INSERT INTO  fn3objetivosdifusion
+SELECT  header,product,To_Date('20100101','yyyymmdd'),To_Date('20110123','yyyymmdd'),weekday,return,percoutoff
+FROM fn3objetivosdifusion
+WHERE inidate=To_Date('20110124','yyyymmdd')

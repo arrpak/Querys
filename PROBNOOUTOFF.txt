@@ -1,0 +1,25 @@
+update fn3probnotoutoff
+set probnotoutoff=0.88
+where output in
+(
+select output
+--,probnotoutoff
+from fn3probnotoutoff,fn3node
+where output like 'VentaMarca028%'
+and output='VentaMarca'||newsstand
+and fathernode='CAMAER' 
+and header='MARCA' 
+and product='DIARIO'
+);
+
+
+select output
+,probnotoutoff
+from fn3probnotoutoff,fn3node
+where output like 'VentaMarca028%'
+and output='VentaMarca'||newsstand
+and fathernode='CAMAER' 
+and header='MARCA' 
+and product='DIARIO';
+
+

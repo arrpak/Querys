@@ -1,0 +1,86 @@
+
+
+shutdown  -r  -t 60 /m \\192.168.191.3
+
+
+taskkill /s 192.168.191.192 /im tolsh.exe
+
+
+
+
+
+C:\Documents and Settings\bayes.BAYES>taskkill /s vinogradov /im iexplore.exe
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 4624.
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 5836.
+
+
+C:\Documents and Settings\bayes.BAYES>taskkill /s vinogradov /im iexplore.exe
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 5408.
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 1188.
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 4072.
+
+C:\Documents and Settings\bayes.BAYES>tasklist /s vinogradov
+
+Nombre de imagen             PID Nombre de sesión Núm. de  Uso de memor
+========================= ====== ================ ======== ============
+System Idle Process            0                         0        28 KB
+System                         4                         0       240 KB
+smss.exe                     660                         0       408 KB
+csrss.exe                    716                         0     5,156 KB
+winlogon.exe                 748                         0     7,680 KB
+services.exe                 792                         0     4,448 KB
+lsass.exe                    804                         0     2,580 KB
+ati2evxx.exe                 976                         0     3,096 KB
+svchost.exe                  996                         0     6,036 KB
+svchost.exe                 1064                         0     4,744 KB
+svchost.exe                 1424                         0    32,204 KB
+svchost.exe                 1572                         0     3,796 KB
+svchost.exe                 1664                         0     6,832 KB
+ati2evxx.exe                1804                         0     3,648 KB
+spoolsv.exe                 1900                         0     6,688 KB
+ekrn.exe                     560                         0    47,644 KB
+omtsreco.exe                 688                         0     7,464 KB
+explorer.exe                 332                         0    19,256 KB
+egui.exe                     180                         0     6,732 KB
+MOM.exe                      168                         0     6,632 KB
+msmsgs.exe                  1388                         0     2,756 KB
+ISUSPM.exe                  1396                         0     3,636 KB
+daemon.exe                  1248                         0     8,524 KB
+Skype.exe                   1196                         0    23,968 KB
+ctfmon.exe                   512                         0     3,520 KB
+hamachi.exe                 1312                         0     6,256 KB
+skypePM.exe                 2944                         0    21,744 KB
+AcroRd32.exe                2888                         0    32,716 KB
+realsched.exe               3084                         0       164 KB
+CCC.exe                     2300                         0     6,512 KB
+drwtsn32.exe                 676                         0     6,308 KB
+drwtsn32.exe                5028                         0     3,128 KB
+GoogleToolbarNotifier.exe   3964                         0     1,328 KB
+csrss.exe                   5724                         2     2,380 KB
+winlogon.exe                2428                         2     5,304 KB
+rdpclip.exe                 5684                         0     4,732 KB
+ati2evxx.exe                1868                         2     3,520 KB
+logon.scr                   4280                         2     1,700 KB
+wuauclt.exe                 5644                         0     4,164 KB
+OUTLOOK.EXE                 4520                         0    36,032 KB
+WINWORD.EXE                 5612                         0    10,952 KB
+IEXPLORE.EXE                4956                         0    26,288 KB
+wmiprvse.exe                2132                         0     6,348 KB
+
+C:\Documents and Settings\bayes.BAYES>taskkill /s vinogradov /im iexplore.exe
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 5324.
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 3684.
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 3496.
+
+C:\Documents and Settings\bayes.BAYES>tasklist /s vinogradov
+
+C:\Documents and Settings\bayes.BAYES>taskkill /s laurent /im iexplore.exe
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 5844.
+
+C:\Documents and Settings\bayes.BAYES>taskkill /s laurent /im iexplore.exe
+Correcto: se terminó el proceso "IEXPLORE.EXE" con PID 5844.
+
+C:\Documents and Settings\bayes.BAYES>taskkill /s laurent /im iexplore.exe
+ERROR: no se encontró el proceso "iexplore.exe".
+
+C:\Documents and Settings\bayes.BAYES>

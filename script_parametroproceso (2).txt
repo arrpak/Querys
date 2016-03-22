@@ -1,0 +1,40 @@
+insert into fn2parametroproceso
+values ('estimakio.bat', 1, 'Outputdef de un nodo de PV que se desea estimar. Ej: VentaMarca000000100002');
+insert into fn2parametroproceso
+values ('estimakio.bat', 2, 'Sesion de estimacion. Ej: 20001231.PV');
+
+insert into fn2parametroproceso
+values ('prevpack.bat', 1, 'Camino del fichero con los codigos de outputdef de punto de venta a prever');
+insert into fn2parametroproceso
+values ('prevpack.bat', 2, 'Sesion de prevision. Ej. 2000122431.PV');
+
+insert into fn2parametroproceso
+values ('modgloest.bat', 1, 'Outputdef de un nodopadre que se desea estimar. Ej: VentaMarcaCAMCAP');
+insert into fn2parametroproceso
+values ('modgloest.bat', 2, 'Sesion de estimacion. Ej: 20001231.PV');
+
+insert into fn2parametroproceso
+values ('modgloprev.bat', 1, 'Outputdef de un nodopadre que se desea prever. Ej: VentaMarcaCAMCAP');
+insert into fn2parametroproceso
+values ('modgloprev.bat', 2, 'Sesion de prevision. Ej. 2000122431.PV');
+
+insert into fn2parametroproceso values ('followestpv.bat', 1, 'Sesion de estimacion. Ej: 20001231.PV');
+insert into fn2parametroproceso values ('followestpv.bat', 2, 'Numero de segundos en espera.');
+
+insert into fn2parametroproceso values ('followprevpv.bat', 1, 'Sesion de prevision. Ej. 2000122431.PV');
+insert into fn2parametroproceso values ('followprevpv.bat', 2, 'Numero de segundos en espera.');
+
+insert into fn2parametroproceso values ('loadresult.bat', 1, 'Mensaje a enviar.');
+
+
+insert into fn2parametroproceso values ('llama.bat', 1, 'Mensaje a enviar.');
+commit;
+
+
+insert into fn2proceso values ('loadresults.bat', 4, 'Calcula y carga en la BD los resultados de agotados y devolucion');
+update fn2proceso set descripcion = 'Calcula y carga en la BD los resultados de agotados y devolucion'
+where  codigo = 'loadresults.bat';
+insert into fn2parametroproceso values ('loadresults.bat', 1, 'Cabecera. Ej: MARCA');
+insert into fn2parametroproceso values ('loadresults.bat', 2, 'Producto. Ej: DIARIO');
+insert into fn2parametroproceso values ('loadresults.bat', 3, 'Fecha inicio de calculo. Ej: y2001m01d01');
+insert into fn2parametroproceso values ('loadresults.bat', 4, 'Fecha final de calculo. Ej: y2001m01d01');

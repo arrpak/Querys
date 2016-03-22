@@ -1,0 +1,14 @@
+Procedimiento para actualizar el fichero de promociones diarias de emupromotionnode;
+
+Primerio hay que actualizar emupromotiondate con:
+
+llenapromotiondate_actualizaPorFecha.tol en source/process/promotion
+
+
+
+Exp emu/emu@vpnemu FILE=c:\partido.dmp Log=c:\partido.Log tables=emupromotiondate
+
+Imp formarca/formarca@formarca FILE=c:\partido.dmp Log=c:\partido.Log tables=emupromotiondate
+
+
+Actualiar el Excel solo la segunda parte.

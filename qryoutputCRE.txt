@@ -1,0 +1,45 @@
+
+UPDATE fn5outputdating
+SET orderf=-1
+
+INSERT INTO fn5outputdating
+SELECT output,'CtC.D',1,transformation,arima,iniest,endest,timesetomit
+FROM fn5outputdating
+WHERE SubStr(output,11,12) in
+(
+SELECT newsstand
+FROM fn3newsstandon
+WHERE
+dateoff IS null
+AND newsstand LIKE '013%' AND newsstand <>'013001900486'
+MINUS(
+SELECT newsstand
+FROM fn3operation
+WHERE operationdate=To_Date('20070311','yyyymmdd')
+AND newsstand LIKE '013%'
+AND service>0
+))
+
+INSERT INTO fn5estimation
+SELECT
+'FICTICIA',output,'CtC.D',dating,transformation,arima,inidate,enddate,
+iniestdate,estdate,estar,estma,datacount,varcount,const,stddeviation,
+percerror,loglikelyhood,schwarz,timesetomit,grouped,state,stateinfo
+FROM fn5estimation
+WHERE
+estsession='DiasTipicos'
+AND SubStr(output,11,12) in
+(
+SELECT newsstand
+FROM fn3newsstandon
+WHERE
+dateoff IS null
+AND newsstand LIKE '013%' AND newsstand <>'013001900486'
+MINUS(
+SELECT newsstand
+FROM fn3operation
+WHERE operationdate=To_Date('20070311','yyyymmdd')
+AND newsstand LIKE '013%'
+AND service>0
+))
+;

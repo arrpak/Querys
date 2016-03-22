@@ -1,0 +1,464 @@
+SELECT * FROM FN3EQUIPOFUTBOL
+WHERE CODIGO IN
+(SELECT DISTINCT equipolocal
+FROM fn3partidofutbol
+WHERE dominio='EUR'
+AND competicion IN
+('COPAEUROPA','UEFA','RECOPA')
+MINUS
+(SELECT  CODIGO
+FROM FN3EQUIPOFUTBOLRSSSF2008OK))
+ORDER BY NACION
+
+--UPDATE FN3EQUIPOFUTBOL SET DESCRIPCION='A.P.O.P./Kinyras' WHERE CODIGO='APO';
+--UPDATE FN3EQUIPOFUTBOLRSSSF2008OK SET CODIGO='LER' WHERE CODIGO='LE2';
+
+ SELECT equipo,dominio,codigo,descripcion
+FROM
+FN3EQUIPOFUTBOLRSSSF2008OK
+WHERE codigo IN
+(
+SELECT codigo
+FROM
+(
+SELECT codigo,Count(*)
+FROM
+(
+SELECT DISTINCT codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK
+GROUP BY codigo,dominio
+ORDER BY codigo)
+GROUP BY codigo
+HAVING Count(*)>1))
+ORDER BY DOMINIO
+;
+
+
+SELECT competicion,FN3PARTIDOFUTBOLRSSF2011.dominio,categoria,temporada,fase,jornada,fechapartido,valido,equipolocal,equipovisitante,
+       goleslocal,golesvisitante,penaltieslocal,penaltiesvisitante,t1.codigo,t2.codigo
+FROM FN3PARTIDOFUTBOLRSSF2011,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t1,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t2
+WHERE
+equipolocal       =t1.equipo(+) AND
+equipovisitante   =t2.equipo(+) AND
+t1.dominio = t2.dominio AND
+temporada='2007/2008' AND
+FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio   AND T1.dominio='ADR';
+
+
+  AND
+--FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio AND
+--FN3PARTIDOFUTBOLRSSF2011.dominio=t2.dominio AND
+
+--dominio='SPA'
+
+t1.codigo IS NULL;
+
+
+
+
+SELECT *
+FROM FN3PARTIDOFUTBOLRSSF2011
+WHERE  dominio='CHI' AND  TEMPORADA='2009/2010'
+ORDER BY fechapartido
+
+DELETE
+SELECT * FROM FN3PARTIDOFUTBOLRSSF2011
+WHERE  dominio='KAZ' AND temporada='2008/2009' AND valido='S';
+
+SELECT * FROM FN3PARTIDOFUTBOLRSSF2011
+WHERE dominio='KAZ' AND temporada='2008/2009'
+--AND fechapartido<dat('20091231')
+ORDER BY fechapartido;
+
+DELETE  FROM FN3PARTIDOFUTBOLRSSF2011
+WHERE dominio='SMR' AND temporada='2008/2009'   ;
+
+
+UPDATE   FN3PARTIDOFUTBOLRSSF2011
+SET temporada='2008/2009'
+WHERE dominio='SMR' AND temporada='2009/2010';
+
+
+
+
+SELECT DISTINCT EQUIPOLOCAL,DOMINIO,Count(*)
+FROM   FN3PARTIDOFUTBOLRSSF2011
+WHERE TEMPORADA='2009/2010'
+GROUP BY EQUIPOLOCAL,DOMINIO
+ORDER BY DOMINIO
+
+
+
+SELECT Count(*),dominio,
+Sum(CASE WHEN fechapartido<dat('20100101') THEN 1 ELSE 0 END) AS part2009,
+Sum(CASE WHEN fechapartido>dat('20100101') THEN 1 ELSE 0 END) AS part2010
+FROM   FN3PARTIDOFUTBOLRSSF2011
+WHERE TEMPORADA='2009/2010'
+GROUP BY dominio;
+
+
+SELECT *
+FROM  FN3PARTIDOFUTBOLRSSF2011
+WHERE dominio='EIR' AND temporada='2009/2010'
+
+--DELETE   FN3PARTIDOFUTBOLRSSF2011  WHERE dominio='NOR' AND temporada='2009/2010';
+
+UPDATE FN3 SET DOMINIO='ING'
+
+
+SELECT equipo,dominio,codigo,descripcion
+FROM
+FN3EQUIPOFUTBOLRSSSF2008OK
+WHERE codigo IN
+(
+SELECT codigo
+FROM
+(
+SELECT codigo,Count(*)
+FROM
+(
+SELECT DISTINCT codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK
+GROUP BY codigo,dominio
+ORDER BY codigo)
+GROUP BY codigo
+HAVING Count(*)>1))
+ORDER BY DOMINIO
+;
+
+
+SELECT * FROM FN3PARTIDOFUTBOLRSSF2011
+WHERE
+EQuipolocal='Kultsu FC'
+
+ SELECT *
+ FROM FN3EQUIPOFUTBOLRSSSF2008OK
+WHERE CODIGO='SLV'
+
+
+create TABLE fn3equipofutbol2010
+AS
+SELECT *
+FROM fn3equipofutbol
+WHERE codigo='ttttt'
+
+ALTER TABLE FORMARCA.FN3EQUIPOFUTBOL2010
+	ADD ( CONSTRAINT FN3EQUIPOFUTBOLTIPEQUFK2010
+	FOREIGN KEY(TIPOEQUIPO)
+	REFERENCES FORMARCA.FN3TIPOEQUIPOCOMPETICION(CODIGO))
+
+
+  ALTER TABLE FORMARCA.FN3EQUIPOFUTBOL2010
+	ADD ( CONSTRAINT FN3EQUIPOFUTBOLNACFK2010
+	FOREIGN KEY(NACION)
+	REFERENCES FORMARCA.FN3NACION(CODIGO)
+	ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE VALIDATE );
+
+CREATE UNIQUE INDEX FORMARCA.FN3EQUIPOFUTBOLPK2010
+	ON FORMARCA.FN3EQUIPOFUTBOL2010(CODIGO);
+
+insert into fn3equipofutbol2010
+--SELECT DISTINCT 'insert into fn3equipofutbol2010 values ( '''||codigo||'''',''',CLB,''',dominio,0,InitCap(descripcion)||''')'''
+SELECT DISTINCT codigo,'CLB',dominio,0,SubStr(REPLACE(REPLACE(InitCap(descripcion),')',' '),'(',' '),1,40)--,'$'
+FROM FN3EQUIPOFUTBOLRSSSF2008OK
+where dominio NOT IN ('SBA','SYM','MON') --AND CODIGO<>'SW2'
+;
+
+
+SELECT Count(*) FROM  fn3equipofutbol2010;
+--TRUNCATE TABLE  fn3equipofutbol2010
+
+SELECT DISTINCT DOMINIO FROM  FN3EQUIPOFUTBOLRSSSF2008OK
+
+
+
+
+///////////QUERY APUESTAS
+select fechapartido,equipolocal,equipovisitante,goleslocal,golesvisitante,t2.fuerza,t3.fuerza,goleslocal-golesvisitante as difgolloc,
+0.5+t2.fuerza-t3.fuerza as diffueloc,(0.5+t2.fuerza-t3.fuerza-(goleslocal-golesvisitante)) as error,1 as local
+from fn3partidofutbol t1,fn3fuerzaequipo t2,fn3fuerzaequipo t3
+WHERE
+COMPETICION='LIGA' AND TEMPORADA='2010/2011' AND dominio='SPA' and
+CATEGORIA='PRIMERA' AND
+--valido='S' and
+t1.fechapartido=t2.fecha and
+t1.fechapartido=t3.fecha and
+t1.equipolocal=t2.equipo and
+t1.equipovisitante=t3.equipo
+--and fechapartido<sysdate
+
+
+insert into FN3PARTIDOFUTBOLRSSF2010
+values('LIGA','ADR'
+,'PRIMERA','2007/2008','REGULARDOB','3',to_date('2007-10-07','yyyy-mm-dd'),'Y','Ranger ''s','Santa Coloma','2','2',null,null,null,null,null,null);
+
+
+                                                  insert into FN3PARTIDOFUTBOLRSSF2010
+values('LIGA','ADR'
+,'PRIMERA','2006/2007','REGULARDOB','1',to_date('2006-09-24','yyyy-mm-dd'),'Y','Encamp','Ranger''s','0','3',null,null,null,null,null,null)
+
+
+
+
+
+UPDATE  FN3EQUIPOFUTBOLRSSSF2008OK SET DESCRIPCION='UN KAERJENG 97' WHERE CODIGO='U97'
+-UPDATE  FN3EQUIPOFUTBOLRSSSF2008OK SET CODIGO='U97' WHERE DESCRIPCION='UN KAERJENG 97'
+
+
+SELECT  * FROM FN3PARTIDOFUTBOLRSSF2010
+WHERE EQUIPOLOCAL IN
+(
+SELECT DISTINCT EQUIPOLOCAL
+FROM   FN3PARTIDOFUTBOLRSSF2011 WHERE dominio='RCH'
+minus
+SELECT EQUIPO,DOMINIO
+FROM   FN3EQUIPOFUTBOLRSSSF2008OK
+WHERE codigo='XXX' OR DESCRIPCION='0' OR DESCRIPCION='xxx'
+ORDER BY DOMINIO
+   )
+
+SELECT       *
+FROM   FN3PARTIDOFUTBOLRSSF2011
+WHERE EQUIPOLOCAL='Ãšjpest'
+
+SELECT * FROM  FN3PARTIDOFUTBOLRSSF2010 WHERE dominio='RCH'
+
+
+
+SELECT Count(*),dominio
+from
+FN3PARTIDOFUTBOLRSSF2011
+GROUP BY dominio
+
+SELECT * FROM   FN3PARTIDOFUTBOLRSSF2011 WHERE DOMINIO='ESV'
+UPDATE FN3PARTIDOFUTBOLRSSF2011 SET DOMINIO='SBA' WHERE DOMINIO='SER';
+
+
+SELECT *
+FROM all_tables
+WHERE table_name LIKE '%PARTIDO%'
+
+
+SELECT * FROM FN3PARTIDOFUTBOLRSSF2010 where temporada='2008/2009'
+
+                                                                                                           competicion,dominio,categoria,temporada,fase,jornada,fechapartido,valido,equipolocal,equipovisitante,goleslocal,golesvisitante,penaltieslocal,penaltiesvisitante,incidencia01,incidencia02,goleadores01,goleadores02
+
+
+
+SELECT dominio,temporada,Count(*)
+FROM FN3PARTIDOFUTBOLRSSF2010
+GROUP BY dominio,temporada;
+
+
+CREATE  TABLE FN3PARTIDOFUTBOLRSSF2011 AS SELECT * FROM FN3PARTIDOFUTBOLRSSF2010;
+TRUNCATE table   FN3PARTIDOFUTBOLRSSF2011;
+
+SELECT * FROM  FN3PARTIDOFUTBOLRSSF2011 WHERE DOMINIO='FIN' ORDER BY FECHAPARTIDO DESC;
+
+insert into FN3PARTIDOFUTBOLRSSF2011
+values('LIGA','ADR'
+,'PRIMERA','2006/2007','REGULARDOB','1',to_date('2006-09-24','yyyy-mm-dd'),'Y','Encamp','Ranger''s','0','3',null,null,null,null,null,null);
+
+
+ SELECT dominio,temporada,categoria,valido,Count(*)
+FROM FN3PARTIDOFUTBOLRSSF2011
+GROUP BY dominio,temporada,valido,categoria ORDER BY DOMINIO,TEMPORADA;
+
+
+SELECT *
+FROM  FN3PARTIDOFUTBOLRSSF2011
+WHERE   TEMPORADA='2009/2010'
+
+DELETE FN3PARTIDOFUTBOLRSSF2011
+WHERE dominio='ALE'
+
+SELECT * FROM    FN3PARTIDOFUTBOLRSSF2011
+WHERE EQUIPOVISITANTE IN
+(
+SELECT DISTINCT equipoVISITANTE
+FROM  FN3PARTIDOFUTBOLRSSF2011
+WHERE temporada='2009/2010'
+UNION
+SELECT DISTINCT equipovisitante
+FROM  FN3PARTIDOFUTBOLRSSF2011
+WHERE temporada='2009/2010'
+MINUS
+SELECT equipo
+FROM fn3equipofutbolrsssf2008ok)
+
+
+
+
+
+
+ALTER TABLE fn3equipofutbolrsssf2008ok
+add CONSTRAINT fn3equipofutbolrsssf2008PK PRIMARY KEY (equipo,dominio,codigo,descripcion);
+
+update  fn3equipofutbolrsssf2008ok SET codigo='XXX' WHERE codigo IS NULL
+
+SELECT * FROM  fn3equipofutbolrsssf2008ok WHERE codigo IS NULL;
+
+
+insert into FN3PARTIDOFUTBOLRSSF2011
+values('LIGA','ADR'
+,'PRIMERA','2008/2009','REGULARDOB','1',to_date('2008-09-21','yyyy-mm-dd'),'Y','Ranger''s FC','Inter Club','1','2',null,null,null,null,null,null)
+
+
+
+
+SELECT * FROM fn3equipofutbolrsssf2008ok  WHERE dominio='EIR'
+
+
+
+
+
+insert into FN3PARTIDOFUTBOLRSSF2011
+values('LIGA','AndorraD1'
+,'PRIMERA','2009/2010','REGULARDOB','3',to_date('04/10/2009','dd/mm/yyyy'),'S','Engordany','Sant Julià','0','10',null,null,null,null,null,null)
+
+
+SELECT DISTINCT dominio
+FROM  FN3PARTIDOFUTBOLRSSF2011
+ORDER BY dominio;
+
+UPDATE  FN3PARTIDOFUTBOLRSSF2011 SET dominio='RUS' WHERE dominio='RússiaD1';
+
+
+
+
+
+--DELETE  FN3PARTIDOFUTBOLRSSF2011 WHERE temporada='2009/2010' AND dominio='IsraelLA';
+
+
+
+
+
+INSERT INTO fn3equipofutbolrsssf2008ok
+(
+SELECT DISTINCT equipoVISITANTE,DOMINIO,'XXX',equipoVISITANTE
+FROM  FN3PARTIDOFUTBOLRSSF2011
+WHERE temporada='2009/2010'
+AND EQUIPOVISITANTE IN
+(
+SELECT DISTINCT equipoVISITANTE
+FROM  FN3PARTIDOFUTBOLRSSF2011
+WHERE temporada='2009/2010'
+MINUS
+SELECT EQUIPO
+FROM fn3equipofutbolrsssf2008ok))
+
+SELECT * FROM fn3equipofutbolrsssf2008ok WHERE CODIGO='UCD';
+
+
+
+
+
+SELECT competicion,FN3PARTIDOFUTBOLRSSF2011.dominio,categoria,temporada,fase,jornada,fechapartido,valido,equipolocal,equipovisitante,
+       goleslocal,golesvisitante,penaltieslocal,penaltiesvisitante,t1.codigo,t2.codigo
+FROM FN3PARTIDOFUTBOLRSSF2011,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t1,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t2
+WHERE
+goleslocal>=0 and
+equipolocal       =t1.equipo(+) AND
+equipovisitante   =t2.equipo(+) AND
+t1.dominio = t2.dominio AND
+--temporada='2007/2008' AND
+FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio
+order by fechapartido desc
+
+
+
+
+DELETE FN3EQUIPOFUTBOLRSSSF2008OK
+WHERE      EQUIPO
+ IN
+ (
+SELECT EQUIPO
+FROM   FN3EQUIPOFUTBOLRSSSF2008OK
+MINUS
+(SELECT DISTINCT EQUIPOLOCAL
+FROM   FN3PARTIDOFUTBOLRSSF2011 WHERE dominio='RCH'
+UNION
+SELECT DISTINCT EQUIPOvisitante
+FROM   FN3PARTIDOFUTBOLRSSF2011 WHERE dominio='RCH')
+  )
+
+
+
+
+INSERT INTO FN3EQUIPOFUTBOLRSSSF2008OK
+ SELECT  DISTINCT EQUIPOLOCAL,dominio,'XXX',equipolocal
+ FROM   FN3PARTIDOFUTBOLRSSF2011 WHERE dominio='RCH'
+and  EQUIPOLOCAL in
+ (
+  SELECT DISTINCT EQUIPOLOCAL
+FROM   FN3PARTIDOFUTBOLRSSF2011 WHERE dominio='RCH'
+   MINUS
+         SELECT EQUIPO
+FROM   FN3EQUIPOFUTBOLRSSSF2008OK
+WHERE    dominio='RCH'       )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DELETE FN3PARTIDOFUTBOLRSSF2011
+WHERE    dominio='SUE'
+AND  TEMPORADA='2009/2010'
+
+
+
+
+
+
+
+
+
+
+
+SELECT DISTINCT DOMINIO||CODIGO
+FROM   FN3EQUIPOFUTBOLRSSSF2008OK
+MINUS
+ SELECT DISTINCT NACION||CODIGO
+FROM   FN3EQUIPOFUTBOl
+WHERE TIPOEQUIPO='CLB'
+
+
+SELECT DISTINCT NACION||CODIGO
+FROM   FN3EQUIPOFUTBOl
+WHERE TIPOEQUIPO='CLB'
+MINUS
+SELECT DISTINCT DOMINIO||CODIGO
+FROM   FN3EQUIPOFUTBOLRSSSF2008OK
+
+
+
+SELECT Count(*)
+FROM FN3PARTIDOFUTBOLRSSF2011
+;
+
+
+
+
+
+
+
+

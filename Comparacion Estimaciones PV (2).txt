@@ -1,0 +1,41 @@
+select count(*),state,stateinfo
+from fn3estimation
+where
+estsession='20040119.PV'
+group by state,stateinfo;
+
+
+
+
+select e1.output,e1.percerror as dia12,e2.percerror as dia19
+from
+(select output,SCHWARZ,percerror
+from fn3estimation
+where estsession='20040112.PV') e1,
+(select output,SCHWARZ,percerror
+from fn3estimation
+where estsession='20040119.PV') e2
+where
+e1.output=e2.output
+
+
+
+
+select count(*)/count(distinct(output))
+from fn3estimationinput
+where estsession='20040112.PV'
+and output like 'VentaMarca010%'
+and input like 'Ration%';
+
+
+
+
+select substr(input,15,10),count(*)
+from fn3estimationinput
+where estsession='20040116II.PV'
+and input ='RationExpand(y2004m01d06, FechadoPV, PulseOut)'
+and output like 'VentaMarca028%'
+group by  substr(input,15,10)
+order by substr(input,15,10);
+
+

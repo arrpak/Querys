@@ -1,0 +1,48 @@
+SELECT t1.sonnode,t2.node,t1.dateprint,t2.orderf,t1.forsession,t3.fathernodeforsession,t4.forecast,t5.venta
+from
+(SELECT *
+FROM fn3printingnodeforsession
+WHERE
+dateprint>To_Date('20100101','yyyymmdd')
+--dateprint=To_Date('20100107','yyyymmdd')
+AND node='CAM'
+--AND sonnode='CAMCAP'
+AND header='MARCA') t1,
+(SELECT dateprint,orderf,node
+FROM fn3printing
+WHERE
+dateprint>To_Date('20100101','yyyymmdd')
+--dateprint=To_Date('20100107','yyyymmdd')
+AND node='CAM'
+AND used='Y'
+AND header='MARCA') t2,
+(
+SELECT code,fathernodeforsession
+FROM fn3forsession) t3,
+(SELECT output,valuedate,forecast,forsession
+FROM fn3forecastseries
+WHERE
+output LIKE 'VentaMarcaCAM%' and
+valuedate>To_Date('20100101','yyyymmdd')
+--valuedate=To_Date('20100107','yyyymmdd')
+) t4,
+(
+SELECT node,infodate,((serviceCont + incidenceCont - returnCont) + estimatedSale) AS venta
+FROM fn3nodeinformation
+WHERE header='MARCA'
+AND product='DIARIO'
+AND node LIKE 'CAM%'
+AND infodate>To_Date('20100101','yyyymmdd')
+--AND infodate=To_Date('20100107','yyyymmdd')
+) t5
+WHERE
+t1.node=t2.node
+AND t1.orderf=t2.orderf
+AND t1.dateprint=t2.dateprint
+AND t1.dateprint=t4.valuedate
+AND t1.dateprint=t5.infodate
+AND t2.dateprint=t5.infodate
+AND t1.forsession=t3.code
+AND t3.fathernodeforsession=t4.forsession
+AND 'VentaMarca'||t1.sonnode=t4.output
+AND t1.sonnode=t5.node

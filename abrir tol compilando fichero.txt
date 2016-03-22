@@ -1,0 +1,1 @@
+c:\tol4\bin\> tolbase -i f:/fn3/altapvfn3.tol

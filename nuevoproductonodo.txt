@@ -1,0 +1,9 @@
+insert into fn3Node
+select distinct ope.header, ope.product, ope.newsStand,
+      'nodo terminal', ope.newsStand, nod.fatherNode
+from fn3operation ope, fn3node nod
+where ope.header     = 'EXPANSION'       and
+      ope.product    = 'LIBRO'      and
+      ope.header     = nod.header    and
+--      ope.product    = nod.product   and
+      ope.newsStand  = nod.newsStand;

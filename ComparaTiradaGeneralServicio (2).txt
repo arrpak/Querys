@@ -1,0 +1,29 @@
+SELECT *
+from
+(SELECT node,dateprint,orderf
+FROM fn3printing
+WHERE header='MARCA' AND product='DIARIO'
+AND dateprint>=dat('20080102') AND used='Y') t1,
+(
+SELECT node,dateprint,orderf,
+100*Ceil(((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))-30)/100) AS service
+FROM fn3printingdetail
+WHERE header='MARCA' AND product='DIARIO' and node='CAM'
+AND dateprint>=dat('20080102')
+GROUP BY node,dateprint,orderf) t2 ,
+(
+select infodate,node,sum(service)
+from fn3nodeinformation
+WHERE header='MARCA' AND product='DIARIO'
+AND infodate>=dat('20080102')
+group by infodate,node
+) t3
+WHERE
+t1.node=t2.node AND
+t3.node=t2.node AND
+t3.infodate=t1.dateprint AND
+t3.infodate=t2.dateprint AND
+t1.orderf=t2.orderf
+

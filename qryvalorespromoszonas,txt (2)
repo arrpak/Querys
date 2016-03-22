@@ -1,0 +1,9 @@
+SELECT *
+FROM FN3ESTIMATIONINPUTEFFECT
+WHERE EsTSESSION='20070319.InformeZonas'
+AND input IN
+(
+SELECT code
+FROM fn3input
+WHERE (setinput LIKE '%2007%' OR setinput LIKE '%MARCA%'))
+ORDER BY output,input,valuedate

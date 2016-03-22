@@ -1,0 +1,56 @@
+define fechaFin = '20110301';
+/*
+SELECT tfjc.competicion, tfjc.dominio, tfjc.categoria, tfjc.temporada, tfjc.fase, tfjc.jornada, fechainicio, fechafin, fecini, fecfin
+FROM
+(SELECT competicion, dominio, categoria, temporada, fase, jornada, fechainicio, fechafin
+ FROM fn3fasejornadacompeticion) tfjc,
+(SELECT competicion, dominio, categoria, temporada, fase, jornada, Min(fechapartido) AS fecini, Max(fechapartido) AS fecfin
+ FROM fn3partidofutbol
+ --WHERE fechapartido < To_Date('&fechaFin', 'yyyymmdd')  AND
+ --competicion='CLASEUROCOPA' AND dominio='EUR' AND categoria='PRIMERA' AND FASE='LIGUILLA1DOB' AND JORNADA='NOJOR'
+ GROUP BY competicion, dominio, categoria, temporada, fase, jornada) tpf
+WHERE tfjc.competicion = tpf.competicion
+AND tfjc.dominio = tpf.dominio
+AND tfjc.categoria = tpf.categoria
+AND tfjc.temporada = tpf.temporada
+AND tfjc.fase = tpf.fase
+AND tfjc.jornada = tpf.jornada
+AND (to_char(fechainicio,'yyyymmdd') <> to_char(fecini,'yyyymmdd') OR
+     to_char(fechafin,'yyyymmdd') <> to_char(fecfin,'yyyymmdd'))
+ORDER BY tfjc.competicion, tfjc.dominio, tfjc.categoria, tfjc.temporada;
+*/
+UPDATE fn3fasejornadacompeticion t1 SET fechainicio = (SELECT Min(fechapartido)
+                                                        FROM fn3partidofutbol t2
+                                                        WHERE t2.competicion = t1.competicion
+                                                        AND t2.dominio = t1.dominio
+                                                        AND t2.categoria = t1.categoria
+                                                        AND t2.temporada = t1.temporada
+                                                        AND t2.fase = t1.fase
+                                                        AND t2.jornada = t1.jornada),
+                                        fechafin = (SELECT Max(fechapartido)
+                                                    FROM fn3partidofutbol t2
+                                                    WHERE t2.competicion = t1.competicion
+                                                    AND t2.dominio = t1.dominio
+                                                    AND t2.categoria = t1.categoria
+                                                    AND t2.temporada = t1.temporada
+                                                    AND t2.fase = t1.fase
+                                                    AND t2.jornada = t1.jornada)
+WHERE (competicion, dominio, categoria, temporada, fase, jornada) IN
+(SELECT tfjc.competicion, tfjc.dominio, tfjc.categoria, tfjc.temporada, tfjc.fase, tfjc.jornada
+ FROM
+ (SELECT competicion, dominio, categoria, temporada, fase, jornada, fechainicio, fechafin
+  FROM fn3fasejornadacompeticion) tfjc,
+ (SELECT competicion, dominio, categoria, temporada, fase, jornada, Min(fechapartido) AS fecini, Max(fechapartido) AS fecfin
+  FROM fn3partidofutbol
+  --WHERE fechapartido < To_Date('&fechaFin', 'yyyymmdd')
+  GROUP BY competicion, dominio, categoria, temporada, fase, jornada) tpf
+ WHERE tfjc.competicion = tpf.competicion
+ AND tfjc.dominio = tpf.dominio
+ AND tfjc.categoria = tpf.categoria
+ AND tfjc.temporada = tpf.temporada
+ AND tfjc.fase = tpf.fase
+ AND tfjc.jornada = tpf.jornada
+AND (to_char(fechainicio,'yyyymmdd') <> to_char(fecini,'yyyymmdd') OR
+     to_char(fechafin,'yyyymmdd') <> to_char(fecfin,'yyyymmdd')))
+
+

@@ -1,0 +1,33 @@
+SELECT p.node,
+       fs.forsession, fs.output, fs.dating,
+       fs.valuedate, fs.forecast, fs.variance,
+       fs.filter, fs.noise, 0 AS forcens, fs.used, 'N' AS closed,
+       pns.simdec, pns.lowlim, pns.upplim, pns.probnotoutoff, ni.normalinv, pns.minabsinc, pns.maxabsinc, pns.minperinc, pns.maxperinc
+FROM   fn3printingnodedecsession pnd, fn3decision d, fn3printing p, fn5forecastseries fs, fn3output o,
+       fn3node n, fn3probnotoutoffbystretch pns, fn3normalinv ni
+WHERE  pnd.decsession    = d.decsession
+  AND  pnd.header        = p.header
+  AND  pnd.product       = p.product
+  AND  pnd.node          = p.node
+  AND  pnd.dateprint     = p.dateprint
+  AND  pnd.orderf        = p.orderf
+  AND  pnd.dateprint     = fs.valuedate
+  AND  pnd.header        = o.header
+  AND  pnd.product       = o.product
+  AND  pnd.header        = n.header
+  AND  pnd.product       = n.product
+  AND  pnd.sonnode       = n.fathernode
+  AND  d.forsession      = fs.forsession
+  AND  fs.output         = o.code
+  AND  o.node            = n.code
+  AND  pns.probnotoutoff = ni.prob
+  AND  p.header          = 'MARCA'
+  AND  p.product         = 'DIARIO'
+  AND  p.dateprint       >= to_date('2009/01/02', 'YYYY/MM/DD')
+  AND  p.dateprint       = to_date('2009/01/02', 'YYYY/MM/DD')
+  AND  p.dateprint       <= to_date('2009/03/31', 'YYYY/MM/DD')
+  AND  p.used            = 'Y'
+  AND  fs.used            = 'Y'
+  AND  fs.forecast       > pns.lowlim
+  AND  fs.forecast       <= pns.upplim
+  AND  n.newsstand IS NOT NULL

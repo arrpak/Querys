@@ -1,0 +1,180 @@
+select  to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))| |'/01','yyyy/mm/dd') as operationdate ,
+sum(case when return=0 then 1 else 0 end)/count(*) as PorcAgot
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and ( newsstand  like '003%' or
+      newsstand  like '046%' or
+      newsstand  like '030%' or
+      newsstand  like '012%' )
+and
+service+incidence-return>50
+and operationdate>to_date('20000101','yyyymmdd')
+group by  to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))| |'/01','yyyy/mm/dd') ;
+
+--query para sacar la prevision y la venta
+
+select infodate as dia,sumprev,venta
+from
+( select sum(forecast) as sumprev,valuedate
+  from fn3forecastseries
+  where
+  used='Y' and
+  (output like 'VentaMarcaCAV%' OR
+   output like 'VentaMarcaCMU%'OR 
+   output like 'VentaMarcaCMUPER' OR
+   output like 'VentaMarcaCMUPLA') and
+  valuedate>sysdate-110
+  group by valuedate) previ,
+(   select infodate,sum(servicecont+incidencecont-returncont) as venta
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='CAVCMU'
+ group by infodate)
+where
+valuedate=infodate
+
+
+-- QUERY PARA SACAR EL RATIO CIERRE Y COMPARALO CON EL AÑO ANTERIOR
+
+select 
+   Replace(node,' ','') as Prefijo,
+   infoDate+365 as infoDate ,
+   (numOpenCont) as PvControladosAbiertosTRAS  ,
+   NULL as PvControladosAbiertos
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'EXT')
+  and ( infodate >= To_date('20031001', 'YYYYMMDD'))
+  and ( infodate <= To_date('20031231', 'YYYYMMDD'))
+  and numopecont>0
+union
+ select 
+   Replace(node,' ','') as Prefijo,
+   infoDate  as infoDate ,
+   null as PvControladosAbiertosTras ,
+   (numOpenCont) as PvControladosAbiertos
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'EXT')
+  and ( infodate >= To_date('20041001', 'YYYYMMDD'))
+  and ( infodate <= To_date('20041231', 'YYYYMMDD'))
+  and numopecont>0
+order by infoDate,Prefijo;
+
+
+--DIF SERV - DECISION
+
+
+select pri.dateprint,Decitotal-servicio
+from
+(SELECT DATEPRINT, SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as Decitotal,orderf
+FROM FN3PRINTINGdetail
+WHERE HEADER='MARCA' and product='DIARIO' and
+node='CAVCMU'
+group by dateprint,orderf) deci,
+(   select infodate,sum(service) as servicio
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='CAVCMU'
+ group by infodate) serv,
+(
+select dateprint,orderf
+from fn3printing 
+  where header='MARCA' and product='DIARIO'
+   and node='CAVCMU'
+and used='Y') pri
+where 
+infodate=pri.dateprint
+and pri.dateprint=deci.dateprint 
+and pri.dateprint||pri.orderf=deci.dateprint||deci.orderf;
+
+
+--DIF SERV - DECISION2
+
+select sum(fn3ope.service+fn3ope.incidence)- SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as DifVal,fn3ope.operationdate
+from fn3operation fn3ope, fn3printingdetail fn3pri, fn3printing fn3pg
+where fn3ope.header='MARCA' AND
+      fn3ope.product='DIARIO' AND
+      fn3ope.header=fn3pri.header AND
+      fn3ope.header=fn3pg.header and
+      fn3ope.product=fn3pri.product AND
+      fn3ope.product=fn3pg.product and
+      substr(fn3ope.newsstand,1,7) in ('0460555','0300557','0030556','0120558') and
+      fn3ope.newsstand=fn3pri.newsstand and
+      fn3ope.operationdate<=to_date('20040930','yyyymmdd') and
+      fn3ope.operationdate>=to_date('20040701','yyyymmdd') and
+      fn3ope.operationdate=fn3pri.dateprint and
+      fn3ope.operationdate=fn3pg.dateprint and
+      fn3pri.orderf=fn3pg.orderf and
+      fn3pg.node ='CAVCMU' and
+      fn3pg.node = fn3pri.node AND
+      fn3pg.used='Y'
+GROUP BY fn3ope.operationdate
+AGOTADOS A PARTIR DE UNA VENTA 
+------------------------------
+
+select  to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))| |'/01','yyyy/mm/dd') as operationdate ,
+sum(case when return=0 then 1 else 0 end)/count(*) as PorcAgot50
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and ( newsstand  like '003%' or
+      newsstand  like '046%' or
+      newsstand  like '030%' or
+      newsstand  like '012%' ) and
+service+incidence-return>50
+and operationdate>to_date('20040101','yyyymmdd') 
+and operationdate<to_date('20041001','yyyymmdd') 
+group by  to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))| |'/01','yyyy/mm/dd'); 
+
+
+--query para sacar el porcentaje de agotado con respecto (al servicio) tamano de un Kiosco
+
+select service,
+sum(case when return=0 then 1 else 0 end)/count(*) as PorcAgot
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and operationdate>=to_date('20040701','yyyymmdd') 
+and operationdate<=to_date('20040930','yyyymmdd')
+and
+SERVICE>0 AND
+SERVICE<500 and
+(newsstand like '003%' OR 
+ newsstand like '012%' OR 
+ newsstand like '046%' OR
+ newsstand like '0300557%')
+group by SERVICE
+
+--query para sacar la devolucion en funcion de la venta
+
+select service+incidence-return as venta, 
+sum(return/service)/count(*) as devolucion
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and operationdate>=to_date('20040401','yyyymmdd') 
+and operationdate<=to_date('20040630','yyyymmdd')
+and
+SERVICE>0 AND
+SERVICE<200 and
+(newsstand like '003%' OR 
+ newsstand like '012%' OR 
+ newsstand like '046%' OR
+ newsstand like '030%')
+group by service+incidence-return
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+SELECT (probdate),Count(*)
+FROM fn3probnotoutoff
+GROUP BY probdate
+ORDER BY probdate
+
+INSERT INTO fn3probnotoutoff
+SELECT output,sysdate,probnotoutoff-0.03
+FROM fn3probnotoutoff
+WHERE probdate=dat('2007/01/15')
+
+
+SELECT 'VentaMarca'||newsstand
+FROM fn3node
+WHERE (fathernode LIKE 'EXT%' OR fathernode LIKE 'AND%') AND newsstand IS NOT null

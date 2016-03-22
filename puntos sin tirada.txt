@@ -1,0 +1,18 @@
+SELECT newsstand
+FROM fn3operation
+WHERE
+header='MARCA' AND product='DIARIO' and
+operationdate=dat('20080928')
+UNION
+SELECT newsstand
+FROM fn3operationnotcontrolled
+WHERE
+header='MARCA' AND product='DIARIO' AND operationdate=dat('20080928')
+MINUS
+(
+SELECT  newsstand
+FROM fn3printingdetail
+WHERE
+dateprint=dat('20080928') and
+header='MARCA' AND product='DIARIO')
+

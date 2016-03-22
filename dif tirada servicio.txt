@@ -1,0 +1,21 @@
+
+select ope.operationdate,ope.newsstand,
+         SUM(ROUND(decision + increaseDec)) as TOTAL_TIRADA,service as servido,
+         return as devol
+from fn3printingdetail pri, fn3operation ope
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  ='CAM'   and
+      pri.newsstand = ope.newsstand and
+      ope.header='MARCA' and
+      ope.product='DIARIO' and
+--      service=0 and
+      pri.orderf = 1               and
+      pri.dateprint = to_date('20100427', 'YYYYMMDD') and
+      pri.dateprint=ope.operationdate
+      having  (SUM(ROUND(decision + increaseDec))-service)>1
+group by ope.operationdate,ope.newsstand,service,return;
+
+
+
+

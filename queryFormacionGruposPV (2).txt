@@ -1,0 +1,47 @@
+
+
+
+select op.newsstand,avg(service+incidence-return),substr(fathernode,1,6)
+from fn3operation op,fn3node nod
+where 
+nod.newsstand=op.newsstand and
+operationdate>to_date('2004/01/01','yyyy/mm/dd')
+and substr(newsstand,1,3) in
+('006','010','011','021','029','041','052','014','023','004','018','028')
+group by op.newsstand,substr(fathernode,1,6)
+;
+
+
+--Creo los grupos
+
+insert into fn3newsstandgroupdefinition
+select distinct('Delegacion'||delegate),('PV delegación'||delegate)
+from fn3codification
+where
+substr(newsstand,1,3) in
+('006','010','011','021','029','041','052','014','023','004','018','028');
+
+
+--Relleno los  grupos
+
+insert into fn3newsstandgroup
+select 'Delegacion'||delegate,op.newsstand
+--,avg(service+incidence-return),delegate
+from fn3operation op,fn3codification nod
+where 
+nod.newsstand=op.newsstand and
+operationdate>to_date('2004/01/01','yyyy/mm/dd')
+and substr(op.newsstand,1,3) in
+('006','010','011','021','029','041','052','014','023','004','018','028')
+group by op.newsstand,delegate
+;
+
+
+--Creo los grupos de PV con poca venta
+
+insert into fn3newsstandgroupdefinition
+select distinct('Del'||substr(delegate,1,3)||'PVVentaBaja'),('PV delegación '||delegate)
+from fn3codification
+where
+substr(newsstand,1,3) in
+('006','010','011','021','029','041','052','014','023','004','018','028');

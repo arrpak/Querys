@@ -1,0 +1,13 @@
+
+
+select operationdate,sum(service+incidence-return)
+from fn3operation
+where operationdate>sysdate-400
+and newsstand in
+(select newsstand
+from fn3newsstandgroup
+where newsstandgroup='CastroUrdiales')
+group by operationdate
+
+
+

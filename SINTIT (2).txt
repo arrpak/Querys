@@ -1,0 +1,51 @@
+   select newon.newsstand
+   from fn3newsstandon newon,fn3node nod
+   where
+(dateoff is null or
+ dateoff >=to_date('20041201','yyyymmdd') )
+and dateon<=to_date('20041201','yyyymmdd')
+and newon.newsstand=nod.newsstand
+and fathernode like 'EXT%' and
+header='MARCA' and product='DIARIO';
+
+
+
+
+
+select ope.newsstand
+from fn3operation ope,fn3node nod
+where
+ope.header='MARCA' and 
+ope.product='DIARIO' and
+nod.header='MARCA' and 
+nod.product='DIARIO' and
+nod.newsstand=ope.newsstand and
+operationdate=to_date('20041201','yyyymmdd') and
+fathernode like 'EXT%' and
+service>0;
+
+
+
+select newon.newsstand
+from fn3newsstandon newon,fn3node nod
+where
+(dateoff is null or
+ dateoff >=to_date('20041201','yyyymmdd') )
+and dateon<=to_date('20041201','yyyymmdd')
+and newon.newsstand=nod.newsstand
+and fathernode like 'EXT%' and
+header='MARCA' and product='DIARIO'
+minus
+(
+select ope.newsstand
+from fn3operation ope,fn3node nod
+where
+ope.header='MARCA' and 
+ope.product='DIARIO' and
+nod.header='MARCA' and 
+nod.product='DIARIO' and
+nod.newsstand=ope.newsstand and
+operationdate=to_date('20041201','yyyymmdd') and
+fathernode like 'EXT%' and
+service>0);
+

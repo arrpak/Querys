@@ -1,0 +1,14 @@
+SELECT operationdate,Count(*),Sum(Service+incidence) AS serv,
+                              Sum(service+incidence-RETURN) AS venta,
+                              Sum(Decode(RETURN,0,1,0)) AS ago,
+                              Sum(RETURN)/Sum(service+incidence) AS pordev,
+                              Sum(Decode(RETURN,0,1,0))/Count(*) AS porago
+FROM fn3operation
+WHERE header='MARCA' AND product='DIARIO'
+AND operationdate > SYSDATE-30
+AND newsstand IN
+(
+SELECT code
+FROM fn3newsstand
+WHERE town='ALCORCON')
+GROUP BY operationdate

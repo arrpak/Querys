@@ -1,0 +1,94 @@
+insert into
+fn3substitution
+select substr(output,11,12),substr(input,6,12),null,null
+  from fn3estimationinput
+  where estsession='20040223.SUST.PV'
+ and input like 'Sust%' and
+ factor=1 and
+ value>0.05 and 
+output in
+(
+  select output
+  from fn3estimationinput
+  where estsession='20040223.SUST.PV'
+ and input like 'Sust%' and
+ factor=1 and
+ value>0.05 and 
+output in
+ (select output  from fn3estimation
+   where estsession='20040223.SUST.PV' and estpower=0)
+and substr(output,11,3)='006'
+having count(*)<=5
+group by output
+);
+
+
+
+
+
+
+
+
+  select output,count(*)
+  from fn3estimationinput
+  where estsession='20040223.SUST.PV'
+ and input like 'Sust%' and
+ factor=1 and
+ value>0.5 and 
+output in
+ (select output
+ from fn3estimation
+   where estsession='20040223.SUST.PV' and estpower=1)
+and substr(output,11,3)='006'
+having count(*)<=5
+  group by output
+order by count(*);
+
+
+
+
+
+
+
+
+
+select substr(output,1,20),input,value
+  from fn3estimationinput
+  where estsession='20040223.SUST.PV'
+ and input like 'Sust%' and
+ factor=1 and
+-- value>0.1 and 
+output ='VentaMarca006001400026';
+
+
+
+
+
+
+
+insert into fn3substitutionaux
+select *
+from fn3substitution
+where newsstand>'010' and newsstand<'011';
+
+
+
+
+insert into fn3substitution
+select *
+from fn3substitutionaux
+where newsstand||subst
+not in
+(
+select newsstand||subst
+from fn3substitution);
+
+
+
+
+
+
+
+
+
+

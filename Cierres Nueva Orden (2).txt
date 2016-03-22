@@ -1,0 +1,14 @@
+
+set pagesize 50000;
+--spool c:\qq.txt;
+select clo.newsstand,datefrom,dateuntil
+from  fn3closingfixed clo,
+(select newsstand
+from fn3newsstandon
+where dateoff is null) newon
+where 
+dateuntil>sysdate+500 and 
+substr(clo.newsstand,1,3)='028' and
+clo.newsstand=newon.newsstand
+;
+

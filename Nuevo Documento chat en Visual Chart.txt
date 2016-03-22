@@ -1,0 +1,53 @@
+set pagesize 3000;
+set colsep '|';
+select newsstand,count(*)
+from
+(select newsstand,
+operationdate,
+service+incidence as ser,
+return as dev,
+service+incidence-return as ven
+from fn3operation
+where header='MARCA' and
+product='DIARIO' and
+service+incidence-return>10 and
+return=0 AND
+substr(newsstand,1,3)='028' and
+newsstand='028103600624' and
+operationdate>To_date('20030501','yyyymmdd')
+union
+select newsstand,
+operationdate,
+service+incidence as ser,
+return as dev,
+service+incidence-return as ven
+from fn3operationnotcontrolled
+where header='MARCA' and
+product='DIARIO' and
+service+incidence-return>15 and
+return=0 AND
+substr(newsstand,1,3)='028' and
+operationdate>To_date('20030501','yyyymmdd')) ope
+where
+ope.dev=0
+group by newsstand
+order by count(*);
+
+
+
+
+
+set pagesize 3000;
+set colsep '|';
+select newsstand,count(*)
+from fn3operation
+where header='MARCA' and
+product='DIARIO' and
+service+incidence-return>10 and
+return=0 AND
+substr(newsstand,1,3)='028' and
+operationdate>To_date('20030501','yyyymmdd')
+group by newsstand
+order by count(*);
+
+

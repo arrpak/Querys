@@ -1,0 +1,38 @@
+029000508240
+
+
+
+
+
+
+
+select *
+ from fn3outputdating
+where output='VentaMarca029000508240'
+
+
+
+
+update fn3outputdating
+set orderf=-10
+where output='VentaMarca029000508240'
+and dating='CtC.D';
+
+update fn3outputdating
+set orderf=1
+where output='VentaMarca029000504460'
+and dating='Diario';
+
+
+
+
+
+insert into fn3outputdating
+select output,'Diario',1,iniest,endest,arima,power,translation,timesetomit
+from fn3outputdating
+where output='VentaMarca029000508240' and dating='CtC.D';
+
+
+
+insert into fn3servicefixed
+select 	 'MARCA','DIARIO','004001101032','SUN',sysdate,sysdate+22,1 from dual

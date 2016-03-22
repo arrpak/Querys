@@ -1,0 +1,48 @@
+
+insert into fn3forecast
+select 'EXPANSION.CAM.20021003.01.DT.PV',output,dating,inidate,enddate,inifordate,fordate,
+        origdate,estsession,state,stateinfo,error,description
+from fn3forecast
+where forsession='EXPANSION.CAM.20020925.01.DT.PV';
+
+
+--Inserta la misma prevision para los demas dias
+insert into fn3forecastseries
+select 'EXPANSION.CAM.20021003.01.DT.PV',output,dating,to_date('20021003','yyyymmdd'),
+       forecast,variance,decision,filter,noise,forcens,used,closed
+from fn3forecastseries
+where forsession='EXPANSION.CAM.20020925.01.DT.PV'
+and valuedate=to_date('20020925','yyyymmdd');
+
+
+
+insert into fn3printingdetail
+select header,product,node,to_date('20021003','yyyymmdd'),orderf,
+       newsstand,forsession,decision,increasedec
+from fn3printingdetail
+where header='EXPANSION' and
+      product='DIARIO' and
+      dateprint=to_date('20020925','yyyymmdd') and
+      orderf=1;
+
+
+/*
+update fn3printingdetail
+set
+forsession ='EXPANSION.CAM.20020415.01.DT.PV'
+where header='EXPANSION' AND
+PRODUCT='DIARIO' AND
+NODE='CAM' AND
+ORDERF=1 AND
+DATEPRINT=to_date('20020416','yyyymmdd');
+*/
+
+
+insert into fn3printingnodeforsession
+select header,product,node,to_date('20021003','yyyymmdd'),orderf,
+       sonnode,'EXPANSION.CAM.20021003.01.DT.PV'
+from fn3printingnodeforsession
+where header='EXPANSION' AND
+      product='DIARIO'  and
+      dateprint=to_date('20020925','yyyymmdd') and
+      orderf=1;

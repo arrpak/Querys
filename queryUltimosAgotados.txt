@@ -1,0 +1,11 @@
+SELECT newsstand,Count(*)
+FROM fn3operation
+WHERE
+header='MARCA' AND product='DIARIO'
+AND operationdate>SYSDATE-15
+AND RETURN=0
+GROUP BY newsstand
+ORDER BY 2 desc
+
+
+fn5nodeinformation

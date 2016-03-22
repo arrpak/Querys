@@ -1,0 +1,33 @@
+SELECT *
+FROM ezcestimationinput
+WHERE
+estsession='e20100919Com.01' AND
+(input  LIKE 'GrandesDirectoresDelCine2009%'
+or input like 'LibroGrandesObrasArte2009%'
+or input like 'DVDDomingoCine2010%'
+or input like 'FuentesDeHorno2010	%'
+or input like 'TvOki19HD2010%'
+or input like 'Tupperware2010%'
+or input like 'DVDClasicosPremiados2010%'
+or input like 'MiniTDT2010%'
+or input like 'SintonizadorTDTUSB2010%'
+or input like 'MovilVodafoneSonyEricssonAino2010%'
+or input like 'DVDHitchcock2010%'
+or input like 'GafasSolSunPlanet2010%'
+or input like 'AspiradorInteligente2010%'
+or input like 'CuentosBiblia2010%'
+or input like 'ImpresoraHPSinCables2010%'
+or input like 'DVDCronicasIIGM2010%'
+or input like 'GrillMultifuncion2010%'
+or input like 'RobotCocinaMyCook2010%'
+or input like 'TVLed19Belson2010%'
+or input like 'MochilaEspana2010%'
+or input like 'BanderaEspana2010%'
+or input like 'DVDClasicosCineSuspense2010%'
+or input like 'DVDDomingoCineII2010	%'
+or input like 'RevistaEstilo2010%'
+or input like 'VideoCamara2010%'
+or input like 'ManosLibresBluetoothMP32010%'
+);
+
+

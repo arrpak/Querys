@@ -1,0 +1,14 @@
+CREATE OR REPLACE FUNCTION f1 (newst IN VARCHAR2)
+RETURN NUMBER AS
+contador  NUMBER ;
+BEGIN
+ SELECT Count(*) INTO contador
+ FROM fn3newsstandon
+ WHERE newsstand = newst;
+ RETURN(contador);
+END;
+
+
+
+ SELECT f1('028000100004')
+ FROM dual;

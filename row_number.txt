@@ -1,0 +1,30 @@
+
+  select e1.numEq as NumEqLoc, e2.numEq as NumEqVis,
+         case when neutral = 'N' then 0 else 1 end as Neutral,
+         golesLocal, golesVisitante,
+         nvl(penaltiesLocal, 0) as PenLoc,
+         nvl(penaltiesVisitante, 0) as PenVis
+  from  FN3PARTIDOFUTBOL pf,
+        (
+          select codigo, row_number() over (order by codigo) numEq,
+                 fuerzainicial
+          from fn3equipofutbol
+          where  tipoequipo = 'CLB'
+          order by codigo
+        ) e1,
+        (
+          select codigo, row_number() over (order by codigo) numEq,
+                 fuerzainicial
+          from fn3equipofutbol
+          where  tipoequipo = 'CLB'
+          order by codigo
+        ) e2
+  where pf.competicion != 'AMISTOSO' and
+        pf.fechapartido >= to_date('1993/01/02', 'YYYY/MM/DD') and
+        pf.fechapartido <= to_date('1999/02/01', 'YYYY/MM/DD') and
+        pf.equipolocal = e1.codigo and
+        pf.equipovisitante = e2.codigo and
+        pf.golesLocal is not NULL and
+        pf.golesVisitante is not NULL and
+        pf.valido       = 'S'
+  order by fechapartido

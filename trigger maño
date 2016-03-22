@@ -1,0 +1,23 @@
+SELECT *
+FROM tablas_modif ORDER BY ultima_modif DESC
+
+
+DECLARE
+  CURSOR c IS
+    SELECT *
+    FROM   all_triggers
+    WHERE  status = 'ENABLED'
+      AND  owner = 'FORMARCA';
+
+  v_qry VARCHAR2(20000);
+BEGIN
+  FOR i IN c LOOP
+    v_qry := 'alter trigger '|| i.trigger_name ||' disable ';
+    --Dbms_Output.Put_Line(v_qry);
+    EXECUTE IMMEDIATE v_qry;
+  END LOOP;
+END;
+
+
+
+

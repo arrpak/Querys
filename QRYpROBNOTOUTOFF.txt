@@ -1,0 +1,78 @@
+
+ select substr(output,11,3),max(probdate),probnotoutoff
+from fn3probnotoutoff
+group by substr(output,11,3),probnotoutoff;
+
+
+
+
+
+
+ select substr(output,11,12),probdate,probnotoutoff
+from fn3probnotoutoff
+where
+output like 'VentaMarca041%' and
+probdate>=to_date('20041014','yyyymmdd');
+
+
+
+
+
+group by substr(output,11,3),probnotoutoff;
+
+
+
+
+
+
+
+
+
+
+insert into fn3probnotoutoff
+select distinct(output),to_date('20050405','yyyymmdd'),0.87
+from
+(select output,max(probdate),probnotoutoff
+from fn3probnotoutoff
+where
+--probdate>=to_date('20041014','yyyymmdd') and
+(
+output like 'VentaMarca041%' or
+output like 'VentaMarca011%' or
+output like 'VentaMarca021%' or
+output like 'VentaMarca014%' or
+output like 'VentaMarca004%' or
+output like 'VentaMarca023%' or
+output like 'VentaMarca029%' or 
+output like 'VentaMarca052%' or 
+output like 'VentaMarca006%' or 
+output like 'VentaMarca010%' or 
+output like 'VentaMarca028%' or 
+output like 'VentaMarca018%' 
+)
+group by output,probnotoutoff)
+;
+------------------
+------------------
+update
+fn3probnotoutoff
+set probnotoutoff=0.96
+where substr(output,11,12) in
+(select newsstand
+from fn3node
+where fathernode='CAMCAP') and
+probdate=to_date('20050405','yyyymmdd');
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+SELECT t1.fecha,t1.fuerza,t2.fuerza
+FROM fn3fuerzaequipoprue t1,fn3fuerzaequipo t2
+WHERE t1.equipo='RMA' AND t2.equipo='RMA'
+AND t1.equipo=t2.equipo
+AND t1.fecha=t2.fecha

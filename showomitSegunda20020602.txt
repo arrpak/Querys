@@ -1,0 +1,43 @@
+spool c:\showomit20020602.txt
+select 
+    tirada.header, 
+    tirada.product, 
+    tirada.newsStand, 
+    tirada.datePrint, 
+    round(tabMedDes.media, 4)                   as media, 
+    round(tabMedDes.desviacion, 4)               as desviacion, 
+    round(tirada.decision+tirada.increaseDec, 4) as decision, 
+    round((tabMedDes.media * (1 + 0.24)), 4) as propuesta 
+ from FN3PRINTINGDETAIL tirada, 
+ ( 
+ select header, 
+        product, 
+        newsStand, 
+        avg(service + incidence - return)            as media, 
+       greatest(stddev(service+incidence-return), 2) as desviacion 
+ from FN3OPERATION
+ where  header         = 'MARCA'              and 
+        product        = 'DIARIO'              and 
+        operationDate <  to_date('20020602', 'yyyymmdd')  and 
+        operationDate >=  to_date('20020602', 'yyyymmdd')  - (7*(6)) and 
+        operationDate !=  to_date('20020328', 'yyyymmdd')  and   
+        operationDate !=  to_date('20020516', 'yyyymmdd')  and 
+      to_char(operationDate, 'DY') = to_char( to_date('20020602', 'yyyymmdd') ,'DY') and 
+        service + incidence - return > 0 
+ group  by header, product, newsStand 
+ ) tabMedDes 
+ where tirada.header    = tabMedDes.header           and 
+       tirada.product   = 'SEGUNDA'                  and 
+--       tirada.newsstand='028109802058' and
+       tirada.node      = 'CAM'              and 
+       tirada.datePrint =  to_date('20020602', 'yyyymmdd')               and 
+       tirada.orderF    = '6' and 
+       tirada.newsStand = tabMedDes.newsStand        and 
+       tirada.decision   != 0                  
+      and 
+       (tirada.decision   < 0                              or 
+        tirada.decision > tabMedDes.media * (1 + 0.40) + 2 * tabMedDes.desviacion or
+        tirada.decision < tabMedDes.media * (1 + 0.40) - 2 * tabMedDes.desviacion or
+        abs(round(tirada.decision+tirada.increaseDec, 4)-round((tabMedDes.media * (1 + 0.24)), 4))>40)
+ order by decision - propuesta desc;
+spool off;

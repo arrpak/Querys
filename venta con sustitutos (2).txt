@@ -1,0 +1,72 @@
+SELECT t1.newsstand,t1.dateprint,t1.decision+increasedec,t2.forsession
+from
+(SELECT header,product,node,dateprint,orderf,newsstand,forsession,decision,increasedec,decsession,decsys
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND product='DIARIO'
+AND node='CAM'
+AND dateprint=dat('20080731')) t1,
+(SELECT DISTINCT(forsession)
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND product='DIARIO'
+AND forsession LIKE '2008%'
+AND node='CAM'
+AND dateprint=dat('20080731')) t2
+WHERE
+t1.newsstand=t2.newsstand
+
+
+
+SELECT 'VentaMarca'||t1.newsstand,'VentaMarca'||subst,t3.forecast
+FROM fn3substitution t1,fn3newsstandon t2,fn3forecastseries t3
+where t1.newsstand LIKE '028%'
+AND t3.forsession='2008073006.PV'
+AND t3.valuedate=dat('20080731')
+AND t2.dateoff IS NULL
+AND t1.newsstand=t2.newsstand
+AND 'VentaMarca'||t1.newsstand=t3.output
+
+
+(SELECT newsstand
+FROM fn3substitution
+WHERE
+'VentaMarca'||subst
+IN
+(SELECT output
+from
+(
+SELECT DISTINCT(output) AS output,valuedate,closed
+FROM fn3forecastseries
+where
+forsession='2008073006.PV'
+AND closed='Y'
+AND valuedate=dat('20080731')))
+)
+
+
+
+
+
+
+delete fn3printingdetail
+where dateprint=dat('20080804')
+and newsstand in
+(
+'028107625748',
+'028101625739',
+'028106425742',
+'028001125746',
+'028106225745',
+'028105425755',
+'028001625738',
+'028001424152',
+'028102025404',
+'028201125741');
+
+
+
+
+
+
+

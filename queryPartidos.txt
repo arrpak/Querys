@@ -1,0 +1,21 @@
+spool c:\part
+set linesize 250;
+set colsep '|';
+set pagesize 20000;
+select COMPETICION,categoria,temporada,fase,jornada,fechapartido,
+neutral,valido,local.descripcion,visi.descripcion,goleslocal,golesvisitante,
+penaltieslocal,penaltiesvisitante,loc.descripcion,vis.descripcion
+from fn3partidofutbol,fn3equipofutbol local,fn3equipofutbol visi,fn3nacion loc,fn3nacion vis
+where local.codigo=equipolocal and
+      visi.codigo=equipovisitante and
+      loc.codigo = local.nacion and
+      vis.codigo = visi.nacion
+       ;
+
+
+
+
+select COMPETICION,categoria,temporada,fase,jornada,fechapartido,
+neutral,valido,equipolocal,equipovisitante,goleslocal,golesvisitante,
+penaltieslocal,penaltiesvisitante
+from fn3partidofutbol;

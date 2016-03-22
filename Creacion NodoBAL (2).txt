@@ -1,0 +1,21 @@
+insert into fn3nodesaleadvance
+select 'MARCA','DIARIO','BAL',
+       t1.saledate,
+       to_date('20020308','yyyymmdd'),
+       sum(t1.service)+sum(t2.service)+sum(t3.service),
+       sum(t1.return)+sum(t2.return)+sum(t3.return),
+       sum(t1.sale)+sum(t2.sale)+sum(t3.sale)
+from fn3nodesaleadvance t1 ,fn3nodesaleadvance t2,
+     fn3nodesaleadvance t3
+where t1.node='BALMEN' and
+      t2.node='BALIBI' and
+      t3.node='BALMLL' and  
+      t1.saledate<to_date('20020101','yyyymmdd') and
+      t1.saledate=t2.saledate     and 
+      t2.saledate=t3.saledate     
+group by t1.node,t2.node,t1.saledate,t2.saledate,
+         t3.node,t3.saledate;
+
+select node,saledate,service
+from fn3nodesaleadvance
+where node='LEV';

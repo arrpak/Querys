@@ -1,0 +1,275 @@
+
+PUNTOS QUE RECIBIMOS DATOS Y ESTAN NO OPERATIVOS
+-------------------------------------------------
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(
+newsstand like '028%')
+and operationdate=to_date('20060926','yyyymmdd')
+union
+select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(
+newsstand like '028%')
+and operationdate=to_date('20060926','yyyymmdd'))
+minus
+(select newsstand
+from fn3newsstandon
+where dateoff is null);
+
+PUNTOS CERRADOS A LOS QUE SEGUIMOS MANDANDO SERVICIOS
+-----------------------------------------------------
+(select newsstand
+from fn3newsstandon
+where dateoff is null
+AND
+(newsstand like '028%'))
+minus
+select newsstand
+from fn3printingdetail
+where
+header='MARCA' and product='DIARIO' and node='AND'
+and orderf=1
+and dateprint=to_date('20060915','yyyymmdd')
+MINUS
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20060915','yyyymmdd')
+AND SERVICE>0
+union
+(select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20060915','yyyymmdd')
+AND SERVICE>0)
+);
+
+PUNTOS CON SERVICIO Y DE LOS QUE NO RECIBIMOS DATO
+--------------------------------------------------
+select det.newsstand
+from fn3printingdetail det ,fn3newsstandon non
+where det.header='MARCA' and det.product='DIARIO' and
+(det.newsstand like '028%') and
+det.decision>0 and
+det.orderf=1 and
+det.dateprint=to_date('20060926','yyyymmdd')
+and det.newsstand=non.newsstand
+and dateoff is null
+minus
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20060926','yyyymmdd')
+union
+select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20060926','yyyymmdd'));
+
+PUNTOS QUE DEBERIAN HABER LLEVADO SERVICIO Y NO LO LLEVARON
+-----------------------------------------------------------
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '011%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '018%')
+and operationdate=to_date('20060926','yyyymmdd')
+union
+select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '011%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '018%')
+and operationdate=to_date('20060926','yyyymmdd'))
+minus
+(
+select det.newsstand
+from fn3printingdetail det ,fn3newsstandon non
+where det.header='MARCA' and det.product='DIARIO' and
+(det.newsstand like '011%' or
+det.newsstand like '041%' or det.newsstand like '029%' or
+det.newsstand like '021%' or
+det.newsstand like '004%' or det.newsstand like '014%' or
+det.newsstand like '023%' or det.newsstand like '052%' or
+det.newsstand like '018%') and
+det.decision>0 and
+det.orderf=1 and
+det.dateprint=to_date('20060926','yyyymmdd')
+and det.newsstand=non.newsstand(+)
+and dateoff is null);
+
+DIFERENCIAS ENTRE SERVICIO Y DECISION
+-------------------------------------
+select decision.newsstand,servicio.service,decision
+from
+(select newsstand,service,to_number(null)
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20060926','yyyymmdd')
+union
+(select newsstand,service,to_number(null) as decision
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%')
+and operationdate=to_date('20060926','yyyymmdd'))) servicio,
+(select newsstand,to_number(null) as service,
+(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as decision
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+(newsstand like '028%') and
+orderf=1
+and
+dateprint=to_date('20060926','yyyymmdd')) decision
+where
+decision.newsstand=servicio.newsstand(+)
+and (decision=0 or servicio.service=0)
+and not(decision=0 and servicio.service is null)
+--and abs(decision-servicio.service)>0
+;
+
+DETECTA PUNTOS CERRADOS QUE EN REALIDAD NO LO ESTAN
+---------------------------------------------------
+
+select newsstand,datefrom,dateuntil
+from fn3closingfixed
+where dateuntil>sysdate
+and newsstand in
+(select newsstand
+from fn3newsstandon
+where dateoff is null
+and (newsstand like '011%' or newsstand like '010%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or newsstand like '006%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '018%') )
+order by newsstand;
+
+
+PUNTOS QUE LLEVAN CERRADO MUCHO TIEMPO
+--------------------------------------
+
+
+
+SELECT NEWSSTAND,MAX(OPERATIONDATE)
+FROM FN3OPERATION
+WHERE
+HEADER='MARCA' AND PRODUCT='DIARIO' AND
+NEWSSTAND IN
+(
+select det.newsstand
+from fn3printingdetail det ,fn3newsstandon non
+where det.header='MARCA' and det.product='DIARIO' and
+(det.newsstand like '011%' or
+det.newsstand like '041%' or det.newsstand like '029%' or
+det.newsstand like '021%' or
+det.newsstand like '004%' or det.newsstand like '014%' or
+det.newsstand like '006%' or det.newsstand like '010%' or
+det.newsstand like '023%' or det.newsstand like '052%' or
+det.newsstand like '018%') and
+det.decision>0 and
+det.orderf=1 and
+det.dateprint=to_date('20060926','yyyymmdd')
+and det.newsstand=non.newsstand
+and dateoff is null
+minus
+(select newsstand
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '011%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '006%' or newsstand like '010%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '018%')
+and operationdate=to_date('20060926','yyyymmdd')
+union
+select newsstand
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '011%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '006%' or newsstand like '010%' or
+newsstand like '018%')
+and operationdate=to_date('20060926','yyyymmdd')))
+GROUP BY NEWSSTAND
+HAVING Max(OPERATIONDATE)<=To_Date('20080807','YYYYMMDD')
+ORDER BY Max(OPERATIONDATE);
+
+
+
+QUITA SERVICIO A LOS QUE NO LLEVARON LOS DOMINGOS ANTERIORES
+
+--INSERT INTO fn3servicemodified
+SELECT 'MARCA','DIARIO',newsstand,To_Date('20050821','yyyymmdd'),0
+FROM fn3printingdetail
+WHERE
+header='MARCA' AND product='DIARIO'
+AND (node='AND' OR node='EXT')
+AND dateprint=To_Date('20050821','yyyymmdd')
+AND decision>0
+AND newsstand IN
+(
+SELECT newsstand
+FROM fn3newsstandon
+WHERE dateoff IS NULL
+and
+(newsstand like '011%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '006%' or newsstand like '010%' or
+newsstand like '018%')
+MINUS(
+SELECT newsstand
+from
+(SELECT newsstand,Sum(service)
+FROM fn3operation
+WHERE
+operationdate>=To_Date('20050801','yyyymmdd')
+AND To_Char(operationdate,'DY')='DOM'
+and
+(newsstand like '011%' or
+newsstand like '041%' or newsstand like '029%' or
+newsstand like '021%' or
+newsstand like '004%' or newsstand like '014%' or
+newsstand like '023%' or newsstand like '052%' or
+newsstand like '006%' or newsstand like '010%' or
+newsstand like '018%')
+HAVING Sum(service)>0
+GROUP BY newsstand)));

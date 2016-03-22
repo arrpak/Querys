@@ -1,0 +1,41 @@
+select 'VentaMarcaAsCAMCAP',fecha,sum(valor)
+from fn2seriestmp
+where (nombre='VentaMarcaCAMCAP' or
+      nombre='VentaAsCAMCAP')
+and fecha>to_date('19990830','yyyymmdd')
+group by fecha;
+
+------------------------------------------------------------------------------
+select 'VentaMarcaCAMCAP',fechaventa,venta
+from fn2avanceventaglobal
+where cabecera='MARCA' and
+            producto='DIARIO' and
+            nodo='CAMCAP' and
+            fechaventa >to_date('19990830','yyyymmdd')
+----------------------------------------------------------------------------
+
+select 'VentaMarcaAsCAMCAP',fechaventa,venta+valor
+from fn2avanceventaglobal,fn2seriestmp
+where cabecera='MARCA' and
+            producto='DIARIO' and
+            nodo='CAMCAP' and
+            fechaventa >to_date('19990830','yyyymmdd') and
+           nombre='VentaAsCAMCAP'
+
+
+
+
+
+
+
+
+
+
+select count(*)
+from fn2seriestmp
+where nombre='VentaMarcaAsCAMCAP';
+
+
+select min(fecha)
+from fn2seriestmp
+where nombre='VentaAsCAMCAP' 

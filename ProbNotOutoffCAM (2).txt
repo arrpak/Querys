@@ -1,0 +1,204 @@
+select newsstand,avg(service-return)
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+substr(newsstand,1,3)='028'and
+operationdate>sysdate-45
+group by newsstand;
+
+
+
+
+
+set linesize 150;
+
+
+INSERT INTO FN3PROBNOTOUTOFF
+select output,to_date('20040223','yyyymmdd'),0.86          
+from fn3probnotoutoff
+where 
+probdate=to_date('20040223','yyyymmdd') and
+output in
+(
+select 'VentaMarca'||newsstand
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+substr(newsstand,1,3)='028'and
+operationdate>sysdate-45 
+having 
+avg(service-return)>38 AND avg(service-return)<=48
+group by newsstand)
+;
+
+-----------------------
+------------------------
+------------------------
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.86          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>62 AND avg(service-return)<=602
+ group by newsstand
+ ;
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.87          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>49 AND avg(service-return)<=62
+ group by newsstand
+ ;
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.88          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>38 AND avg(service-return)<=49
+ group by newsstand
+ ;
+
+
+
+
+  INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.88          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>32 AND avg(service-return)<=38
+ group by newsstand
+ ;
+
+
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.89          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>26 AND avg(service-return)<=32
+ group by newsstand
+ ;
+
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.89          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>26 AND avg(service-return)<=32
+ group by newsstand
+ ;
+
+
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.9          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>22 AND avg(service-return)<=26
+ group by newsstand
+ ;
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.9          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>18.3 AND avg(service-return)<=22
+ group by newsstand
+ ;
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.91         
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>18.3 AND avg(service-return)<=22
+ group by newsstand
+ ;
+
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.91          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>14.8 AND avg(service-return)<=18.3
+ group by newsstand
+ ;
+
+
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.92          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>11.2 AND avg(service-return)<=14.8
+ group by newsstand
+ ;
+
+
+
+ INSERT INTO FN3PROBNOTOUTOFF
+ select 'VentaMarca'||newsstand,to_date('20040223','yyyymmdd'),0.92          
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>0 AND avg(service-return)<=11.2
+ group by newsstand
+ ;
+---------------------------------
+---------------------------------
+
+
+
+ select distinct('VentaMarca'||newsstand )
+ from fn3operation
+ where header='MARCA' and product='DIARIO' and
+ substr(newsstand,1,3)='028'and
+ operationdate>sysdate-45 
+ having 
+ avg(service-return)>0 AND avg(service-return)<=11.2
+group by newsstand
+  ;
+
+
+

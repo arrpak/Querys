@@ -1,0 +1,78 @@
+* La tabla fseriesused guarda para cada dia la fecha, punto,previsin,decision y forsession,
+se rellena con el proceso: UPDATEPRIFORUSED.
+
+SELECT * FROM ERRORPREVPPV;
+
+La tabla ERRORPREVPPV
+
+
+
+
+
+--INSERT INTO errorprevppv
+CREATE view errorprevppv
+as
+SELECT '1' AS OPERACION,t1.newsstand,forsession,valuedate,t3.fathernode,servicio,devolucion,venta,forecast,Round(decision) AS Decision,
+       CASE WHEN forecast<venta THEN forecast-venta ELSE 0 END AS ErrorPVNeg,
+       CASE WHEN forecast>=venta THEN forecast-venta ELSE 0 END AS ErrorPVPos,
+       CASE WHEN Round(decision)-venta<0 THEN 1 ELSE 0 END AS AgoFNUsada,
+       (CASE WHEN Round(decision)-venta=0 THEN 1 ELSE 0 END)*(case WHEN servicio>0 THEN 1 ELSE 0 END ) AS AgoFNOKUsada,
+       CASE WHEN Round(decision)<=venta THEN 1 ELSE 0 END AS AgoFNFSeries,
+       CASE WHEN Round(decision)<=venta THEN venta-Round(decision) ELSE 0 END AS VentaPerdida,
+       CASE WHEN Round(decision)>venta THEN Round(decision)-Venta ELSE 0 END AS DevFNSeries,
+        case
+       when (servicio-devolucion) <= 002 then '[000 - 002]'
+       when (servicio-devolucion) <= 005 then '[003 - 005]'
+       when (servicio-devolucion) <= 010 then '[006 - 010]'
+       when (servicio-devolucion) <= 015 then '[011 - 015]'
+       when (servicio-devolucion) <= 020 then '[016 - 030]'
+       when (servicio-devolucion) <= 050 then '[031 - 050]'
+       when (servicio-devolucion) <= 100 then '[051 - 100]'
+       else '[101 - INF]' end  as Tramo,psi.issue,
+              ceil(nvl((Case when (Round(decision)-Venta) > 0 then 1 else 0
+end)*(1-least(Servicio-Venta, 1))*psi.issue, 0)) as AusServReal,
+CASE WHEN devolucion=0 THEN 1 ELSE 0 END AS AgoReal
+from
+(SELECT newsstand,operationdate AS fecha,service+incidence AS servicio,RETURN AS Devolucion,
+service+incidence-RETURN AS venta
+from fn3operation
+WHERE
+header='MARCA' AND product='DIARIO'
+AND operationdate>To_Date('20090101') ) t1,fseriesused,fn3parallelsegmentissue psi,
+(SELECT newsstand,fathernode
+FROM fn3node
+WHERE
+header='MARCA' AND product='DIARIO') t3
+WHERE
+t1.newsstand=fseriesused.newsstand
+AND fseriesused.newsstand=t3.newsstand
+AND t1.fecha=fseriesused.valuedate
+AND         case
+       when (servicio-devolucion) <= 002 then '[000 - 002]'
+       when (servicio-devolucion) <= 005 then '[003 - 005]'
+       when (servicio-devolucion) <= 010 then '[006 - 010]'
+       when (servicio-devolucion) <= 015 then '[011 - 015]'
+       when (servicio-devolucion) <= 020 then '[016 - 030]'
+       when (servicio-devolucion) <= 050 then '[031 - 050]'
+       when (servicio-devolucion) <= 100 then '[051 - 100]'
+       else '[101 - INF]' end=SEGMENT
+--AND  ceil(nvl((Case when (Round(decision)-Venta) > 0 then 1 else 0 end)*(1-least(Servicio-Venta, 1))*psi.issue, 0)) >0
+AND fseriesused.valuedate>dat('20090101');
+
+
+--SELECT * FROM errorprevppv
+
+
+
+
+SELECT valuedate,Count(*)
+FROM errorprevppvnew
+GROUP BY valuedate;
+
+
+drop view errorprevppv;
+
+
+select * from errormg;
+
+

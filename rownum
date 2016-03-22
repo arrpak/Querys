@@ -1,0 +1,15 @@
+SELECT rownum,rn,code
+from
+(SELECT ROWNUM AS RN,code
+FROM fn3newsstand
+WHERE ROWNUM<1000
+ORDER BY code)
+
+
+
+SELECT max(rownum) FROM fn3newsstand;
+SELECT Count(*) FROM fn3newsstand;
+
+SELECT max(rownum) FROM fn3estimationseries;
+SELECT Count(*) FROM fn3estimationseries;
+

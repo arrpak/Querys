@@ -1,0 +1,15 @@
+SELECT DISTINCT newsstand
+FROM fn3printingdetail
+WHERE header='EXPANSION' AND product='DIARIO'
+AND dateprint>=dat('20081203')
+AND decision >0
+AND To_Char(dateprint,'dy')<>'sáb'
+MINUS
+(
+SELECT DISTINCT newsstand
+FROM fn3operation
+WHERE header='EXPANSION' AND product='DIARIO'
+AND operationdate>=dat('20081103')
+AND service+incidence-return >0
+AND To_Char(operationdate,'dy')<>'sáb'
+)

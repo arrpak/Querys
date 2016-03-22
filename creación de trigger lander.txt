@@ -1,0 +1,10 @@
+
+PROMPT CREATE OR REPLACE TRIGGER ezcestinpeff_h$no_del_upd
+CREATE OR REPLACE TRIGGER ezcestinpeff_h$no_del_upd
+BEFORE DELETE OR UPDATE ON ezcestimationinputeffect_h
+BEGIN
+  Raise_Application_Error(-20000,'LANDER IBARRA: No se permiten deletes ni updates en la tabla EZcEstimationInputEffect_H');
+END;
+/
+
+

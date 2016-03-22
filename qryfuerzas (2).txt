@@ -1,0 +1,31 @@
+
+SELECT Sum(fuerza),fecha
+FROM fn3fuerzaequipoprue
+--WHERE fecha=To_Date('19920606','yyyymmdd')
+GROUP BY fecha
+
+delete fn3fuerzaequipoprue
+WHERE fecha>To_Date('19920306','yyyymmdd')
+;
+
+INSERT INTO fn3fuerzaequipoprue
+SELECT equ,To_Date('19920308','yyyymmdd'),0
+FROM
+(
+SELECT equipolocal AS equ,goleslocal  AS difgol
+FROM fn3partidofutbol
+WHERE valido='S'
+AND goleslocal-golesvisitante IS NOT null
+UNION all
+SELECT equipovisitante AS equ,golesvisitante AS difgol
+FROM fn3partidofutbol
+WHERE valido='S'
+AND goleslocal-golesvisitante IS NOT NULL)
+GROUP BY equ
+
+
+
+update fn3fuerzaequipoprue
+SET fuerza=0
+WHERE fecha=To_Date('19920306','yyyymmdd')
+

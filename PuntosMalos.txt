@@ -1,0 +1,13 @@
+set head off;
+set pagesize 5000;
+select substr(output,0,40),stddeviation,estpower
+from fn3estimation
+where estsession='20020619_CAM.PV'
+and output in
+(
+select output
+from fn3forecast
+where forsession='2002062230_CAM.PV'
+and stateinfo like '%Noise mal definido%'
+and output like 'VentaMarca028%')
+order by estpower,stddeviation desc;

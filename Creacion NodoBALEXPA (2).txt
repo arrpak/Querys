@@ -1,0 +1,60 @@
+DELETE fn3nodesaleadvance
+WHERE
+NODE='BAL' and
+header='EXPANSION' and 
+product='DIARIO' and
+saledate<to_date('20020101','yyyymmdd');
+-------------------------------------------
+
+DELETE fn3nodesaleadvance
+WHERE
+NODE='LEV' and
+header='EXPANSION' and 
+product='DIARIO' and
+saledate<to_date('20020101','yyyymmdd');
+
+
+-------------------------------------------
+
+insert into fn3nodesaleadvance
+select 'EXPANSION','DIARIO','BAL',
+       t1.saledate,
+       to_date('20021210','yyyymmdd'),
+       sum(t1.service)+sum(t2.service)+sum(t3.service) as ser,
+       sum(t1.return)+sum(t2.return)+sum(t3.return) as ret,
+       sum(t1.sale)+sum(t2.sale)+sum(t3.sale) as sale
+from fn3nodesaleadvance t1 ,fn3nodesaleadvance t2,
+     fn3nodesaleadvance t3
+where t1.node='BALMEN' and
+      t2.node='BALIBI' and
+      t3.node='BALMLL' and  
+      t1.header='EXPANSION' and
+      t1.product='DIARIO' and
+      t1.product=t2.product and
+      t2.product=t3.product and
+      t2.header=t3.header and
+      t1.header=t2.header and
+      t1.saledate<to_date('20020101','yyyymmdd') and
+      t1.saledate=t2.saledate     and 
+      t2.saledate=t3.saledate     
+group by t1.node,t2.node,t1.saledate,t2.saledate,
+         t3.node,t3.saledate;
+
+-------------------------------------------
+insert into fn3nodesaleadvance
+select 'EXPANSION','DIARIO','LEV',
+       t1.saledate,
+       to_date('20021210','yyyymmdd'),
+       sum(t1.service)-sum(t2.service) as ser,
+       sum(t1.return)-sum(t2.return)   as ret,
+       sum(t1.sale)-sum(t2.sale)       as sale
+from fn3nodesaleadvance t1 ,fn3nodesaleadvance t2
+where t1.node='LEVBAL' and
+      t2.node='BAL' and
+      t1.header='EXPANSION' and
+      t1.product='DIARIO' and
+      t1.product=t2.product and
+      t1.header=t2.header and
+      t1.saledate<to_date('20020101','yyyymmdd') and
+      t1.saledate=t2.saledate
+group by t1.node,t2.node,t1.saledate,t2.saledate;

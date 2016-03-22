@@ -1,0 +1,56 @@
+select substr(company,1,30),code,way,substr(province,1,10)
+from fn3newsstand
+where code in
+(
+select newsstand
+from fn3newsstandgroup
+where newsstandgroup='BP');
+
+
+select substr(company,1,20),code,substr(way,1,30),phone,substr(town,1,10)
+from fn3newsstand
+where code in
+(
+select newsstand
+from fn3newsstandgroup
+where newsstandgroup='BP') and province='Madrid'
+order by substr(town,1,30);
+
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+
+
+select sum(return)/sum(service)
+from fn3operation
+where operationdate>=to_Date('20030901','yyyymmdd') and
+newsstand in
+(
+select newsstand
+from fn3newsstandgroup
+where newsstandgroup='BP') and newsstand like '028%' and
+header='MARCA'
+group by operationdate;
+
+
+
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+
+
+select count(*)
+from fn3operation
+where operationdate>=to_Date('20030901','yyyymmdd') and
+--return=0 and
+newsstand in
+(
+select newsstand
+from fn3newsstandgroup
+where newsstandgroup='BP') and newsstand like '028%' and
+header='MARCA'
+group by operationdate;
+
+
+
+

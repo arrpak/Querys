@@ -1,0 +1,25 @@
+  select fecha,sum(servicio+incidencia)
+ from fn2operacion
+  where fecha > to_date('2000/10/19','yyyy/mm/dd')
+ group by fecha
+
+
+
+select fecha,orden,sum(decision+increndecision)
+from fn2detalletirada
+where fecha > to_date('2001/02/27','yyyy/mm/dd')
+group by fecha,orden;
+
+
+
+
+select fecha,orden,utilizada
+from fn2tirada
+where fecha > to_date('2000/10/19','yyyy/mm/dd');
+
+
+
+select dia,sum(decision),sum(incremdecision)
+from opemarca
+where dia > to_date('2000/10/19','yyyy/mm/dd')
+group by dia

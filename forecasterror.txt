@@ -1,0 +1,57 @@
+set pagesize 5000
+set linesize 120
+spool c:\PREV_VENTA_20020918.txt
+insert into fn3forecasterror
+select newsstand,operationdate,service+incidence as ser,service+incidence-return as venta,forecast,substr(forsession,1,40)
+from fn3operation ope,fn3forecastseries fore
+where ope.newsstand like '028%' and
+      ope.operationdate=to_date('20020930','yyyymmdd') and
+      ope.header='MARCA' and 
+      ope.product='DIARIO' and
+      fore.used='Y' and
+      'VentaMarca'||ope.newsstand=output and
+      operationdate=valuedate;
+spool off;
+
+
+create table Fn3ForecastError
+(code 	char(12),
+operationdate	date,
+servicio	float(10),
+venta           float(10),
+forecast	float(10),
+Forsession	char(80),
+constraint      newsstand foreign key(code) references fn3newsstand,
+constraint      newsstand_date primary key(code,operationdate)
+);
+
+drop table Fn3ForecastError;
+
+
+
+insert into fn3forecasterror
+select newsstand,operationdate,service+incidence as ser,service+incidence-return as venta,
+forecast,substr(forsession,1,40)
+from fn3operation ope,fn3forecastseries fore
+where ope.newsstand like '028%' and
+      ope.operationdate>to_date('20021020','yyyymmdd') and
+      ope.operationdate<to_date('20021030','yyyymmdd') and
+      ope.header='MARCA' and 
+      ope.product='DIARIO' and
+      fore.used='Y' and
+      'VentaMarca'||ope.newsstand=output and
+      operationdate=valuedate;
+
+
+
+
+create table Fn3ForecastError
+(code 	char(12),
+operationdate	date,
+service  	float(10),
+sale            float(10),
+forecast	float(10),
+Forsession	 char(80),
+constraint      newsstand foreign key(code) references fn3newsstand,
+constraint      newsstand_date primary key(code,operationdate)
+);

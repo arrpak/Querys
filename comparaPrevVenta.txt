@@ -1,0 +1,55 @@
+select substr(output,11,23) ,valuedate,forecast,decision
+from fn3forecastseries
+where output='VentaMarca028000100002'
+and used='Y'
+and valuedate>to_date('20020801','yyyymmdd');
+
+
+select substr(output,0,23) as output,valuedate,forecast,
+decision,service+incidence-return as Venta
+from fn3forecastseries,fn3operation
+where output='VentaMarca028109002768'
+and used='Y'
+and valuedate>to_date('20020801','yyyymmdd')
+and header='MARCA'
+and product='DIARIO'
+and newsstand=substr(output,11,12) 
+--and 'VentaMarca'||newsstand=substr(output,0,23)
+and valuedate=operationdate;
+
+
+
+
+insert into fn3newsstandgroup
+
+
+
+set head off
+set pagesize 3000
+set colsep '|'
+spool c:\kk.txt
+
+insert into fn3newsstandgroup
+select 'Todos',newsstand
+from fn3newsstandon
+where dateoff is null
+and newsstand like '028%';
+spool off;
+
+
+select substr(output,0,22) as output,valuedate,forecast,
+decision,service+incidence-return as Venta
+from fn3forecastseries,fn3operation
+where used='Y'
+and valuedate=to_date('20020801','yyyymmdd')
+and header='MARCA'
+and product='DIARIO'
+and newsstand like '028%'
+and forecast<service+incidence-return
+and newsstand=substr(output,11,12) 
+--and 'VentaMarca'||newsstand=substr(output,0,23)
+and valuedate=operationdate
+order by service+incidence-return-forecast;
+
+
+

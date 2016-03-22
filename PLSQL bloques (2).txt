@@ -1,0 +1,64 @@
+SELECT SYSDATE FROM dual;
+
+
+declare
+dia  date;
+r DATE;
+begin
+dia:='2010/01/02';
+SELECT DISTINCT infodate INTO r
+FROM fn3nodeinformation
+WHERE infodate='2011/02/02'
+;
+dbms_output.put_line(r);
+END;
+
+
+
+
+
+
+SELECT *
+FROM fn3nodeinformation
+WHERE infodate='&dia'
+
+
+
+
+
+DECLARE
+  CURSOR cpaises
+  IS
+  SELECT Codigo,descripcion
+  FROM fn3nacion;
+  codigo VARCHAR2(3);
+  descripcion  VARCHAR2(25);
+BEGIN
+  OPEN cpaises;
+  FETCH cpaises INTO codigo,descripcion;
+  CLOSE cpaises;
+  dbms_output.put_line(codigo);
+END;
+
+
+
+
+DECLARE
+orden INTEGER;
+codigo varchar(90);
+BEGIN
+FOR REG IN (select codigo,descripcion,rownum as orden from (SELECT codigo,descripcion FROM fn3nacion order by codigo))
+LOOP
+dbms_output.put_line(reg.orden||'    '||reg.descripcion);
+END LOOP;
+END;
+
+
+
+
+
+SELECT TEXT
+FROM all_SOURCE
+WHERE owner='FORMARCA'
+AND TYPE='PROCEDURE' AND NAME='SERVICIOMIN4'
+;

@@ -1,0 +1,32 @@
+
+
+
+
+
+
+select operationdate,newsstand,service as servicio,return as dev
+,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>sysdate-365 and
+newsstand in
+(
+select code
+from fn3newsstand
+where company like '%OPENCOR%'
+and code in
+(select newsstand
+from fn3newsstandon
+where dateoff is null) and province='Madrid');
+
+
+
+
+(
+select code,company,way,num,town
+from fn3newsstand
+where company like '%OPENCOR%'
+and code in
+(select newsstand
+from fn3newsstandon
+where dateoff is null) and province='Madrid');

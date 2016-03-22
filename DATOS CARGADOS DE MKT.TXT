@@ -1,0 +1,42 @@
+SELECT To_Char(fecha,'yyyymm'),Round(Avg(ventas_esti))
+FROM ezcproductoinformacionagregada
+WHERE
+z_geografica = 'Málaga'  AND  PRODUCTO = 'Diario'
+AND fecha > To_Date('20100101','yyyymmdd')
+GROUP BY To_Char(fecha,'yyyymm');
+
+
+SELECT DISTINCT PRODUCTO FROM ezcproductoinformacionagregada;
+
+
+SELECT 'EstadioEf',To_Char(valuedate,'yyyymm'),Round(SUM(issue))
+FROM ezcestimationissue
+WHERE
+--OUTPUT='VentaSevilla'
+estsession='e20110927.NZ.03' AND
+input LIKE  'Estadio%' AND input LIKE  '%Sevilla%'
+GROUP BY 'EstadioEf',To_Char(valuedate,'yyyymm');
+
+
+SELECT DISTINCT INPUT
+FROM ezcestimationissue
+WHERE
+--OUTPUT='VentaSevilla'
+estsession='e20110927.NZ.03' AND
+input LIKE  'Estadio%'
+
+
+SELECT 'EstadioEf',To_Char(valuedate,'yyyymm'),Round(AVG(issue))
+FROM
+(
+SELECT 'EstadioEf',valuedate,(SUM(issue)) AS ISSUE
+FROM ezcestimationissue
+WHERE
+--OUTPUT='VentaSevilla'
+estsession='e20110927.NZ.03' AND
+input LIKE  'Estadio%' AND input  LIKE  '%Sevilla%'
+GROUP BY 'EstadioEf',valuedate
+)
+GROUP BY 'EstadioEf',To_Char(valuedate,'yyyymm');
+
+

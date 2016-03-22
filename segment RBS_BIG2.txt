@@ -1,0 +1,8 @@
+
+set transaction use rollback segment RBS_BIG2;
+
+  delete Fn3FuerzaEquipo_bkp
+  where fecha >= to_date('1996/01/02', 'YYYY/MM/DD') and
+        fecha <= to_date('1996/12/31', 'YYYY/MM/DD');
+commit;
+exit;

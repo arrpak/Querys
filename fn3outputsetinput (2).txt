@@ -1,0 +1,4 @@
+ insert into fn3outputsetinput
+ select 'VentaMarcaNOR',SETINPUT,DATING,AGGREGATED
+ from fn3outputsetinput
+ where output='VentaMarcaNOROES';

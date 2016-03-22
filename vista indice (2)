@@ -1,0 +1,74 @@
+
+CREATE VIEW indice
+as
+SELECT t1.codigo,(t1.tot*t1.dif+t2.tot*t2.dif)/(t1.tot+t2.tot) AS indice
+FROM
+(SELECT t1.codigo,Avg(goleslocal-golesvisitante) AS dif,Count(*)  AS tot
+FROM FN3PARTIDOFUTBOLRSSF2011,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t1,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t2
+WHERE
+goleslocal>=0 and
+equipolocal       =t1.equipo(+) AND
+equipovisitante   =t2.equipo(+) AND
+t1.dominio = t2.dominio AND
+FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio
+--AND t1.codigo='RMA'
+GROUP BY t1.codigo ) t1,
+(SELECT t2.codigo,Avg(golesvisitante-goleslocal) AS dif,Count(*)  AS tot
+FROM FN3PARTIDOFUTBOLRSSF2011,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t1,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t2
+WHERE
+goleslocal>=0 and
+equipolocal       =t1.equipo(+) AND
+equipovisitante   =t2.equipo(+) AND
+t1.dominio = t2.dominio AND
+FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio
+--AND t1.codigo='RMA'
+GROUP BY t2.codigo ) t2
+WHERE t1.codigo=t2.codigo
+ORDER BY 2 DESC;
+
+
+
+
+
+SELECT t1.codigo,(t1.tot*t1.dif+t2.tot*t2.dif)/(t1.tot+t2.tot) AS indice
+FROM
+(SELECT t1.codigo,Avg(goleslocal-golesvisitante+t3.indice) AS dif,Count(*)  AS tot
+FROM FN3PARTIDOFUTBOLRSSF2011,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t1,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t2
+WHERE
+goleslocal>=0 and
+equipolocal       =t1.equipo(+) AND
+equipovisitante   =t2.equipo(+) AND
+t3.codigo=t1.codigo and
+t1.dominio = t2.dominio AND
+FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio
+--AND t1.codigo='RMA'
+GROUP BY t1.codigo ) t1,
+(SELECT t2.codigo,Avg(golesvisitante-goleslocal+t4.indice) AS dif,Count(*)  AS tot
+FROM FN3PARTIDOFUTBOLRSSF2011,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t1,
+(SELECT  equipo,codigo,dominio
+FROM FN3EQUIPOFUTBOLRSSSF2008OK) t2,indice t3,indice t4
+WHERE
+goleslocal>=0 and
+equipolocal       =t1.equipo(+) AND
+equipovisitante   =t2.equipo(+) AND
+t4.codigo=t1.codigo and
+t1.dominio = t2.dominio AND
+FN3PARTIDOFUTBOLRSSF2011.dominio=t1.dominio
+--AND t1.codigo='RMA'
+GROUP BY t2.codigo ) t2
+WHERE t1.codigo=t2.codigo
+ORDER BY 2 DESC;

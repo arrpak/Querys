@@ -1,0 +1,440 @@
+-- TOTALES TIRADA LUNES DIA 11
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+select count(*), sum(decision), sum(increaseDec), sum(decision+increaseDec) as TOTAL
+from   fn3PrintingDetail
+where  datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10;
+-- TOTALES TIRADA MARTES DIA 12
+select count(*), sum(decision), sum(increaseDec), sum(decision+increaseDec) as TOTAL
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021112', 'YYYYMMDD') and
+       orderf    = 1;
+-- TOTALES TIRADA MIERCOLES DIA 13
+select count(*), sum(decision), sum(increaseDec), sum(decision+increaseDec) as TOTAL
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021113', 'YYYYMMDD') and
+       orderf    = 4;
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+
+-- TOTALES TIRADA MIERCOLES DIA 14
+select count(*), sum(decision), sum(increaseDec), sum(decision+increaseDec) as TOTAL
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021114', 'YYYYMMDD') and
+       orderf    = 1;
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+
+-- COMPARACION TIRADA LUNES DIA 11 Y MARTES DIA 12
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+select tabLun.newsStand,
+       tabLun.decision as decLun,
+       tabMar.decision + tabMar.incDec as decMar,
+       tabLun.decision - (tabMar.decision + tabMar.incDec) as difLunMar
+from
+(
+select newsStand, decision
+from   fn3PrintingDetail
+where  datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10
+) tabLun,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021112', 'YYYYMMDD') and
+       orderf    = 1
+) tabMar
+where tabLun.newsStand = tabMar.newsStand and
+      tabLun.decision > (tabMar.decision + tabMar.incDec)
+order by difLunMar;
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+
+
+-- COMPARACION TIRADA LUNES DIA 11 (10) Y MIERCOLES DIA 13 (4)
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+select tabLun.newsStand,
+       substr(tabMie.forSession, 1, 30) as forSes,
+       tabLun.decision + tabLun.incDec as decLun,
+       tabMie.decision + tabMie.incDec as decMie,
+       (tabLun.decision + tabLun.incDec) - (tabMie.decision + tabMie.incDec) as difLunMie
+from
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10 and
+       decision  > 0
+) tabLun,
+(
+select newsStand, forSession, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021113', 'YYYYMMDD') and
+       orderf    = 4 and
+       decision  > 0
+) tabMie
+where tabLun.newsStand = tabMie.newsStand and
+      (tabLun.decision + tabLun.incDec) - (tabMie.decision + tabMie.incDec) > 10 and
+      tabMie.forSession = 'ModificacionServicio'
+order by difLunMie;
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+
+
+
+-- COMPARACION TIRADA LUNES DIA 11 (10) Y JUEVES DIA 14 (1)
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+select --sum((tabLun.decision + tabLun.incDec) - (tabJue.decision + tabJue.incDec))
+       tabLun.newsStand,
+       substr(tabJue.forSession, 1, 30) as forSes,
+       tabLun.decision + tabLun.incDec as decLun,
+       tabJue.decision + tabJue.incDec as decJue,
+       (tabLun.decision + tabLun.incDec) - (tabJue.decision + tabJue.incDec) as difLunJue
+from
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10 and
+       decision  > 0
+) tabLun,
+(
+select newsStand, forSession, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021114', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabJue
+where tabLun.newsStand = tabJue.newsStand and
+      (tabLun.decision + tabLun.incDec) - (tabJue.decision + tabJue.incDec) > 10 --and      tabJue.forSession = 'ModificacionServicio'
+order by difLunJue;
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+
+
+-- COMPARACION TIRADA LUNES DIA 11 (10) Y VIERNES DIA 15 (1)
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+select tabLun.newsStand,
+       substr(tabVie.forSession, 1, 20) as forSes,
+       tabLun.decision + tabLun.incDec as decLun,
+       tabMar.decision + tabMar.incDec as decMar,
+       tabMie.decision + tabMie.incDec as decMie,
+       tabJue.decision + tabJue.incDec as decJue,
+       tabVie.decision + tabVie.incDec as decVie,
+       (tabLun.decision + tabLun.incDec) - (tabVie.decision + tabVie.incDec) as difLunVie--,
+--     (tabJue.decision + tabJue.incDec) - (tabVie.decision + tabVie.incDec) as difJueVie
+from
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10 and
+       decision  > 0
+) tabLun,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021112', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabMar,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021113', 'YYYYMMDD') and
+       orderf    = 4 and
+       decision  > 0
+) tabMie,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021114', 'YYYYMMDD') and
+       orderf    = 2 and
+       decision  > 0
+) tabJue,
+(
+select newsStand, forSession, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021115', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabVie
+where tabLun.newsStand = tabMar.newsStand and
+      tabMar.newsStand = tabMie.newsStand and
+      tabMie.newsStand = tabJue.newsStand and
+      tabJue.newsStand = tabVie.newsStand and
+      (tabLun.decision + tabLun.incDec) - (tabVie.decision + tabVie.incDec) > 10 and
+--    (tabJue.decision + tabJue.incDec) - (tabVie.decision + tabVie.incDec) > 10 and
+      tabVie.forSession != 'ModificacionServicio'
+order by difLunVie;
+select to_char(sysDate, 'YYYYMMDD HH24:Mi:SS') from dual;
+
+
+
+
+
+
+
+
+
+
+
+SELECT substr(input, 1, 30), factor, orderF, value, aggregated, estimated
+FROM   Fn3EstimationInput
+WHERE  estsession='20021105_CAM.PV' AND
+       output='VentaMarca028104400749' AND
+       dating='Diario'
+
+
+SELECT avg(value)
+FROM   Fn3EstimationInput
+WHERE  estsession='20021105_CAM.PV' AND
+       input='IncremPatin' AND
+       value < 1;
+
+
+SELECT avg(value)
+FROM   Fn3Estimation est, Fn3EstimationInput inp
+WHERE  est.estsession = inp.estSession AND
+       est.output     = inp.output     AND
+       est.dating     = inp.dating     AND
+       est.estsession = '20021105_CAM.PV' AND
+       input          = 'IncremPatin' AND
+       estPower       = 1;
+
+delete from fn3ForecastSeries where forSession = '2002111219_TOLBASE_CAM.PV';
+delete from fn3Forecast       where forSession = '2002111219_TOLBASE_CAM.PV';
+commit;
+
+select datePrint, decision, increaseDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       ((datePrint = to_date('20021111', 'YYYYMMDD') and orderf = 10) or
+        (datePrint = to_date('20021112', 'YYYYMMDD') and orderf =  1) or
+        (datePrint = to_date('20021113', 'YYYYMMDD') and orderf =  4)) and
+       newsStand = '028104400749'
+order  by datePrint;
+
+
+select count(*)
+from   fn3servicemodified
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       modifiedDate = to_date('20021113', 'YYYYMMDD');
+
+
+select count(*),
+       sum(prevLun.forecast) as prevLun,
+       sum(prevMar.forecast) as prevMar
+from
+(
+select output, forecast
+--select count(*)
+from   fn3ForecastSeries forSer
+where  forSession = '2002111219_CAM.PV' and
+       valueDate  = to_date('20021113', 'YYYYMMDD') and
+       closed     = 'N'
+) prevLun,
+(
+select output, forecast
+--select count(*)
+from   fn3ForecastSeries forSer
+where  forSession = '2002111320_CAM.PV' and
+       valueDate  = to_date('20021113', 'YYYYMMDD') and
+       closed     = 'N'
+) prevMar
+where  prevLun.output = prevMar.output and
+       prevLun.forecast - prevMar.forecast > 5;
+
+
+select count(*)
+from   fn3ServiceModified serMod, fn3ForecastSeries forSer
+where  header       = 'MARCA' and
+       product      = 'DIARIO' and
+       modifiedDate = to_date('20021113', 'YYYYMMDD') and
+       fore.output  = 'VentaMarca'||newsStand and
+       fore.forSession     = forSer.forSession and
+       fore.output         = forSer.output and
+       fore.dating         = forSer.dating and
+       serMod.modifiedDate = forSer.valueDate;
+
+
+028201202524
+
+
+
+
+-- INSERCION EN MODIFICACION DE SERVICIO DE LOS PV CON SERVICIO EL MIE < EL LUN
+insert into fn3ServiceModified
+select 'MARCA',
+       'DIARIO',
+       tabLun.newsStand,
+       to_date('20021114', 'YYYYMMDD'),
+       tabLun.decision + tabLun.incDec
+from
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10 and
+       decision  > 0
+) tabLun,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021114', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabJue
+where tabLun.newsStand = tabJue.newsStand and
+      (tabLun.decision + tabLun.incDec) - (tabJue.decision + tabJue.incDec) > 10;
+
+
+
+-- PTOS Q SE VAN A CAMBIAR EL SERV Q YA ESTAN EN MODSERV DEL JUE 14
+select tabMod.newsStand 
+from
+(
+select newsStand
+from   fn3ServiceModified
+where  header = 'MARCA' and
+       product = 'DIARIO' and
+       modifiedDate = to_date('20021114', 'YYYYMMDD')
+) tabMod,
+(
+select tabLun.newsStand
+from
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10 and
+       decision  > 0
+) tabLun,
+(
+select newsStand, forSession, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021114', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabJue
+where tabLun.newsStand = tabJue.newsStand and
+      (tabLun.decision + tabLun.incDec) - (tabJue.decision + tabJue.incDec) > 10 
+) tabIns
+where tabMod.newsStand = tabIns.newsStand;
+
+
+
+
+-- INSERCION EN MODIFICACION DE SERVICIO DE LOS PV CON SERVICIO EL VIE < EL JUE
+insert into fn3ServiceModified
+select 'MARCA',
+       'DIARIO',
+       tabLun.newsStand,
+       to_date('20021115', 'YYYYMMDD'),
+       tabJue.decision + tabJue.incDec
+from
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021111', 'YYYYMMDD') and
+       orderf    = 10 and
+       decision  > 0
+) tabLun,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021112', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabMar,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021113', 'YYYYMMDD') and
+       orderf    = 4 and
+       decision  > 0
+) tabMie,
+(
+select newsStand, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021114', 'YYYYMMDD') and
+       orderf    = 2 and
+       decision  > 0
+) tabJue,
+(
+select newsStand, forSession, decision, increaseDec as incDec
+from   fn3PrintingDetail
+where  header  = 'MARCA' and
+       product = 'DIARIO' and
+       node    = 'CAM' and
+       datePrint = to_date('20021115', 'YYYYMMDD') and
+       orderf    = 1 and
+       decision  > 0
+) tabVie
+where tabLun.newsStand = tabMar.newsStand and
+      tabMar.newsStand = tabMie.newsStand and
+      tabMie.newsStand = tabJue.newsStand and
+      tabJue.newsStand = tabVie.newsStand and
+      (tabJue.decision + tabJue.incDec) - (tabVie.decision + tabVie.incDec) > 10 and
+      tabVie.forSession != 'ModificacionServicio'

@@ -1,0 +1,54 @@
+
+
+PROMPT
+PROMPT ******************************************** LOCK ******************************************************************
+
+COLUMN y new_value sid NOPRINT
+SELECT name||'_'||TO_CHAR(sysdate, 'ddmonyy_hh24miss') y FROM v$database;
+
+SPOOL lock_&sid..txt
+
+PROMPT
+PROMPT ******************************************** PARAMETROS CONFIGURADOS
+
+SELECT inst_id, name parametro, DECODE(type,1,'boolean',2,'string',3,'integer') type, value valor
+FROM gv$parameter2
+WHERE name IN ('row_locking','dml_locks','enqueue_resources')
+ORDER BY 2,1;
+
+PROMPT
+PROMPT ******************************************** BLOQUEOS DE USUARIO
+
+SELECT s.inst_id, o.owner||'.'||o.object_name objeto, start_time, t.xidusn, s.sid, s.serial#, s.machine, s.username usuario, s.osuser,
+       DECODE(l.type, 'TM', 'DML', 'UL', 'PL/SQL User Lock', l.type) lock_type,
+       DECODE(lmode,
+  0, 'None',           /* Mon Lock equivalent */
+  1, 'Null',           /* N */
+  2, 'Row-S (SS)',     /* L */
+  3, 'Row-X (SX)',     /* R */
+  4, 'Share',          /* S */
+  5, 'S/Row-X (SSX)',  /* C */
+  6, 'Exclusive',      /* X */
+  TO_CHAR(lmode)) held,
+       DECODE(request,
+  0, 'None',           /* Mon Lock equivalent */
+  1, 'Null',           /* N */
+  2, 'Row-S (SS)',     /* L */
+  3, 'Row-X (SX)',     /* R */
+  4, 'Share',          /* S */
+  5, 'S/Row-X (SSX)',  /* C */
+  6, 'Exclusive',      /* X */
+  TO_CHAR(request)) requested,
+       DECODE(block,
+         0, 'Not Blocking',  /* NOT blocking any other processes */
+  1, 'Blocking',      /* This lock blocks other processes */
+  2, 'Global',        /* This lock is global, so we can't tell */
+  TO_CHAR(block)) blocking_others
+FROM gv$lock l, dba_objects o, gv$session s, gv$transaction t
+WHERE l.type IN ('TM','UL') AND
+      o.object_id(+) = id1 AND
+      s.sid = l.sid AND
+      s.inst_id = l.inst_id AND
+      l.inst_id = t.inst_id AND
+      saddr = ses_addr(+)
+ORDER BY 1,5;

@@ -1,0 +1,136 @@
+Define header='ABC';
+Define promo='LibroEnciclopediaPerro';	  //Sin año
+Define promotype='REGALOS';
+Define node='CAM';
+Define price='9.95';
+Define description='Cada domingo un tomo, primero un 3.95,http://servicios.lasprovincias.es/promociones/imag/perros_micro.swf'
+Define expression='WD(7)'
+Define inidate='20100418';
+Define enddate='20101107';
+Define iniinput='0';
+Define endinput='0';
+Define year='2010';
+
+
+--SELECT * FROM emupromotiontype;
+
+INSERT INTO emupromotion VALUES ('&header','DIARIO','&promo'||'&year','&promotype',&price,'&description');
+--select * from emupromotion where code='&promo'||'&year';
+
+INSERT INTO emupromotionnode VALUES ('&header','DIARIO','&promo'||'&year','&node','&expression',
+                                      To_Date('&inidate','yyyymmdd'),To_Date('&enddate','yyyymmdd'),'&description');
+--select * from emupromotionnode where promotion='&promo'||'&year';
+
+insert into ezcinput values ('&promo'||'&year'||'.ini','SqlProNodCreaPulseIni("&header","DIARIO","&promo'||'&year","&node")','0.1',null,null,null,'Pulso Inicial para la promocion &promo de la cabecera &header',null,null,null,null,null);
+
+insert into ezcinput values ('&promo'||'&year'||'.iv',       'SqlProNodCreaIndInvVenNMTmsPro("&header","DIARIO","&promo'||'&year","&node",Serie OutputOrig2iv, Real &iniinput, Real &endinput)','0.1',null,null,null,'Inverso Venta para la promocion &promo de la cabecera &header',              null,null,null,null,null);
+
+insert into ezcinput values ('&promo'||'&year'||'.ivTen','SqlProNodCreaTendIndInvVenNMTmsPro("&header","DIARIO","&promo'||'&year","&node",Serie OutputOrig2iv, Real &iniinput, Real &endinput)','0.1',null,null,null,'Tendencia del Inverso Venta para la promocion &promo de la cabecera &header',null,null,null,null,null);
+
+
+
+--select * from ezcinput where code like '&promo'||'&year'||'%';
+-- and code like '%2009%';
+
+insert into ezcsetinput values ('&header'||'_'||'&promo'||'&year',1,'Y' ,
+'Promociones'||'&header'||'_'||'&year'
+,'SetInput para los Inputs de la promocion '||'&promo'||' del periódico '||'&header'
+);
+
+--select * from ezcsetinput where code='&header'||'_'||'&promo'||'&year';
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ini' ,null,null,null,null,
+                                     'Y','Pulso Inicial para la promocion &promo de la cabecera &header');
+
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.iv' ,null,null,null,null,
+									  'Y','Inverso Venta para la promocion &promo de la cabecera &header');
+
+insert into ezcinputsetinput values ('&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ivTen' ,null,null,null,null,
+									  'N','Tendencia del Inverso Venta para la promocion &promo de la cabecera &header');
+
+
+
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ini','0.1');
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.iv','0.1');
+
+insert into ezcpromotioninput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year','&promo'||'&year'||'.ivTen','0.1');
+
+
+insert into ezcpromotionsetinput values ('&header','DIARIO','&promo'||'&year','&header'||'_'||'&promo'||'&year' ,'&description'  );
+
+
+
+
+--select * from  ezcinputsetinput where setinput='&header'||'_'||'&promo'||'&year';
+
+
+
+
+
+
+/*
+
+
+
+delete from  ezcpromotionsetinput
+where promotion like '%DVDElViajeDelEmperador2010%';
+
+
+delete
+ezcpromotioninput
+where input  like '%DVDElViajeDelEmperador2010%';
+
+
+
+delete
+ezcinputsetinput
+where input  like  '%DVDElViajeDelEmperador2010%';
+
+
+
+
+delete
+ezcinput
+where code  like  '%DVDElViajeDelEmperador2010%';
+
+
+delete
+from
+EZCPROMOTIONSETINPUTLINKED
+where promotion like  '%DVDElViajeDelEmperador2010%';
+
+
+
+delete
+--select * from
+emupromotionnode
+where promotion  like  '%DVDElViajeDelEmperador2010%';
+
+
+delete
+--select * from
+emupromotion
+where code  like  '%DVDElViajeDelEmperador2010%';
+
+/*
+select *
+from all_constraints
+where constraint_name like '%EZCPROMOSILINKPROMFK%';
+				 */
+
+delete
+from
+emupromotion
+where code  like  'DVDElViajeDelEmperador2010';
+
+select *
+--
+
+
+
+*/
+
+insert into ezcpromotionsetinput values ('ELPAIS','DIARIO','DVDNaturaleza'||'2010','ELPAIS'||'_'||'DVDNaturaleza'||'2010' ,'15 Documentales de David Attenborough para la BBC, el primero doble a 1e http://www.elpais.com/corporativos/elpais/coleccionables/2010/losdesafiosdelatierra/'  )

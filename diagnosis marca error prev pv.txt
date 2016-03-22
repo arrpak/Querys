@@ -1,0 +1,37 @@
+select NEWSSTAND,FORSESSION,FORECAST, 
+VENTA, DECSYS, DECPRINTING, DECPRINTINGINCR, SERV, NODPADRE
+FROM
+(
+SELECT t1.newsstand,t1.forsession,t2.forecast,
+t4.service+t4.incidence-t4.return as venta,round(t2.decision) as decsys,round(t1.decision) as decprinting,
+round(t1.decision+t1.increasedec) decprintingincr,t4.service+t4.incidence as serv,t5.fathernode as nodpadre
+FROM FN3PRINTINGDETAIL T1,FN3FORECASTSERIES T2,FN3PRINTINGNODEFORSESSION  T3,fn3operation t4,fn3node  t5
+WHERE T1.HEADER='MARCA'
+AND T1.PRODUCT='DIARIO'
+AND T1.DATEPRINT>=To_Date('20110804','YYYYMMDD')
+AND T1.DATEPRINT=T2.VALUEDATE
+AND T1.NEWSSTAND=SubStr(T2.OUTPUT,11,12)
+AND T1.DATEPRINT=T3.DATEPRINT
+AND T1.NODE=T3.NODE
+AND T1.HEADER=T3.HEADER AND T1.PRODUCT=T3.PRODUCT
+AND T1.ORDERF=T3.ORDERF AND T3.SONNODE='CAMCAP'
+AND t1.dateprint=t4.operationdate
+AND t1.newsstand=t4.newsstand
+AND t1.header=t4.header
+AND t1.product=t4.product
+AND t1.newsstand=t5.newsstand
+AND t1.header=t5.header
+AND t1.product=t5.product
+AND t5.fathernode IN ('CAMAER','CAMATI','CAMCAP','CAMPER','CAMPERVG','CAMSIE','CAMGAS','CAMVIA','CAMVLR','CAMVIP')
+AND REPLACE(T3.FORSESSION,'.MG','.PV')=T2.FORSESSION)
+
+
+
+
+
+
+
+
+
+
+

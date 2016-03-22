@@ -1,0 +1,131 @@
+--Inserta NP en Forecast
+------------------------
+
+insert into fn3forecast
+select '2002060817.SEG_CAM',output,
+       dating,inidate,enddate,inifordate,fordate,origdate,
+       '20020528_CAM',state,stateinfo,error,description
+from fn3forecast
+where forsession='2002060817_CAM';
+
+--Inserta NP en ForecastSeries
+------------------------------
+
+insert into fn3forecastseries
+select '2002060817.SEG_CAM','VentaMarca'||substr(output,11,21),
+       dating,valuedate,forecast*0.2,variance,
+       decision*0.2,filter,noise,forcens,used,closed
+from fn3forecastseries
+where forsession='2002060817_CAM';
+
+--Inserta PV en Forecast
+------------------------
+
+insert into fn3forecast
+select forsession,'VentaMarcaSegunda'||substr(output,11,21),
+       dating,inidate,enddate,inifordate,fordate,origdate,
+      'FICTICIA',state,stateinfo,error,description
+from fn3forecast
+where forsession='2002062230_CAM.PV';
+
+--Inserta PV en ForecastSeries
+------------------------------
+
+insert into fn3forecastseries
+select forsession,'VentaMarcaSegunda'||substr(output,11,21),
+       dating,valuedate,forecast/6,variance,
+       decision/6,filter,noise,forcens,used,closed
+from fn3forecastseries
+where forsession='2002062230_CAM.PV';
+
+
+--Insert PV en los Nodos
+------------------------
+
+insert into fn3node
+select header,'INSIGNIA',code,description,newsstand,fathernode
+from fn3node
+where header='MARCA' and 
+      product='DIARIO' and
+newsstand in
+(
+select newsstand
+from fn3node
+where header='MARCA' and product='DIARIO'
+AND Newsstand LIKE '028%'
+MINUS
+select newsstand
+from fn3node
+where header='MARCA' and product='SEGUNDA'
+AND Newsstand LIKE '028%');
+
+
+--Inserta en Output los PV de SEGUNDA
+-------------------------------------
+insert into fn3output
+select 'VentaMarcaSegunda'||node,header,'SEGUNDA',node
+from fn3output
+where header='MARCA' and 
+      product='DIARIO' and
+node in
+(
+select node
+from fn3output
+where header='MARCA' and product='DIARIO'
+AND NODE LIKE '028%'
+MINUS
+select node
+from fn3output
+where header='MARCA' and product='SEGUNDA'
+AND NODE LIKE '028%');
+
+--Inserta en OutputDating los PV de SEGUNDA
+-------------------------------------
+insert into fn3outputdating
+select substr(output,1,10)||'Segunda'||substr(output,11,12)
+       ,dating,orderf,iniest,endest,arima,
+       power,translation,timesetomit
+from fn3outputdating
+where output like 'VentaMarca028%'
+and substr(output,11,12) not in
+(
+select substr(output,18,12)
+from fn3outputdating
+where output like 'VentaMarcaSegunda028%');
+
+--Inserta en Fn3Estimation la FICTICIA
+--------------------------------------
+insert into fn3estimation
+select 'DiasTipicos',substr(output,1,10)||'Segunda'||substr(output,11,12),
+       dating,arima,inidate,enddate,iniestdate,
+       estdate,estpower,esttranslation,estregar,estseaar,estregma,
+       estseama,datacount,varcount,const,stddeviation,percerror,
+       schwarz,grouped,state,stateinfo
+from fn3estimation
+where output like 'VentaMarca028%'
+and estsession='DiasTipicos'
+and substr(output,11,12) not in
+(
+select substr(output,18,12)
+from fn3estimation
+where output like 'VentaMarcaSegunda028%'
+and estsession='DiasTipicos');
+
+--Metemos en Servicio Fijo
+--------------------------
+insert into fn3servicefixed
+select header,'SEGUNDA',newsstand,weekday,datefrom,dateuntil,Round(0.3*Service)
+from fn3servicefixed
+where header='MARCA' and product='DIARIO';
+
+--Metemos en Servicio Minimo
+insert into fn3serviceminimum
+select header,'SEGUNDA',newsstand,weekday,Round(0.3*Service)
+from fn3serviceminimum
+where header='MARCA' and
+product='DIARIO';
+
+
+
+
+

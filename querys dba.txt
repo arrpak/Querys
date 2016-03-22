@@ -1,0 +1,218 @@
+Tema de ordenacion
+----------------------
+
+
+--alter system set "_gby_hash_aggregation_enabled"=false;
+
+
+-- alter system set optimizer_features_enable='9.2.0';
+
+select sum(bytes/(1048576*1024)) from dba_extents;
+
+ESPACIO
+=======
+
+
+select 	T2.tablespace_name,total,libre
+FROM
+(SELECT tablespace_name,
+ROUND(sum(bytes)/1024/1024,0) as libre
+FROM dba_free_space
+WHERE tablespace_name NOT LIKE 'TEMP%'
+GROUP BY tablespace_name) t1,
+(
+SELECT tablespace_name,
+round(sum(BYTES/1024/1024),0) as total
+FROM dba_data_files b
+WHERE tablespace_name NOT LIKE 'TEMP%'
+GROUP BY b.tablespace_name) t2
+where
+t1.tablespace_name=t2.tablespace_name;
+
+
+
+ESPACIO LIBRE
+-------------
+SELECT tablespace_name,
+ROUND(sum(bytes)/1024/1024,0)
+FROM dba_free_space
+WHERE tablespace_name NOT LIKE 'TEMP%'
+GROUP BY tablespace_name;
+
+
+ESPACIO USADO
+-------------
+SELECT tablespace_name,
+round(sum(BYTES/1024/1024),0)
+FROM dba_data_files b
+WHERE tablespace_name NOT LIKE 'TEMP%'
+GROUP BY b.tablespace_name;
+
+
+FICHEROS POR TABLESPACE
+-----------------------
+SELECT FILE_NAME,ROUND(sum(bytes)/1024/1024,0)
+FROM DBA_data_files
+-- WHERE tablespace_name='USERDATA2'
+GROUP BY FILE_NAME;
+
+
+FICHEROS POR TABLESPACE MAS DETALLES
+------------------------------------
+SELECT rpad(a.TABLESPACE_NAME,10) tablespace,rpad(a.FILE_NAME,40) fichero,
+to_char(a.BYTES/1024/1024,'99999.99') MB,
+to_char(a.increment_by*b.value/1024/1024,'9999.99') nextmb,
+to_char(a.MAXBYTES/1024/1024,'99999.99') maxmb
+FROM DBA_DATA_FILES a, v$parameter b
+where b.name='db_block_size';
+
+
+
+TAMAÑO TABLAS
+-------------
+Select segment_type, substr(segment_name,1,30),
+       bytes/(1024*1024*1024) as GB, user_segments.PCT_INCREASE
+From user_segments, all_tables
+where user_segments.segment_name = all_tables.table_name and
+      all_tables.owner = 'SEUR'
+order by 3 desc,segment_type, bytes desc;
+
+
+TAMAÑO INDICES
+-------------
+--//Indices
+Select segment_type, substr(segment_name,1,30),
+       bytes/(1024*1024*1024) as GB, user_segments.PCT_INCREASE
+From user_segments, all_indexes
+where user_segments.segment_name = all_indexes.index_name and
+      all_indexes.owner = 'SEUR'
+order by segment_type, bytes desc;
+
+
+
+
+QUERY BLOQUEOS
+--------------
+
+set linesize 300
+column sid format 999
+column res heading 'Resource Type' format a20
+column id1 format 9999999
+column id2 format 9999999
+column lmode heading 'Lock Held' format a14
+column request heading 'Lock Req.' format a14
+column serial# format 99999
+column username  format a10
+column terminal heading Term format a20
+column tab format a25
+column owner format a16
+select  l.sid,s.serial#,s.username,s.terminal,
+        decode(l.type,'RW','RW - Row Wait Enqueue',
+                   'TM','TM - DML Enqueue',
+                   'TX','TX - Trans Enqueue',
+                   'UL','UL - User',l.type||'System') res,
+        substr(t.name,1,150) tab,u.name owner,
+        l.id1,l.id2,
+        decode(l.lmode,1,'No Lock',
+                2,'Row Share',
+                3,'Row Exclusive',
+                4,'Share',
+                5,'Shr Row Excl',
+                6,'Exclusive',null) lmode,
+        decode(l.request,1,'No Lock',
+                2,'Row Share',
+                3,'Row Excl',
+                4,'Share',
+                5,'Shr Row Excl',
+                6,'Exclusive',null) request
+from v$lock l, v$session s,
+sys.user$ u,sys.obj$ t
+where l.sid = s.sid
+and s.type != 'BACKGROUND'
+and t.obj# = l.id1
+and u.user# = t.owner#
+order by terminal;
+
+
+
+
+PROCESOS DB
+-----------
+
+
+  SET LINESIZE 100
+COLUMN spid FORMAT A10
+COLUMN username FORMAT A10
+COLUMN program FORMAT A45
+
+SELECT s.terminal,
+       s.inst_id,
+       s.sid,
+       s.serial#,
+       p.spid,
+       s.username,
+       s.program
+       FROM   gv$session s
+       JOIN gv$process p ON p.addr = s.paddr AND p.inst_id = s.inst_id
+WHERE  s.type != 'BACKGROUND'
+ORDER BY terminal;
+
+OPERACIONES LARGAS
+-------------------
+
+SELECT opname,target,target_desc,Round(sofar/totalwork,4),totalwork,start_time,time_remaining,message
+FROM  v$session_longops
+WHERE sofar<totalwork
+ORDER BY last_update_time DESC;
+
+
+
+--select count(*) from seuforecastcombination;
+
+
+SELECT S.OSUSER, --Usuario de SO
+S.USERNAME, --Usuario
+A.SQL_TEXT, --Query
+SL.OPNAME, --Operación que esta realizando (Table Scan, Sort/Merge,..)
+trunc((SL.SOFAR*100)/SL.TOTALWORK,2) AS EVOL, --Evolución en %
+SL.SOFAR, --Tiempo que lleva
+SL.TOTALWORK, --Tiempo total
+To_Char(SYSDATE, 'dd/mm/yyyy HH24:MI:SS') AS T_NOW, --Ahora. Día y hora actual.
+To_Char(SYSDATE+((((1/24)/60)/60)*SL.TIME_REMAINING), 'dd/mm/yyyy HH24:MI:SS') AS T_STOP --Día y hora cuando acabará.
+FROM
+V$SESSION_LONGOPS SL, V$SESSION S ,V$SQLAREA A
+WHERE
+SL.SOFAR <> SL.TOTALWORK AND
+SL.SID = S.SID AND
+A.HASH_VALUE=S.SQL_HASH_VALUE;
+
+
+
+
+
+
+
+query commits pendientes
+-----------------------------
+
+
+SELECT *
+FROM V$LOCK L, V$PROCESS P, V$ROLLNAME R
+WHERE L.SID = P.PID(+)
+  AND TRUNC(L.ID1(+)/65536) = R.USN
+  AND L.TYPE(+) ='TX'
+AND L.LMODE(+)=6
+ORDER BY 1
+
+
+
+select forsession,count(*)
+from seuforecastseries
+group by rollup(forsession)
+order by 1
+
+
+
+TAMAÑO BASE DE DATOS
+====================
+select sum(bytes/1048576)  from dba_extents;

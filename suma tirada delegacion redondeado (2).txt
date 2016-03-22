@@ -1,0 +1,128 @@
+--SUMA TIRADA ANDALUCIA
+
+define pridet='20070904';
+define orderf=1;
+
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('EXT')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+UNION
+(SELECT fecha,'Total Extremadura',Sum(PVServicio),Sum(totalred)
+from
+(select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('EXT')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate)
+GROUP BY fecha)
+UNION
+(
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+UNION
+(SELECT fecha,'Total Andalucía',Sum(PVServicio),Sum(totalred)
+from
+(select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate)
+GROUP BY fecha))
+
+
+
+define pridet='20070903';
+define orderf=1;
+
+--SUMA TIRADA CAM
+
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      (ser.service)+
+(100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100)) AS TOTAL
+from
+(SELECT *
+FROM FN3SERVICECAM) ser,
+fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD') and
+     ser.header=pri.header and
+     to_char(pri.dateprint,'DY')= ser.weekday
+group by dateprint,delegate,ser.service;
+
+
+
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+      (ser.service)+
+(100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100)) AS TOTAL
+from
+(SELECT *
+FROM FN3SERVICECAM) ser,
+fn3printingdetail pri, fn3codification cod
+where pri.header    = 'EXPANSION'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD') and
+     ser.header=pri.header and
+     to_char(pri.dateprint,'DY')= ser.weekday
+group by dateprint,delegate,ser.service;

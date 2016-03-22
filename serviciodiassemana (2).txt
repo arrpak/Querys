@@ -1,0 +1,30 @@
+CREATE TABLE fn3diasemana as
+SELECT DISTINCT To_Char(infodate,'dy') AS codigo
+FROM FN3nodeinformation
+WHERE infodate>SYSDATE-15
+
+
+SELECT codigo FROM fn3diasemana
+
+
+SELECT DISTINCT newsstand,codigo
+FROM FN3diasemana t1,fn3operation t2
+WHERE
+OPERATIONDATE>SYSDATE-30
+AND t2.service>0
+minus
+(
+SELECT newsstand,diasem
+from
+(SELECT NEWSSTAND,To_Char(operationdate,'dy') AS diasem,Count(*)
+FROM FN3OPERATION
+WHERE OPERATIONDATE>SYSDATE-30
+AND service>0  AND newsstand <>'000'
+GROUP BY NEWSSTAND,To_Char(operationdate,'dy')
+HAVING Count(*)>0)) t1,
+(SELECT newsstand,To_Char(dateprint,'dy'),Avg(decision+increasedec)
+FROM fn3printingdetail
+WHERE header='MARCA' AND product='DIARIO'
+AND DATEprint>SYSDATE-2
+GROUP BY newsstand,To_Char(dateprint,'dy')
+ ) t2

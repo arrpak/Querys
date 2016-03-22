@@ -1,0 +1,64 @@
+INSERT INTO fn3outputinputinformation
+SELECT output,'PromocionesPEN2008',dating,'HatTrickGutiCupon',type,'0.10',delta,stdomega,stddelta,'Y'
+FROM fn3outputinputinformation
+WHERE input='BanderaRMA2007Cartilla' AND TYPE='F'  ORDER BY output;
+
+
+
+
+INSERT INTO fn5outputinput
+SELECT output,dating,'HatTrickGuti','HatTrickGutiCupon',type,'0.10',delta,'0.0',stddelta,'Y'
+FROM fn5outputinput
+WHERE input='CamisetaMcLarenMercedesCartilla';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO fn3outputinputinformation
+SELECT output,setinput,dating,'HatTrickGutiCartilla',type,'0.20',delta,stdomega,stddelta,'Y'
+FROM fn3outputinputinformation
+WHERE input='BanderaRMA2007';
+
+
+
+
+-- select * from fn3outputinputinformation where input like 'CamisetaMcLarenMercedesCupon'
+
+
+
+INSERT INTO fn5outputinput
+SELECT output,dating,'DVDGloriasBlancas','DVDGloriasBlancasIni',type,'0.25',delta,'0.01',stddelta,'Y'
+FROM fn5outputinput
+WHERE input='TesorosRMATomo';
+
+
+
+update fn3outputinputinformation
+set omega='0.25'
+where input='CamisetaMcLarenMercedesCupon'
+
+
+
+
+update fn5outputinput
+set omega='0.1'
+where input='DVDHeroesDelComicPrimero'
+
+
+delete fn3outputinputinformation where input='CamiseMcLarenMercedesCartilla'

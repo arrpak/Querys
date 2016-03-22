@@ -1,0 +1,29 @@
+select
+CASE node
+WHEN 'AND' THEN 'Andalucía'
+WHEN 'EXT' THEN 'Extremadura'
+WHEN 'CAM' THEN 'Madrid'
+WHEN 'CAVCMU' THEN 'Levante'
+WHEN 'CATBAR' THEN 'Barcelona'
+WHEN 'NOR' THEN 'Norte'
+WHEN 'ARA' THEN 'Aragón'
+WHEN 'CYLSOR2' THEN 'Soria'
+WHEN 'AST' THEN 'Asturias'
+END,
+ To_Char(infoDate,'yyyy/mm/dd') as infoDate ,
+(service) as Servicio ,
+(returnCont + (service - serviceCont + incidence -
+    incidenceCont - estimatedSale)) as DevolucionTotal ,
+((serviceCont + incidenceCont - returnCont) +
+    estimatedSale) as VentaTotal ,
+(numOpen) as PvAbiertos ,
+(numOutOff) as PvAgotadosTotal
+from formarca.Fn3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'AND' OR node='EXT' OR node='CAM' OR node='CAVCMU' OR node='CATBAR' OR node='NOR' or
+        node = 'ARA' OR node = 'CYLSOR2' OR node = 'AST')
+    and (INFODATE >=  to_date('2006/07/01', 'yyyy/mm/dd')   and
+INFODATE <  to_date('2007/12/01', 'yyyy/mm/dd')  )
+    and (( to_char(INFODATE, 'mm')  = '08' or  to_char(INFODATE, 'mm')  = '07'))
+order by infoDate,node

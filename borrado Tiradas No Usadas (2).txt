@@ -1,0 +1,56 @@
+delete from fn3printingdetail
+where newsstand||dateprint||orderf in 
+(select det.newsstand||det.dateprint||det.orderf
+from
+(select orderf||dateprint as ord,node,header,product,orderf
+from fn3printing
+where used='N' and node='CAM' and
+dateprint<to_date('20020101','yyyymmdd') and
+header='MARCA')  pri,fn3printingdetail det
+where
+pri.header=det.header and
+pri.product=det.product and
+pri.node=det.node and
+--pri.dateprint=det.dateprint and
+pri.ord=det.orderf||det.dateprint);
+
+
+------------------------------------------------------------------
+delete from fn3printingnodeforsession
+where dateprint||orderf in
+(
+select dateprint||orderf
+from fn3printing
+where used='N' and node='CAM' and
+dateprint<to_date('20020101','yyyymmdd') and
+header='MARCA');
+
+
+------------------------------------------------------------------
+
+
+delete from fn3printing
+where used='N' and node='CAM' and
+dateprint<to_date('20020101','yyyymmdd') and
+header='MARCA';
+
+
+
+
+
+dateprint||orderf in 
+(select |det.dateprint||det.orderf
+from
+(select orderf||dateprint as ord,node,header,product,orderf
+from fn3printing
+where used='N' and node='CAM' and
+dateprint<to_date('20030101','yyyymmdd') and
+header='EXPANSION')  pri,fn3printingdetail det
+where
+pri.header=det.header and
+pri.product=det.product and
+pri.node=det.node and
+--pri.dateprint=det.dateprint and
+pri.ord=det.orderf||det.dateprint);
+
+

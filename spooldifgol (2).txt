@@ -1,0 +1,62 @@
+  set newpage none;
+  set hea on
+  set linesize 200;
+  set colsep ';';
+  set pagesize 50000;
+spool c:\spoolDifGol.txt
+select equipolocal,avg(goleslocal),stddev(goleslocal),avg(golesvisitante),
+stddev(golesvisitante),categoria,temporada
+from fn3partidofutbol
+where competicion='LIGA'
+and dominio='SPA'
+group by equipolocal,categoria,temporada
+order by temporada,categoria desc,avg(goleslocal) asc;
+select equipovisitante,avg(golesvisitante),stddev(golesvisitante),avg(goleslocal),
+stddev(goleslocal),categoria,temporada
+from fn3partidofutbol
+where competicion='LIGA'
+and dominio='SPA'
+group by equipovisitante,categoria,temporada
+order by temporada,categoria desc,avg(golesvisitante) asc;
+spool off;
+
+spool c:\spoolfuerza1.txt
+select equipo,fecha,fuerza
+from fn3fuerzaequipo,fn3equipofutbol
+where nacion='SPA' and
+equipo=codigo and
+fecha>to_date('19920101','yyyymmdd') and
+fecha<to_date('19951231','yyyymmdd') ;
+spool off;
+
+spool c:\spoolfuerza2.txt
+select equipo,fecha,fuerza
+from fn3fuerzaequipo,fn3equipofutbol
+where nacion='SPA' and
+equipo=codigo and
+fecha>to_date('19960101','yyyymmdd') and
+fecha<to_date('19991231','yyyymmdd') ;
+spool off;
+
+spool c:\spoolfuerza3.txt
+select equipo,fecha,fuerza
+from fn3fuerzaequipo,fn3equipofutbol
+where nacion='SPA' and
+equipo=codigo and
+fecha>to_date('20000101','yyyymmdd');
+spool off;
+
+set newpage none;
+set hea on
+set linesize 200;
+set colsep ';';
+set pagesize 50000;
+spool c:\patifutbol.txt
+select *
+from fn3partidofutbol;
+spool off;
+
+spool c:\eq.txt
+select *
+from fn3equipofutbol;
+spool off;

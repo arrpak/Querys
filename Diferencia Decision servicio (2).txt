@@ -1,0 +1,22 @@
+
+
+
+set pagesize 5000;
+
+select pri.newsstand,dec,ser
+from
+(select newsstand,service+incidence as ser
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate=to_date('20031110','yyyymmdd') and
+substr(newsstand,1,3)='028') ope,
+(select newsstand,round(decision+increasedec) as dec
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint=to_date('20031110','yyyymmdd') and
+node='CAM' and
+orderf=2 )pri
+where
+pri.newsstand=ope.newsstand and
+abs(dec-ser)>3
+;

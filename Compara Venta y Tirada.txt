@@ -1,0 +1,58 @@
+select newsstand,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+      newsstand like '028%' and
+      operationdate=to_date('20001111','yyyymmdd');
+
+select newsstand,decision+increasedec as dec
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+      newsstand like '028%' and
+      dateprint=to_date('20021116','yyyymmdd');
+
+
+
+
+select t1.newsstand,t1.decision+t1.increasedec as dec,
+                    t2.service+t2.incidence-t2.return as venta
+--select count(*)
+from fn3printingdetail t1,fn3operation t2
+where 
+t1.header='MARCA' and
+t1.product='DIARIO' and
+t1.dateprint=to_date('20021116','yyyymmdd') and
+t1.node='CAM' and
+--t1.newsstand like '028%' and 
+t2.operationdate=to_date('20001111','yyyymmdd') and
+t1.newsstand=t2.newsstand and
+t1.decision+t1.increasedec +1 < t2.service+t2.incidence-t2.return and
+t1.header=t2.header and
+t1.product=t2.product ;
+
+
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',t1.newsstand,to_date('20021117','yyyymmdd'),
+greatest((t1.decision+t1.increasedec),(t2.service+t2.incidence-t2.return)) as dec
+--select count(*)
+from fn3printingdetail t1,fn3operation t2
+where 
+t1.header='MARCA' and
+t1.product='DIARIO' and
+t1.dateprint=to_date('20021117','yyyymmdd') and
+t1.node='CAM' and
+t1.newsstand not in
+(select newsstand
+from fn3servicemodified
+where modifieddate=to_date('20021117','yyyymmdd') )and
+--t1.newsstand like '028%' and 
+t2.operationdate=to_date('20021109','yyyymmdd') and
+t1.newsstand=t2.newsstand and
+t1.decision+t1.increasedec +1 < t2.service+t2.incidence-t2.return and
+t1.header=t2.header and
+t1.product=t2.product ;
+
+
+

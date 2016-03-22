@@ -1,0 +1,15 @@
+select way,num,postcode from fn3newsstand
+where code='028001700649';
+
+
+set linesize 200
+select distinct(code),WAY,num,datefrom,dateuntil
+from fn3newsstand,fn3newsstandon,fn3closingfixed
+where 
+postcode='28043'
+and dateoff is null
+AND DATEFROM >TO_DATE('20020701','YYYYMMDD')
+--and dateuntil>sysdate
+and fn3closingfixed.newsstand=code 
+and fn3newsstandon.newsstand=code;
+

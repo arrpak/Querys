@@ -1,0 +1,9 @@
+--INSERT INTO fn3operation
+SELECT *
+--delete
+FROM fn3operationnotcontrolled
+where
+--service>0 AND
+--product='DIARIO'AND
+To_Char(operationdate,'YYYYMM')='201104'
+

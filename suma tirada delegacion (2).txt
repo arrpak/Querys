@@ -1,0 +1,55 @@
+define pridet='20070730';
+
+SET PAGESIZE 400
+SET LINESIZE 300
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+         SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND', 'EXT')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = 1 and
+      pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint, cod.delegate
+union
+(select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+      'EXTREMADURA',
+       count(*) as PVServicio,
+         SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('EXT')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf =1 and
+      pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint)
+union
+(
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+      'ANDALUCIA',
+       count(*) as PVServicio,
+         SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TOTAL
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = 1 and
+      pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint)
+;
+
+

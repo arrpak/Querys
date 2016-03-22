@@ -1,0 +1,126 @@
+select newsstand,operationdate,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO' 
+and substr(newsstand,1,3)='028' 
+and operationdate=to_date('20050201','yyyymmdd')
+;
+
+
+select newsstand,forecast,venta,decision
+from
+(
+select newsstand,operationdate,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and substr(newsstand,1,3)='028'
+and operationdate=to_date('20050201','yyyymmdd')) op,
+(select substr(output,11,12) as outp,forecast,decision
+from fn3forecastseries
+where valuedate=to_date('20050207','yyyymmdd')
+and used='Y') fore
+where newsstand=outp;
+
+
+-----------
+-----------
+select operationdate,service,tirada,decision as decsistema,op.newsstand,forecast,venta
+from
+(
+select newsstand,operationdate,service+incidence-return as venta,service
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and substr(newsstand,1,3)='028'
+and operationdate=to_date('20050207','yyyymmdd')) op,
+(select substr(output,11,12) as outp,forecast,decision
+from fn3forecastseries
+where valuedate=to_date('20050207','yyyymmdd')
+and used='Y') fore,º-
+
+
+
+
+(select newsstand,dateprint,(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TIRADA   
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint=to_date('20050207','yyyymmdd')) det
+where 
+det.newsstand=op.newsstand
+and op.newsstand=outp(+)
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+select op.newsstand,operationdate,service,tirada,decision as decsistema,used,forecast,venta
+from
+(
+select newsstand,operationdate,service+incidence-return as venta,service
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and substr(newsstand,1,3)='028'
+and operationdate=to_date('20050207','yyyymmdd')) op,
+(select substr(output,11,12) as outp,forecast,decision,used,forsession
+from fn3forecastseries
+where valuedate=to_date('20050207','yyyymmdd')
+) fore,
+(select newsstand,dateprint,(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as TIRADA   
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint=to_date('20050207','yyyymmdd')) det,
+(select distinct(forsession),orderf
+from fn3printingnodeforsession
+where
+header='MARCA' and
+product='DIARIO' and
+node='CAM'and
+dateprint=to_date('20050207','yyyymmdd')) pnf,
+(select orderf
+from fn3printing
+where
+header='MARCA' and
+product='DIARIO' and
+node='CAM'and
+dateprint=to_date('20050207','yyyymmdd')
+and used='Y') use
+where 
+det.newsstand=op.newsstand
+and op.newsstand=outp(+)
+and use.orderf=pnf.orderf
+and pnf.forsession=fore.forsession
+;
+
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+
+
+
+
+--PARA UN PUNTO
+
+select newsstand,valuedate,forecast,venta,decision
+from
+(
+select newsstand,operationdate,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand='028000200944'
+) op,
+(select substr(output,11,12) as outp,forecast,decision,valuedate
+from fn3forecastseries
+where
+output='VentaMarca028000200944'
+and used='Y') fore
+where newsstand=outp
+and valuedate>=to_date('20050101','yyyymmdd')
+and valuedate=operationdate
+;
+

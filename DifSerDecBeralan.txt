@@ -1,0 +1,46 @@
+select decision.newsstand,servicio.service,decision
+from
+(select newsstand,service,to_number(null)
+from
+fn3operation
+where header='MARCA' and product='DIARIO' and
+(newsstand like '048%' or newsstand like '039%' or
+newsstand like '011%' or newsstand like '029%' or
+newsstand like '0048%' or newsstand like '009%' or
+newsstand like '020%' or newsstand like '026%' or
+newsstand like '084%' or newsstand like '139%' or
+newsstand like '031%' or newsstand like '040%')
+and operationdate=to_date('20080120','yyyymmdd')
+union
+(select newsstand,service,to_number(null) as decision
+from
+fn3operationnotcontrolled
+where header='MARCA' and product='DIARIO' and
+(newsstand like '048%' or newsstand like '039%' or
+newsstand like '011%' or newsstand like '029%' or
+newsstand like '0048%' or newsstand like '009%' or
+newsstand like '020%' or newsstand like '026%' or
+newsstand like '084%' or newsstand like '139%' or
+newsstand like '031%' or newsstand like '040%')
+and operationdate=to_date('20080120','yyyymmdd'))) servicio,
+(select newsstand,to_number(null) as service,
+(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as decision
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+(newsstand like '048%' or newsstand like '039%' or
+newsstand like '011%' or newsstand like '029%' or
+newsstand like '0048%' or newsstand like '009%' or
+newsstand like '020%' or newsstand like '026%' or
+newsstand like '084%' or newsstand like '139%' or
+newsstand like '031%' or newsstand like '040%')and
+orderf=1
+and
+dateprint=to_date('20080120','yyyymmdd')) decision
+where
+decision.newsstand=servicio.newsstand(+)
+and (decision=0 or servicio.service=0)
+--and not(decision=0 and servicio.service is null)
+--and abs(decision-servicio.service)>2
+--AND servicio.service<decision

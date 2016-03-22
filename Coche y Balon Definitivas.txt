@@ -1,0 +1,86 @@
+
+
+spool c:\BalonOroTot20030603.txt
+select sysdate from dual;
+set colsep '|';
+set pagesize 4000;
+select    serie.out,
+serie.valuedate,
+INPUT.INP,
+f as filter,
+n as noise,
+input.ef
+from
+(select substr(estsession,1,30) as est,SUBSTR(INPUT,1,30) AS INP,
+substr(output,1,30) as out,valuedate,dating,
+       input,to_number(effect) as ef
+from fn3estimationinputeffect
+where input like 'Balon%' and
+estsession='20030603.PROV' and
+output in 
+('VentaMarcaAND','VentaMarcaARA','VentaMarcaBAL','VentaMarcaCAM',
+'VentaMarcaCAT', 'VentaMarcaCEN','VentaMarcaCAN',
+'VentaMarcaEXT','VentaMarcaLEV','VentaMarcaNOR','VentaMarcaNOROES'
+)) input,
+(select substr(estsession,1,30) est,substr(output,1,30) as out,
+valuedate,to_number(filter) f ,to_number(noise) n,dating
+from fn3estimationseries
+where estsession='20030603.PROV' and
+dating='Diario' and
+valuedate>to_date('20030301','yyyymmdd') and
+output in ('VentaMarcaAND','VentaMarcaARA',
+'VentaMarcaBAL','VentaMarcaCAM', 'VentaMarcaCAT','VentaMarcaCEN','VentaMarcaEXT',
+'VentaMarcaLEV','VentaMarcaNOR','VentaMarcaCAN',
+'VentaMarcaNOROES')) serie
+where 
+input.out=serie.out and
+input.valuedate=serie.valuedate and
+input.dating=serie.dating and
+input.est=serie.est ;
+spool off;
+
+
+
+
+
+
+
+
+
+
+spool c:\Coche20030603.txt
+select sysdate from dual;
+set colsep '|';
+set pagesize 4000;
+select    serie.out,
+serie.valuedate,
+INPUT.INP,
+f as filter,
+n as noise,
+input.ef
+from
+(select substr(estsession,1,30) as est,SUBSTR(INPUT,1,30) AS INP,
+substr(output,1,30) as out,valuedate,dating,
+       input,to_number(effect) as ef
+from fn3estimationinputeffect
+where input like 'Coche%' and
+estsession='20030603.PROV' and
+output in 
+('VentaMarcaNOR','VentaMarcaNOROES'
+)) input,
+(select substr(estsession,1,30) est,substr(output,1,30) as out,
+valuedate,to_number(filter) f ,to_number(noise) n,dating
+from fn3estimationseries
+where estsession='20030603.PROV' and
+dating='Diario' and
+valuedate>to_date('20030401','yyyymmdd') and
+output in ('VentaMarcaAND','VentaMarcaARA',
+'VentaMarcaBAL','VentaMarcaCAM', 'VentaMarcaCAT','VentaMarcaCEN','VentaMarcaEXT',
+'VentaMarcaLEV','VentaMarcaNOR','VentaMarcaCAN',
+'VentaMarcaNOROES')) serie
+where 
+input.out=serie.out and
+input.valuedate=serie.valuedate and
+input.dating=serie.dating and
+input.est=serie.est ;
+spool off;

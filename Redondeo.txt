@@ -1,0 +1,11 @@
+update fn3printingdetail
+set increasedec=1
+where
+header='MARCA' and
+node='AND' and
+orderf=1 and
+dateprint=to_date('20030818','yyyymmdd') and
+decision <15 and
+decision-floor(decision)<0.5 and
+decision-floor(decision)>0
+;

@@ -1,0 +1,30 @@
+SELECT Count(*),t1.valuedate,Sum(t1.forecast) AS PrevNew,Sum(t2.forecast) AS PrevOld,Sum(t1.forecast)/Sum(t2.forecast) AS VariacionPrev,
+Sum(t1.decision)/Sum(t2.decision) AS VariacionDec
+FROM
+(SELECT *
+FROM FN3FORECASTSERIES
+WHERE FORSESSION='2009032702_EP0II.PV'
+--AND VALUEDATE=DAT('20090402')
+) t1,
+(
+SELECT *
+FROM FN3FORECASTSERIES
+--WHERE FORSESSION='2009032702.PV'
+WHERE FORSESSION='2009032702.PV'
+--AND VALUEDATE=DAT('20090402')
+) t2
+WHERE
+t1.output=t2.output
+AND t1.valuedate=t2.valuedate
+AND t1.dating=t2.dating
+--AND t1.output LIKE 'VentaMarcaAND%'
+GROUP BY t1.valuedate
+ORDER BY t1.valuedate;
+/*
+SELECT Count(*) ,valuedate
+--delete
+FROM  fn3forecastseries
+WHERE FORSESSION='2009032702_EP0.PV'
+AND output LIKE 'VentaMarca010%'
+GROUP BY valuedate
+*/

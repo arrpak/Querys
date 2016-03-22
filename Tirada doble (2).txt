@@ -1,0 +1,118 @@
+
+delete fn3printingdetail
+ WHERE header='MARCA' AND dateprint=dat('20070826') AND node='CATBAR' AND orderf=2;
+
+INSERT INTO fn3printingdetail
+SELECT header,product,node,dateprint,2,newsstand,forsession,decision+increasedec,0,decsession,decsys
+FROM
+fn3printingdetail
+WHERE header='MARCA' AND dateprint=dat('20070826') AND node='CATBAR' AND orderf=1;
+
+
+
+
+
+
+
+
+SELECT t1.newsstand ,t1.de AS baja,t2.de AS alta
+from
+(
+SELECT header,product,node,dateprint,2,newsstand,forsession,decision+increasedec AS de,0,decsession,decsys
+FROM
+fn3printingdetail
+WHERE header='MARCA' AND dateprint=dat('20070826') AND node='CAVCMU' AND orderf=1) t1,
+(
+SELECT header,product,node,dateprint,2,newsstand,forsession,decision+increasedec AS  de ,0,decsession,decsys
+FROM
+fn3printingdetail
+WHERE header='MARCA' AND dateprint=dat('20070826') AND node='CAVCMU' AND orderf=2) t2
+WHERE t1.newsstand=t2.newsstand
+AND t1.de>0
+AND t2.de<t1.de
+;
+
+--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--DUPLICAR TIRADA DIA SIGUIENTE
+
+INSERT INTO FN3PRINTING
+SELECT header,product,node,dateprint+1,orderf,used,comunicationdate,origdate,description
+FROM FN3PRINTING
+WHERE
+HEADER='MARCA' AND Product='DIARIO' AND node='CYLSOR2'  AND orderf=1
+AND dateprint=To_Date('20080827','yyyymmdd');
+
+
+INSERT INTO FN3PRINTINGNODEFORSESSION
+SELECT header,product,node,dateprint+1,orderf,sonnode,forsession,increaseporc,increasetab
+FROM FN3PRINTINGNODEFORSESSION
+WHERE
+HEADER='MARCA' AND Product='DIARIO' AND node='AST'  AND orderf=1
+AND dateprint=To_Date('20080827','yyyymmdd');
+
+INSERT INTO FN3PRINTINGDETAIL
+SELECT header,product,node,dateprint+1,orderf,newsstand,forsession,decision,increasedec,decsession,decsys
+FROM FN3PRINTINGDETAIL
+WHERE
+HEADER='MARCA' AND Product='DIARIO' AND node='CYLSOR2'  AND orderf=1
+AND dateprint=To_Date('20080827','yyyymmdd');
+
+
+
+
+
+
+
+--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--DUPLICAR TIRADA ALTA
+
+INSERT INTO FN3PRINTING
+SELECT header,product,node,dateprint,2,used,comunicationdate,origdate,description
+FROM FN3PRINTING
+WHERE
+HEADER='MARCA' AND Product='DIARIO' AND node='CAM' AND orderf=1 AND dateprint=To_Date('20110307','yyyymmdd');
+
+
+INSERT INTO FN3PRINTINGNODEFORSESSION
+SELECT header,product,node,dateprint,2,sonnode,forsession,increaseporc,increasetab
+FROM FN3PRINTINGNODEFORSESSION
+WHERE
+HEADER='MARCA' AND Product='DIARIO' AND node='CAM' AND orderf=1 AND dateprint=To_Date('20110307','yyyymmdd');
+
+
+INSERT INTO FN3PRINTINGDETAIL
+SELECT header,product,node,dateprint,2,newsstand,forsession,decision+increasedec,0,decsession,decsys
+FROM FN3PRINTINGDETAIL
+where
+HEADER='MARCA' AND Product='DIARIO' AND node='CAM' AND orderf=1 AND dateprint=To_Date('20110307','yyyymmdd');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DELETE FN3PRINTINGDETAIL WHERE HEADER='MARCA' AND Product='DIARIO' AND node='AND' AND orderf=100 AND dateprint=To_Date('20070916','yyyymmdd');
+DELETE FN3PRINTINGNODEFORSESSION WHERE HEADER='MARCA' AND Product='DIARIO' AND node='AND' AND orderf=100 AND dateprint=To_Date('20070916','yyyymmdd');
+DELETE FN3PRINTING WHERE HEADER='MARCA' AND Product='DIARIO' AND node='AND' AND orderf=100 AND dateprint=To_Date('20070916','yyyymmdd');
+
+
+
+

@@ -1,0 +1,101 @@
+ select  ei.estSession,ei.OUTPUT,
+         ei.input, ei.factor, ei.orderF,
+        value
+ from Fn3EstimationInput ei
+ where (ei.estSession='20030508.PROV' or ei.estSession='20030508.PROV')
+   and (ei.OUTPUT='VentaMarcaAND' or ei.OUTPUT='VentaMarcaANDSEV' or 
+ei.OUTPUT='VentaMarcaARA' or ei.OUTPUT='VentaMarcaARAZAR' or 
+ei.OUTPUT='VentaMarcaBAL' or ei.OUTPUT='VentaMarcaCAM' or 
+ei.OUTPUT='VentaMarcaCAN' or ei.OUTPUT='VentaMarcaCAT' or 
+ei.OUTPUT='VentaMarcaCATBAR' or ei.OUTPUT='VentaMarcaCAVVAL' or 
+ei.OUTPUT='VentaMarcaCEN' or ei.OUTPUT='VentaMarcaEXT' or 
+ei.OUTPUT='VentaMarcaLEV' or ei.OUTPUT='VentaMarcaNOR' or 
+ei.OUTPUT='VentaMarcaNOROES' or ei.OUTPUT='VentaMarcaVASVIZ')
+   and (ei.DATING='Diario')
+ order by input,  factor, orderF;
+
+
+
+ select count(*),output
+ from fn3estimationinputeffect
+ where input like 'MochilaMarca%'
+ group by output;
+
+-----------------------------------------------------------------------------------
+spool c:\balonoro.txt;
+set colsep '|';
+set pagesize 4000;
+select substr(output,1,30),valuedate,
+       substr(input,1,30),to_number(effect)
+from fn3estimationinputeffect
+where input like 'BalonOro%' and
+estsession='20030507.PROV' and
+output in 
+('VentaMarcaAND','VentaMarcaARA','VentaMarcaBAL','VentaMarcaCAM','VentaMarcaCAT',
+ 'VentaMarcaCEN','VentaMarcaEXT','VentaMarcaLEV','VentaMarcaNOR','VentaMarcaNOROES',
+ 'VentaMarcaCAN'
+)
+order by input,output,valuedate;
+
+-----------
+
+spool c:\BalonOroNoiseFil.txt;
+select substr(output,1,30),valuedate,filter,noise
+from fn3estimationseries
+where estsession='20030507.PROV' and
+dating='Diario' and
+valuedate>to_date('20030301','yyyymmdd') and
+output in ('VentaMarcaAND','VentaMarcaARA','VentaMarcaBAL',
+'VentaMarcaCAM', 'VentaMarcaCAT','VentaMarcaCEN','VentaMarcaEXT',
+'VentaMarcaLEV','VentaMarcaNOR','VentaMarcaCAN',
+'VentaMarcaNOROES');
+spool off;
+
+
+
+-------------------------------------------------------------------------------------
+
+
+spool c:\BalonOroTot2.txt
+select sysdate from dual;
+set colsep '|';
+set pagesize 4000;
+select    serie.out,
+serie.valuedate,
+input.inp,
+f as filter,
+n as noise,
+input.ef
+from
+(select substr(estsession,1,30) as est,substr(output,1,30) as out,substr(input,1,30) as inp,
+       valuedate,
+       input,to_number(effect) as ef
+from fn3estimationinputeffect
+where input like 'Balon%' and
+estsession='20030513.PROV' and
+output in 
+('VentaMarcaAND','VentaMarcaARA','VentaMarcaBAL','VentaMarcaCAM',
+'VentaMarcaCAT', 'VentaMarcaCEN','VentaMarcaCAN',
+'VentaMarcaEXT','VentaMarcaLEV','VentaMarcaNOR','VentaMarcaNOROES'
+)) input,
+(select substr(estsession,1,30) est,substr(output,1,30) as out,
+valuedate,to_number(filter) f ,to_number(noise) n
+from fn3estimationseries
+where estsession='20030513.PROV' and
+dating='Diario' and
+valuedate>to_date('20030301','yyyymmdd') and
+output in ('VentaMarcaAND','VentaMarcaARA',
+'VentaMarcaBAL','VentaMarcaCAM', 'VentaMarcaCAT','VentaMarcaCEN','VentaMarcaEXT',
+'VentaMarcaLEV','VentaMarcaNOR','VentaMarcaCAN',
+'VentaMarcaNOROES')) serie
+where 
+input.out=serie.out and
+input.valuedate=serie.valuedate and
+input.est=serie.est ;
+spool off;
+
+
+
+
+
+

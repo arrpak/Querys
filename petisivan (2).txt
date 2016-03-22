@@ -1,0 +1,43 @@
+SELECT TE.newsstand,
+       Range.fecha,
+       to_char(Range.fecha, 'DY'),
+       TE.Dec,
+       TP.service,
+       TP.ven
+  FROM
+ (
+    SELECT distinct dateprint fecha
+    FROM fn3PrintingDetail
+    WHERE header = 'MARCA' and
+          product = 'DIARIO' and
+          newsstand = '028001824005' and
+          dateprint >= to_date('20020820', 'yyyymmdd') and
+          orderf = 1
+    UNION
+    SELECT distinct operationdate
+    FROM fn3operationhistorical
+    WHERE header = 'MARCA' and
+          product = 'DIARIO' and
+          newsstand = '028001824005' and
+          operationdate >= to_date('20020815', 'yyyymmdd')
+ ) Range,
+ (
+    SELECT newsstand,dateprint, decision+increasedec as Dec
+    FROM fn3PrintingDetail
+    WHERE header = 'MARCA' and
+          product = 'DIARIO' and
+          newsstand = '028001824005' and
+          dateprint >= to_date('20020820', 'yyyymmdd') and
+          orderf = 1
+ ) TE,
+ (
+    SELECT newsstand,operationdate, service,service+incidence-return as Ven
+    FROM fn3operationhistorical
+    WHERE header = 'MARCA' and
+          product = 'DIARIO' and
+          newsstand = '028001824005' and
+          operationdate >= to_date('20020815', 'yyyymmdd')
+ ) TP
+  WHERE TE.dateprint (+)= Range.fecha and
+        TP.operationdate (+)= Range.fecha;
+

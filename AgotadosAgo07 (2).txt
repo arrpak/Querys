@@ -1,0 +1,20 @@
+SELECT  dato.newsstand,cod.distributorcode,town,province,agot, ser
+from
+(SELECT newsstand,Sum(Decode(RETURN,0,1,0)) AS Agot,Avg(service+incidence-RETURN) AS med ,round(avg(service+incidence),2) as ser
+
+FROM fn3operation
+WHERE
+header='MARCA'
+AND product='DIARIO'
+AND operationdate>=To_Date('20070801','yyyymmdd')
+AND operationdate<=To_Date('20070831','yyyymmdd')
+AND service>15
+--To_Char(operationdate,'yyyymm')='200708'
+GROUP BY newsstand
+HAVING   Avg(service+incidence-RETURN) >5)
+ dato ,fn3newsstand ,fn3codification cod
+WHERE
+code=dato.newsstand
+AND cod.newsstand=dato.newsstand
+ORDER BY agot desc
+

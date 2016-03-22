@@ -1,0 +1,39 @@
+ INSERT INTO fn3outputinputinformation
+ SELECT 'VentaMarcaANDCORCAP','Eliminados','Diario',input,'E',NULL,NULL,NULL,NULL,'Y'
+ from
+ (select DISTINCT( ei.input ) as Input,ei.output as Prefijo,
+          ei.factor as Factor,       ei.orderF  as "Grado del polinomio"
+        ,ei.value as "Valor del parámetro"
+ from formarca.fn3EstimationInput ei ,fn3input inp
+ where (ei.estSession='20071108.MG')
+   and (ei.output='VentaMarcaANDCORCAP')
+   and (ei.dating='Diario')
+   AND ei.Value<0
+   AND setinput LIKE 'Pro%'
+   AND ei.input=inp.code
+   AND orderf=0
+   AND ei.input NOT in (SELECT input
+                        FROM fn3outputinputinformation
+                        WHERE
+                        output='VentaMarcaANDCORCAP' AND
+                        setinput='Eliminados' AND TYPE='E')
+   )
+
+
+
+
+
+
+INSERT INTO fn3input
+select 'IntervencionANDCORCAP','Diario',
+'Int'||to_char(valuedate,'YYYY')||to_char(valuedate,'mm')||
+to_char(valuedate,'dd'),
+'Pulse(y'||to_char(valuedate,'YYYY')||'m'||to_char(valuedate,'mm')||'d'||
+to_char(valuedate,'dd')||',Diario)',
+to_number(0),null,null,null,'Y',null
+from fn3estimationseries
+where
+output='VentaMarcaANDCORCAP' and
+estsession='20071108.MG' and
+dating='Diario' and
+abs(standarizedresiduals)>3.5;

@@ -1,0 +1,26 @@
+
+select nodopadre,count(*) as Puntos,round(sum(expoperation.prevision)) as forecast,
+         sum(expoperation.decision) as Decision,
+         sum(expoperation.incremdecision) as Incremento,
+         sum(expoperation.decision + expoperation.incremdecision) as TOTAL
+from   fn2nodo, expoperation
+where  expoperation.dia = to_date('20010704','yyyymmdd') and
+       expoperation.ruta  = substr(fn2nodo.puntoventa, 1, 7) and
+       expoperation.punto = substr(fn2nodo.puntoventa, 8, 5) and
+	producto='DIARIO'
+       group by fn2nodo.nodopadre;
+
+
+
+
+
+
+select   count(*) as puntos,
+         round(sum(expoperation.prevision)) as forecast,
+         sum(expoperation.decision) as Decision,
+         sum(expoperation.incremdecision) as Incremento,
+         sum(expoperation.decision + expoperation.incremdecision)as TOTAL
+from   expoperation
+where  expoperation.dia = to_date('20010704','yyyymmdd');
+	
+

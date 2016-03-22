@@ -1,0 +1,86 @@
+
+
+
+Suponemos que no puedes reducirle el tamaño porque le asignaste 2GB y lo tienes lleno.
+
+Te explicamos cómo hacerlo:
+
+1.- Créate un nuevo tablespace temporal en la nueva ubicación física y establécelo como tablespace por defecto, mediente la consulta SQL:
+Código:
+
+CREATE
+    TEMPORARY TABLESPACE "TEMP2" TEMPFILE 'd:\oracle\temp\
+    TEMP2.dbf' SIZE 500M EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M;
+ALTER DATABASE DEFAULT TEMPORARY TABLESPACE "TEMP2"
+
+
+Donde:
+* TEMP2: nombre que quieras darle al nuevo tablespace temporal.
+* d:\oracle\...: unidad, carpeta y nombre del fichero físico para el tablespace temporal.
+* 500M: tamaño en MB del tablespace temporal.
+
+2.- Una vez creado el nuevo tablespace temporal, deberás asignar usuario por usuario (de los que tienes creados ya) que utilice este tablespace como temporal, mediante la consulta SQL:
+Código:
+
+ALTER USER "ALONSO" 
+    TEMPORARY TABLESPACE "TEMP2"
+
+
+Donde:
+* ALONSO: nombre del usuario al que se le asignará el nuevo tablespace temporal.
+* TEMP2: nombre del nuevo tablespace temporal.
+
+Con esto, Oracle, utilizará para los usuarios nuevos que se creen el tablespace nuevo creado ("ALTER DATABASE DEFAULT TEMPORARY TABLESPACE TEMP2") y con la consulta SQL del punto 2, le estamos indicando a Oracle que cambie el tablespace del usuario indicado por el nuevo.
+
+3.- Como último paso, cuando todos los usuarios tengan asignado el nuevo tablespace temporal de Oracle, sólo nos quedará eliminar el tablespace antiguo, con el comando SQL de Oracle:
+Código:
+
+DROP TABLESPACE TEMP INCLUDING CONTENTS AND DATAFILES;
+
+
+Donde:
+* TEMP: nombre del tablespace temporal anterior.
+
+Debes seguir los pasos que te indicamos en el mismo orden, pues si intentas eliminar el tablespace antiguo antes de crear el nuevo y establecerlo como tablespace de Oracle por defecto, te mostrará un mensaje como este:
+
+SQL> DROP TABLESPACE TEMP;
+drop tablespace TEMP
+*
+ERROR at line 1:
+ORA-12906: cannot drop default temporary tablespace
+MensajePublicado:
+Lun Ago 18, 2008 6:59 am 	
+Top of PageVer perfil de usuarioVisitar sitio web del autor
+alonsojpd
+Administrador/Moderador
+
+
+Registrado: Sep 16, 2003
+Mensajes: 1062
+
+	
+Asunto: Re: Cambiar de ubicación y reducir tamaño tablespace Tempora 	Responder citando
+Una consulta que te puede ser útil, te indica el nombre del tablespace temporal, el o los ficheros físicos que componen el tablespace temporal y el tamaño actual del tablespace temporal de Oracle:
+Código:
+
+SELECT tablespace_name "Tablespace Temporal",
+    file_name "Ficheros", bytes/1024/1024 "Tamaño (MB)"
+FROM dba_temp_files WHERE tablespace_name = 'TEMP'
+MensajePublicado:
+Lun Ago 18, 2008 7:16 am 	
+Top of PageVer perfil de usuarioVisitar sitio web del autor
+alonsojpd
+Administrador/Moderador
+
+
+Registrado: Sep 16, 2003
+Mensajes: 1062
+
+	
+Asunto: Re: Cambiar de ubicación y reducir tamaño tablespace Tempora 	Responder citando
+Otra consulta SQL de Oracle que muestra el tablespace temporal asignado a cada usuario:
+
+Código:
+
+select username, temporary_tablespace
+from dba_users 

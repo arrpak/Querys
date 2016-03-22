@@ -1,0 +1,32 @@
+select trim(NAME)||replace(surname1,' ','')||replace(surname2,' ',''),code
+from emunewsstand
+
+
+
+
+
+
+
+
+
+
+SELECT t1.code AS mundo,t2.code AS  marca,t1.town,t1.calle,t2.calle,t2.num
+from
+(SELECT code,way AS calle,Trim(town) AS town,postcode,num
+from emunewsstand) t1,
+(SELECT code,way AS calle,Trim(town) AS town,postcode,num
+from fn3newsstand) t2,
+(SELECT  newsstand
+FROM fn3newsstandon
+WHERE newsstand LIKE '028%') t3
+WHERE
+t1.town=t2.town AND
+SubStr(t1.calle,1,10)=SubStr(t2.calle,1,10) AND
+t2.code=t3.newsstand AND
+t1.postcode=t2.postcode AND
+t1.calle LIKE '%'||t2.num||'%'
+-- AND t2.calle LIKE '%'||t1.calle||'%'
+AND t2.num IS NOT null
+
+
+

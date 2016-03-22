@@ -1,0 +1,45 @@
+CONNECT formarca/formarca@formarca
+DROP TABLE my_metadata;
+CREATE TABLE my_metadata (md CLOB);
+
+CREATE OR REPLACE PROCEDURE get_schema_md IS
+
+-- Define local variables.
+h NUMBER; -- handle returned by OPEN
+th NUMBER; -- handle returned by ADD_TRANSFORM
+doc CLOB; -- metadata is returned in a CLOB
+BEGIN
+-- Specify the object type.
+h := DBMS_METADATA.OPEN('SCHEMA_EXPORT');
+-- Use filters to specify the schema.
+DBMS_METADATA.SET_FILTER(h,'SCHEMA','FORMARCA');
+-- Request that the metadata be transformed into creation DDL.
+th := DBMS_METADATA.ADD_TRANSFORM(h,'DDL');
+-- Fetch the objects.
+LOOP
+doc := DBMS_METADATA.FETCH_CLOB(h);
+-- When there are no more objects to be retrieved, FETCH_CLOB returns NULL.
+EXIT WHEN doc IS NULL;
+-- Store the metadata in the table.
+INSERT INTO my_metadata(md) VALUES (doc);
+--SELECT doc INTO r FROM dual;
+--Dbms_Output.put_line(r);
+COMMIT;
+END LOOP;
+-- Release resources.
+DBMS_METADATA.CLOSE(h);
+END;
+
+/
+-- Execute the procedure.
+
+EXECUTE get_schema_md;
+
+-- See what was retrieved.
+
+SET LONG 9000000
+SET PAGESIZE 0  set feedback off
+set echo off
+spool c:\temp\formarca\formarca_schema.sql
+SELECT * FROM my_metadata;
+spool OFF;

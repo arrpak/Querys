@@ -1,0 +1,317 @@
+--Borramos las tablas existentes que vamos a crear
+
+drop table Fn2GrupoPuntoVenta;
+drop table Fn2DetalleTirada;
+drop table Fn2Tirada;
+drop table Fn2ForSession; 
+drop table Fn2EstSession;
+drop table Fn2AgrupaCjto;
+drop table fn2Codificacion;
+drop table Fn2ParametroProceso;
+drop table Fn2Proceso;
+drop table Fn2Puertos;
+drop table Fn2Pcs;
+
+--añadimos una columna a la tabla fn2estimation
+alter table fn2estimation
+   add(schwarz float(126));
+
+--añadimos una columna a la tabla fn2codificacion
+alter table fn2codificacion
+   add(rutaDistribuidor char(40));
+
+
+--modificamos la referencia de la tabla Fn2Estimation del campo
+--'estSession' y lo referenciamos con 'codigo' de Fn2EstSession
+--Alter Table Fn2Estimation
+--      Modify (estSession references Fn2EstSession(codigo);
+
+--modificamos la referencia de la tabla Fn2Forecast del campo
+--'forSession' y lo referenciamos con 'codigo' de Fn2ForSession
+--Alter Table Fn2Forecast
+--      Add (forSession references Fn2ForSession(codigo));
+
+--añadimos un chequeo en la tabla Fn2EstSession en el campo 'sessionIni'
+ALTER TABLE Fn2EstSession
+      ADD (FOREIGN_KEY (SESSIONINI) REFERENCES Fn2EstSession(CODIGO));
+
+--añadimos un chequeo en la tabla Fn2EstSession en el campo 'estSessionNodoPadre'
+ALTER TABLE Fn2EstSession
+      ADD CONSTRAINT fk_estSession FOREIGN_KEY (ESTSESSIONNODOPADRE)
+      REFERENCES Fn2EstSession(CODIGO);
+
+--añadimos un chequeo en la tabla Fn2forSession en el campo 'forSessionNodoPadre'
+--Alter Table Fn2forSession
+--      Modyfy (foreign key (forSessionNodoPadre) references Fn2forSession(codigo));
+
+--modificamos el ancho de dos campos de la tabla <Fn2PuntoVenta>
+Alter Table Fn2PuntoVenta
+      Modify(VIA       char(60);
+             NUMERO    char(35),
+             TELEFONO  char(15));      
+
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2GrupoPuntoVenta 
+--
+-- PURPOSE: Definicion de la tabla de grupos de puntos de venta.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  grupo             char(20) not null,
+  puntoVenta        char(12) not null,
+  foreign key       (puntoVenta) references Fn2PuntoVenta(codigo),
+  CONSTRAINT pk_GrupoPuntoVenta PRIMARY KEY(grupo,puntoventa)
+                             USING INDEX TABLESPACE MARCA_IDX
+) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 25);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2EstSession 
+--
+-- PURPOSE: Definicion de la tabla de estimaciones por sesión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  sessionIni           char(80),
+  estSessionNodoPadre  char(80),
+  fechaIni             date,
+  fechaFin             date,
+  descripcion          char(80), 
+  CONSTRAINT pk_EstSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX
+ )  
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2ForSession 
+--
+-- PURPOSE: Definicion de la tabla de sesión de previsión
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo               char(80),
+  fecha                date,
+  estSession           char(80),
+  forSessionNodoPadre  char(80),
+  fechaIni             date        not Null,
+  fechaFin             date        not Null,
+  descripcion          char(80),
+  foreign key        (estSession) references Fn2EstSession(codigo),
+  CONSTRAINT pk_forSession PRIMARY KEY(codigo)
+                             USING INDEX TABLESPACE MARCA_IDX 
+ ) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2Tirada 
+--
+-- PURPOSE: Definicion de la tabla de tiradas de productos.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  fecha              date,
+  orden              integer,
+  cabecera           char(12),
+  producto           char(12),
+  utilizada          char(2),
+  fechaComunicado    date        not null,
+  fechaOrigen        date,
+  descripcion        char(80),
+  foreign key       (cabecera, producto) references Fn2Producto(cabecera, codigo),
+  foreign key       (utilizada)          references Fn2DominioSiNo(codigo),
+  CONSTRAINT pk_Tirada PRIMARY KEY(fecha, orden, cabecera, producto)
+                             USING INDEX TABLESPACE MARCA_IDX
+) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2DetalleTirada 
+--
+-- PURPOSE: Definicion de la tabla de detalles de tirada.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  fecha              date,
+  orden              integer,
+  cabecera           char(12),
+  producto           char(12),
+  puntoventa         char(12),
+  forSession         char(80)           not null,
+  decision           float(126),
+  incremDecision     float(126),
+  foreign key       (fecha, orden, cabecera, producto) 
+          references Fn2Tirada(fecha, orden, cabecera, producto),
+  foreign key       (outputDef, forSession, fecha)
+          references Fn2ForecastDetail(outputDef, forSession, valueDate),
+  CONSTRAINT pk_DetalleTirada PRIMARY KEY(fecha, orden, cabecera, producto, outputDef)
+                             USING INDEX TABLESPACE MARCA_IDX
+) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2AgrupaCjto
+--
+-- PURPOSE: Definicion de la tabla de agrupacion de cjtos de input.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo            char(32),
+  conjunto          char(32),
+  foreign key       (conjunto)  references Fn2Cjto(codigo),
+  CONSTRAINT pk_AgrupaCjto PRIMARY KEY(concepto, conjunto)
+                             USING INDEX TABLESPACE MARCA_IDX
+) 
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2Codificacion
+--
+-- PURPOSE: Relaciona puntos de venta con las delegaciones de un distribuidor.
+--          Informa del codigo que esa delegacion utiliza para designar dicho
+--          punto de venta. La relacion es de N:M.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  puntoVenta         char(12),
+  distribuidor       char(12),
+  delegacion         char(12),
+  codigoDistribuidor char(40) not null,
+  rutaDistribuidor   char(40),
+  foreign key       (puntoVenta)               references Fn2PuntoVenta (codigo),
+  foreign key       (distribuidor, delegacion) references Fn2Delegacion (distribuidor, codigo),
+  CONSTRAINT pk_Codificacion
+  primary key       (puntoVenta, distribuidor, delegacion)
+                                               USING INDEX TABLESPACE MARCA_IDX
+)
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2Pcs
+--
+-- PURPOSE: Relacion de todos los PC's con los que se pueden lanzar
+--          las previsiones.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo             char(30),
+  ip                 char(32),
+  descripcion        char(80),
+  CONSTRAINT pk_Pcs  primary key (codigo) USING INDEX TABLESPACE MARCA_IDX
+)
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2Puertos
+--
+-- PURPOSE: Relacion de todos los puerto por los que se pueden lanzar
+--          las previsiones.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo             char(12),
+  CONSTRAINT pk_Puertos primary key (codigo) USING INDEX TABLESPACE MARCA_IDX
+)
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2Proceso
+--
+-- PURPOSE: Procesos que se ejecuta para obtener las previsiones.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo             char(30),
+  nParametros        integer,
+  descripcion         char(80), 
+  CONSTRAINT pk_Proceso primary key (codigo) USING INDEX TABLESPACE MARCA_IDX
+)
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2ParametroProceso
+--
+-- PURPOSE: Procesos que se ejecuta para obtener las previsiones.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  proceso            char(30),
+  nParametro         integer,
+  descripcion        char(80), 
+  foreign key (proceso) references Fn2Proceso(codigo),
+  CONSTRAINT pk_ParametroProceso 
+             primary key (proceso, nParametro) USING INDEX TABLESPACE MARCA_IDX
+)
+  PCTFREE 10
+  PCTUSED 40
+  TABLESPACE MARCA
+  STORAGE (  INITIAL 50K
+             NEXT 50K
+             MAXEXTENTS 249
+             PCTINCREASE 50);
+

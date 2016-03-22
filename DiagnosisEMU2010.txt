@@ -1,0 +1,89 @@
+--DURACION ESTIMACIONES
+-----------------------
+SELECT output,dating,86400*Sum(estdate-iniestdate)/60 AS tiempoest
+FROM emuestimation
+WHERE estsession LIKE 'E20100928.PV'
+GROUP BY  output,dating
+ORDER BY 3 desc
+
+--PUNTOS CON MAYOR ERROR
+------------------------
+SELECT OUTPUT,DATING,TRANSFORMATION,STDDEVIATION
+FROM emuestimation
+WHERE estsession LIKE 'E20100928.PV'
+ORDER BY TRANSFORMATION,STDDEVIATION DESC;
+
+--PUNTOS CON % INTYERRUPCIONES
+------------------------
+
+select output,sum(case when interruptions <>0 then 1 else 0 end)/count(*) as PorcInt,sum(case when interruptions <>0 then 1 else 0 end),count(*)
+from emuestimationseries
+WHERE estsession LIKE 'E20100928.PV'
+group by output
+order by 2 desc;
+
+--Devoluciones
+-------------------------------
+select t1.newsstand,t2.fathernode,avg(Return),sum(return)/(sum(service)+0.0000001)
+from emuoperation t1,emunode t2
+where
+t1.header='ELMUNDO' and t1.product='DIARIO'
+and operationdate>to_date('20100101','yyyymmdd')
+and t1.newsstand=t2.newsstand
+and t1.header=t2.header
+and t1.product=t2.product
+group by t1.newsstand,t2.fathernode
+order by 3 desc;
+
+--Agotados
+-------------------------------
+select t1.newsstand,t2.fathernode,avg(service),
+sum(case when return=0 then 1 else 0 end),sum(case when return=0 then 1 else 0 end)/count(*) as PorAgo
+from emuoperation t1,emunode t2
+where
+t1.header='ELMUNDO' and t1.product='DIARIO'
+and operationdate>to_date('20100101','yyyymmdd')
+and t1.newsstand=t2.newsstand
+and t1.header=t2.header
+and t1.product=t2.product
+--and t1.newsstand='028002504829'
+group by t1.newsstand,t2.fathernode
+order by 4 desc;
+
+
+--Puntos con operaciones sin tirada
+-----------------------------------
+
+
+SELECT newsstand
+FROM emuoperation
+WHERE
+header='ELMUNDO' AND product='DIARIO'
+AND service>0
+AND operationdate=To_Date('20101026','yyyymmdd')
+MINUS
+SELECT newsstand
+FROM  emuprintingdetail
+WHERE
+orderf=1
+AND header='ELMUNDO' AND product='DIARIO'
+AND dateprint=To_Date('20101026','yyyymmdd')
+AND decision+increasedec>0
+;
+
+Puntos con tirada sin operaciones
+---------------------------------
+ SELECT newsstand
+FROM  emuprintingdetail
+WHERE
+orderf=1
+AND header='ELMUNDO' AND product='DIARIO'
+AND dateprint=To_Date('20101026','yyyymmdd')
+AND decision+increasedec>0
+minus
+SELECT newsstand
+FROM emuoperation
+WHERE
+header='ELMUNDO' AND product='DIARIO'
+AND service>0
+AND operationdate=To_Date('20101026','yyyymmdd')	;

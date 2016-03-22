@@ -1,0 +1,35 @@
+define pridet='20110315';
+
+select pri.header AS cabecera, orderf AS orden, to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,
+       count(*) as PVServicio,
+/*
+       (CASE WHEN pri.header = 'MARCA'
+             THEN SUM(ROUND(decision + increaseDec))+ser.service
+             ELSE SUM(case when (decision + increaseDec) <= 50
+                           then ceil(decision + increaseDec)
+                           else ROUND(decision + increaseDec)
+                      end)+ser.service
+        END) AS TOTAL,
+*/
+       (CASE WHEN pri.header = 'MARCA'
+             THEN 100*Ceil((SUM(ROUND(decision + increaseDec))+ser.service)/100)
+             ELSE 100*Ceil((SUM(case when (decision + increaseDec) <= 50
+                                     then ceil(decision + increaseDec)
+                                     else ROUND(decision + increaseDec)
+                                end)+ser.service)/100)
+        END) AS TOTAL_____MARCA
+from
+(SELECT *
+FROM FN3SERVICECAM) ser,
+fn3printingdetail pri, fn3codification cod
+where --pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.dateprint = to_date('&pridet', 'YYYYMMDD') and
+      ser.header=pri.header and
+      to_char(pri.dateprint,'DY')= ser.weekday
+group by pri.header, orderf, dateprint,delegate,ser.service
+ORDER BY cabecera, orden;

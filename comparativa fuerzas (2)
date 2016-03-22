@@ -1,0 +1,20 @@
+select t1.equipo,t1.fecha,t1.fuerza as new,t2.fuerza as old
+from
+(select  equipo,fecha,fuerza
+from fn3fuerzaequipo2010
+--where equipo='SPA'
+)  t1,
+(
+select  equipo,fecha,fuerza
+from fn3fuerzaequipo
+--where t1.equipo='SPA'
+)  t2
+where
+t1.equipo=t2.equipo
+and t1.fecha=t2.fecha
+and t1.fecha=dat('19920305')
+--and t1.fecha=dat('2010/06/11')
+--and t1.equipo='SPA'
+and t1.equipo in (select equipo from fn3equipocompite  where competicion='MUNDIAL' and temporada='2007/2010')
+ORDER BY t1.fuerza ,T1.EQUIPO
+

@@ -1,0 +1,140 @@
+define node='CATBARCAP2'
+define fecha='20080612'
+
+
+SELECT oper.newsstand,servicio,Nvl(tirada,-1) AS TIRADA
+from
+(SELECT op.newsstand AS newsstand,op.service  AS servicio
+FROM fn3operation op,fn3node nod
+WHERE
+op.operationdate=dat('&fecha')
+AND nod.header='MARCA' AND nod.product='DIARIO'
+AND fathernode='&node'
+AND nod.newsstand=op.newsstand
+AND op.header=nod.header
+AND op.product=nod.product) oper,
+(
+SELECT pri.newsstand ,(case when (pri.decision + pri.increaseDec) <= 15
+          then  Ceil (pri.decision + pri.increaseDec)
+          else  ROUND(pri.decision + pri.increaseDec) END) AS tirada
+FROM fn3printingdetail pri,fn3node nod
+WHERE
+dateprint=dat('&fecha')
+ AND nod.header='MARCA' AND nod.product='DIARIO'
+AND fathernode='&node'
+AND nod.newsstand=pri.newsstand) prin
+WHERE prin.newsstand=oper.newsstand
+AND tirada<>servicio
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+define prinode='AND'
+define fecha='20080612'
+
+
+SELECT oper.newsstand,servicio,Nvl(tirada,-1) AS tirada,servicio-tirada AS dif
+from
+(SELECT op.newsstand AS newsstand,op.service  AS servicio
+FROM fn3operation op
+WHERE
+op.operationdate=dat('&fecha')
+AND op.header='MARCA' AND op.product='DIARIO'
+) oper,
+(
+SELECT pri.newsstand ,(case when (pri.decision + pri.increaseDec) <= 15
+          then  Ceil (pri.decision + pri.increaseDec)
+          else  ROUND(pri.decision + pri.increaseDec) END) AS tirada
+FROM fn3printingdetail pri
+WHERE
+dateprint=dat('&fecha')
+ AND header='MARCA' AND product='DIARIO'
+AND node='&prinode'
+) prin
+WHERE prin.newsstand(+)=oper.newsstand
+AND tirada<>servicio
+ORDER BY dif
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+PUNTOS CERRADOS FN3 CON SERVICIO DE LA DISTRIBUIDORA
+
+define node2='AND'
+define fecha='20080619'
+
+(SELECT op.newsstand AS newsstand
+FROM fn3operation op,fn3node nod
+WHERE
+op.operationdate=dat('&fecha')
+AND nod.header='MARCA' AND nod.product='DIARIO'
+AND fathernode like '&node2%'
+AND nod.newsstand=op.newsstand
+AND op.header=nod.header
+AND op.product=nod.product)
+minus
+(
+SELECT pri.newsstand
+FROM fn3printingdetail pri
+WHERE
+dateprint=dat('&fecha')
+ AND pri.header='MARCA' AND pri.product='DIARIO'
+AND node='&node2'
+)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+PUNTOS CON SERVICIO FN3 Y CERRADOS
+
+define node2='CATBAR'
+define fecha='20080612'
+
+(
+SELECT pri.newsstand
+FROM fn3printingdetail pri,fn3newsstandon non
+WHERE
+dateprint=dat('&fecha')
+ AND pri.header='MARCA' AND pri.product='DIARIO'
+AND node='&node2'
+AND decision>0
+and non.dateoff is null
+and non.newsstand=pri.newsstand
+)
+MINUS
+((SELECT op.newsstand AS newsstand
+FROM fn3operation op,fn3node nod
+WHERE
+op.operationdate=dat('&fecha')
+AND nod.header='MARCA' AND nod.product='DIARIO'
+AND fathernode like '&node2%'
+AND nod.newsstand=op.newsstand
+AND op.header=nod.header
+AND op.product=nod.product)
+UNION
+(SELECT op.newsstand AS newsstand
+FROM fn3operationnotcontrolled op,fn3node nod
+WHERE
+op.operationdate>=dat('&fecha')
+AND nod.header='MARCA' AND nod.product='DIARIO'
+AND fathernode like '&node2%'
+AND nod.newsstand=op.newsstand
+AND op.header=nod.header
+AND op.product=nod.product))
+

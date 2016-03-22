@@ -1,0 +1,212 @@
+insert into fn3operationnotloaded
+select header,product,newsstand,operationdate,operationdate+7,service,incidence,return
+from
+(
+ select *
+ from fn3operation
+ where header='EXPANSION' and product='DIARIO'
+ and newsstand like '028%' and
+ operationdate>=to_date('20020901','yyyymmdd')
+ MINUS 
+ select header,product,newsstand,operationdate,service,incidence,return
+ from fn3operationhistorical
+ where header='EXPANSION' and product='DIARIO'
+ and newsstand like '028%' and
+ operationdate>=to_date('20020901','yyyymmdd')
+)
+
+
+
+
+
+delete fn3operation
+where header='EXPANSION' and product='DIARIO'
+ and newsstand like '028%' and
+ operationdate>=to_date('20020901','yyyymmdd');
+
+
+insert into fn3operation
+ select header,product,newsstand,operationdate,service,incidence,return
+ from fn3operationhistorical
+ where header='EXPANSION' and product='DIARIO'
+ and newsstand like '028%' and
+ operationdate>=to_date('20020901','yyyymmdd');
+
+
+
+
+
+insert into fn3operation
+select header,product,newsstand,operationdate
+from fn3operationnotloaded
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020701','yyyymmdd') and
+operationdate<=to_date('20020731','yyyymmdd') and
+newsstand like '028%'
+INTERSECT
+(select header,product,newsstand,operationdate
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020701','yyyymmdd') and
+operationdate<=to_date('20020731','yyyymmdd') and
+newsstand like '028%');
+
+
+
+
+
+select header,product,newsstand,operationdate
+from fn3operation
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020201','yyyymmdd') and
+operationdate<=to_date('20020228','yyyymmdd') and
+newsstand like '028%'
+minus
+(select header,product,newsstand,operationdate
+from fn3operationhistorical
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020201','yyyymmdd') and
+operationdate<=to_date('20020228','yyyymmdd') and
+newsstand like '028%');
+
+
+
+select count(*)
+from fn3operation
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020201','yyyymmdd') and
+operationdate<=to_date('20020228','yyyymmdd') and
+newsstand like '028%'
+UNION ALL
+(select count(*)
+from fn3operation
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020601','yyyymmdd') and
+operationdate<=to_date('20020630','yyyymmdd') and
+newsstand like '028%');
+
+
+
+select count(*),comunicationdate
+from fn3operationhistorical
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020301','yyyymmdd') and
+operationdate<=to_date('20020331','yyyymmdd') and
+newsstand like '028%'
+group by comunicationdate;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delete fn3operationnotloaded
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020501','yyyymmdd') and
+operationdate<=to_date('20020531','yyyymmdd') and
+newsstand like '028%';
+
+
+
+
+
+
+
+
+insert into fn3operation
+select header,product,newsstand,operationdate,service,incidence,return
+from fn3operationhistorical
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020601','yyyymmdd') and
+operationdate<=to_date('20020630','yyyymmdd') and
+comunicationdate=to_date('20020722','yyyymmdd') and
+newsstand like '028%';
+
+
+
+
+------------------------------------------------------------------
+
+--TRASPASO DE OPERATIONNOTLOADED A OPERATION
+insert into fn3operation
+--select count(*)
+select header,product,newsstand,operationdate,service,incidence,return
+from fn3operationnotloaded
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020701','yyyymmdd') and
+operationdate<=to_date('20020731','yyyymmdd') and
+newsstand like '028%';
+
+--BORRADO DE OPERATIONNOTOLOADED
+delete fn3operationnotloaded
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020601','yyyymmdd') and
+operationdate<=to_date('20020630','yyyymmdd') and
+newsstand like '028%';
+
+
+
+
+
+
+
+insert into fn3operationhistorical
+select header,product,newsstand,operationdate,sysdate,service,incidence,return
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020801','yyyymmdd') and
+operationdate<=to_date('20020801','yyyymmdd') and
+newsstand like '028%';
+
+select count(*),comunicationdate
+from fn3operationhistorical
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020201','yyyymmdd') and
+operationdate<=to_date('20020930','yyyymmdd') and
+newsstand like '028%'
+group by comunicationdate;
+
+
+delete fn3operationhistorical
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020801','yyyymmdd') and
+operationdate<=to_date('20020831','yyyymmdd') and
+newsstand like '028%' and
+comunicationdate=to_date('20020625','yyyymmdd');
+
+
+
+
+
+
+delete fn3operationnotloaded
+where header='EXPANSION' and product='DIARIO' and
+operationdate>=to_date('20020927','yyyymmdd') and
+operationdate<=to_date('20020929','yyyymmdd') and
+newsstand like '028%';
+
+
+
+
+select count(*),operationdate
+
+delete
+from fn3operationnotloaded
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20020701','yyyymmdd') and
+operationdate<=to_date('20020731','yyyymmdd') and
+newsstand like '028%'
+group by operationdate;
+
+
+
+

@@ -1,0 +1,9 @@
+select substr(t1.output,0,30),substr(t1.dating,1,12),t1.stddeviation as OLD,
+	t2.stddeviation as NEW,substr(abs((t1.stddeviation-t2.stddeviation)/t1.stddeviation),1,10)*100 as Porc
+from fn3estimation t1,fn3estimation t2
+where t1.estsession='20020823_CAM.PV' and
+      t2.estsession='20020830_CAM.PV' and
+      t1.stddeviation<t2.stddeviation and
+      t1.output=t2.output
+      order by abs((t1.stddeviation-t2.stddeviation)/t1.stddeviation);
+

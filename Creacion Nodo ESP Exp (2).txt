@@ -1,0 +1,72 @@
+DELETE fn3nodesaleadvance
+WHERE
+NODE='ESP' and
+header='EXPANSION' and 
+product='DIARIO' and
+saledate<to_date('20020101','yyyymmdd');
+-------------------------------------------
+
+insert into fn3nodesaleadvance
+select 'EXPANSION','DIARIO','ESP',
+       t1.saledate,
+       sysdate,
+       sum(t1.service)+sum(t2.service)+sum(t3.service)+
+       sum(t4.service)+sum(t5.service)+sum(t6.service)+
+       sum(t7.service)+sum(t8.service)+sum(t9.service)+
+       sum(t10.service) as ser,
+       sum(t1.return)+sum(t2.return)+sum(t3.return)+
+       sum(t4.return)+sum(t5.return)+sum(t6.return)+
+       sum(t7.return)+sum(t8.return)+sum(t9.return)+
+       sum(t10.return) as return,
+       sum(t1.sale)+sum(t2.sale)+sum(t3.sale)+
+       sum(t4.sale)+sum(t5.sale)+sum(t6.sale)+
+       sum(t7.sale)+sum(t8.sale)+sum(t9.sale)+
+       sum(t10.sale) as sale
+from   fn3nodesaleadvance t1 ,fn3nodesaleadvance t2,fn3nodesaleadvance t3,
+       fn3nodesaleadvance t4 ,fn3nodesaleadvance t5,fn3nodesaleadvance t6,
+       fn3nodesaleadvance t7 ,fn3nodesaleadvance t8,fn3nodesaleadvance t9,
+       fn3nodesaleadvance t10
+where t1.node='AND' and
+      t2.node='ARA' and
+      t3.node='CAN' and
+      t4.node='CAM' and
+      t5.node='CAT' and
+      t6.node='NOR' and
+      t7.node='NOROES' and
+      t8.node='EXT' and
+      t9.node='CEN' and
+      t10.node='LEVBAL' and
+      t1.header='EXPANSION' and
+      t1.product='DIARIO' and
+      t1.saledate<to_date('20020101','yyyymmdd') and
+      t1.header=t2.header and
+      t2.header=t3.header and
+      t3.header=t4.header and
+      t4.header=t5.header and
+      t5.header=t6.header and
+      t6.header=t7.header and
+      t7.header=t8.header and
+      t8.header=t9.header and
+      t9.header=t10.header and
+      t1.product=t2.product and
+      t2.product=t3.product and
+      t3.product=t4.product and
+      t4.product=t5.product and
+      t5.product=t6.product and
+      t6.product=t7.product and
+      t7.product=t8.product and
+      t8.product=t9.product and
+      t9.product=t10.product and
+      t1.saledate=t2.saledate     and 
+      t2.saledate=t3.saledate     and
+      t3.saledate=t4.saledate     and
+      t4.saledate=t5.saledate     and
+      t5.saledate=t6.saledate     and
+      t6.saledate=t7.saledate     and
+      t7.saledate=t8.saledate     and
+      t8.saledate=t9.saledate     and
+      t9.saledate=t10.saledate   
+group by t1.node,t2.node,t3.node,t4.node,t5.node,t6.node,t7.node,t8.node,t9.node,t10.node,
+         t1.saledate,t2.saledate,t3.saledate,t4.saledate,t5.saledate,t6.saledate,
+         t7.saledate,t8.saledate,t9.saledate,t10.saledate;
+

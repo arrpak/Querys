@@ -1,0 +1,32 @@
+select
+header,product,edition,geographiczone,
+CASE
+WHEN geographiczone IN ('ALM','ALG','CAD','GRA','JAE','MAL','JER','SEV','JAE','MEL','HUE','COB')  THEN 'Andalucía'
+WHEN geographiczone IN ('ZAM','VLL','SEG','SAL','PAC','LEO','AVI')  THEN 'Castilla-León Resto'
+WHEN geographiczone IN ('BAR')  THEN 'Barcelona'
+WHEN geographiczone IN ('ESP')  THEN 'Nacional'
+WHEN geographiczone IN ('ARA')  THEN 'Aragón'
+WHEN geographiczone IN ('MAD')  THEN 'Madrid'
+WHEN geographiczone IN ('BUR')  THEN 'Burgos'
+WHEN geographiczone IN ('SOR')  THEN 'Soria'
+WHEN geographiczone IN ('LRI')  THEN 'LaRioja'
+WHEN geographiczone IN ('NAV')  THEN 'Navarra'
+WHEN geographiczone IN ('CMU')  THEN 'Murcia'
+WHEN geographiczone IN ('AST')  THEN 'Asturias'
+WHEN geographiczone IN ('CCA')  THEN 'Cantabria'
+WHEN geographiczone IN ('CAC','BAD')  THEN 'Extremadura'
+WHEN geographiczone IN ('TEN','PAL')  THEN 'Canarias'
+WHEN geographiczone IN ('GUA','CRE','TOL','ALB','CUE')  THEN 'Castilla-La Mancha'
+WHEN geographiczone IN ('LER','TAR','GIR')  THEN 'CataluñaResto'
+WHEN geographiczone IN ('IBI','MLL','MEN')  THEN 'Baleares'
+WHEN geographiczone IN ('VAL','CAS','ALI')  THEN 'Comunidad Valenciana'
+WHEN geographiczone IN ('GUI','VIZ','ALA')  THEN 'Pais Vasco'
+WHEN geographiczone IN ('COR','LUG','PON','ORE')  THEN 'Galicia'
+end AS ZonaBayes
+,mes,anno,avg(service),avg(service-return) ,
+avg(return),(sum(return)/sum(service)) ,
+avg(numpvoutoff),avg(numpvopen)
+from fn3emuproductinformation
+where numpvoutoff>0	and header='MARCA'
+group by header,product,edition,geographiczone,mes,anno
+ORDER BY mes,anno

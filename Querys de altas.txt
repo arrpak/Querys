@@ -1,0 +1,84 @@
+insert into Fn2Nodo
+values ('MARCA', 'DIARIO', '100003323834',
+        'nodo terminal', '100003323834', 'CAMPER');
+
+insert into Fn2Output
+values ('VentaMarca100002720421','MARCA','DIARIO','100002720421');
+
+insert into Fn2OutputDef
+values ('VentaMarca100002720421','VentaMarca100002720421','DIARIO',
+to_date('2000/10/06','YYYY/MM/DD'),to_date('2001/01/01','YYYY/MM/DD'),NULL);
+
+
+insert into Fn2estimation
+(estsession,outputdef,state)
+values('FICTICIA','VentaMarca100002720421','FIN');
+
+
+
+
+
+
+SELECT * FROM FN2OUTPUTDEF
+WHERE OUTPUTDEF LIKE='%23778%';
+
+
+
+
+
+
+Update Fn2OutputDef set Finestusuario=to_date('2010/01/01','yyyy/mm/dd')where
+outputdef like '%20000323777%';
+
+
+
+
+**************************************************************
+
+
+select * from expoperation where dia=to_date('2000/09/09','YYYY/MM/DD');
+
+**************************************************************
+
+select count(*)
+from   kiosco;
+
+select count(*)
+from   Fn2PuntoVenta;
+
+select count(*)
+from   Fn2Nodo
+where  puntoventa IS NOT NULL;
+
+select count(*)
+from   Fn2Output;
+
+
+
+
+
+***************************************************************
+
+
+
+
+
+
+
+INSERT INTO Fn2Forecast
+VALUES ('2000091320.RMAGanCopEur',
+        'VentaMarca100005223685',
+        to_date('2000/09/13','YYYY/MM/DD'),
+        to_date('2000/09/20','YYYY/MM/DD'),
+        to_date('2000/09/10','YYYY/MM/DD'),
+        to_date('2000/09/12','YYYY/MM/DD'),
+        'FICTICIA',
+        'ERR',
+        'Fin de la prevision',
+        -1,
+        'Prevision de las ventas de MARCA del pv 100005223685.sf')
+
+
+delete Fn2Forecast
+where outputdef = 'VentaMarca100005223685'
+                   fn2output.nodo = Fn2puntoventa.codigo);

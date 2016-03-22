@@ -1,0 +1,27 @@
+     select node
+    from
+    (
+      select distinct code as node, fathernode
+      from   fn3node
+      where  header  = 'MARCA'
+        and  product = 'DIARIO'
+        and  newsstand is null
+    ) t1
+    start with node = 'CAM'
+    connect by prior node = fathernode
+
+
+
+    union
+    select node
+    from
+    (
+      select distinct code as node, fathernode
+      from   fn3node
+      where  header  = '"+ header +"'
+        and  product = '"+ product +"'
+        and  newsstand is null
+    ) t2
+    start with node = '"+ node +"'
+    connect by node = prior fathernode
+    ";

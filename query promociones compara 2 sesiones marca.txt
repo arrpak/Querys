@@ -1,0 +1,50 @@
+Define newfs ='20110323.01.MktSemanal.BSR';
+Define oldfs ='20110316.02.MktSemanal.BSR';
+define firstdate='20110101';
+define lastdate ='20110320';
+
+
+
+
+SELECT t1.cabecera,t1.promocion,t1.ejemnuevo,t2.ejemantiguo,round(ejemnuevomed,0),round(ejemantiguomed,0)
+FROM
+(
+select cabecera,promocion,sum(numejemplares) AS ejemnuevo,avg(numejemplares) AS ejemnuevomed
+from (select Replace(ei.output, 'Com') as Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionInput esi
+where
+esi.input = ei.input
+--and  esi.setinput = isi.setinput
+and
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('&firstdate','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion
+) t1,
+(
+select cabecera,promocion,sum(numejemplares) AS ejemantiguo,avg(numejemplares) AS ejemantiguomed
+from (select Replace(ei.output, 'Com') as Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from fn3EstimationIssue ei,fn3PromotionInput esi
+where
+esi.input = ei.input
+--and  esi.setinput = isi.setinput
+and
+ei.estsession = '&oldfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'
+AND ei.valuedate>=To_Date('&firstdate','yyyymmdd')
+AND ei.valuedate<=To_Date('&lastdate','yyyymmdd'))
+GROUP BY cabecera,promocion
+) t2
+WHERE t1.cabecera=t2.cabecera
+AND t1.promocion=t2.promocion;
+
+
+
+

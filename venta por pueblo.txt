@@ -1,0 +1,11 @@
+SELECT operationdate,Sum(service+incidence) AS tirada,Sum(Service+incidence-RETURN) AS venta
+FROM fn3operation
+WHERE header='MARCA' AND product='DIARIO'
+AND operationdate>SYSDATE-400
+AND newsstand IN
+(
+SELECT code
+FROM fn3newsstand
+WHERE town='PINTO'
+)
+GROUP BY operationdate

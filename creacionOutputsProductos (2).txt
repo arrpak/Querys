@@ -1,0 +1,152 @@
+
+define prod='CAZ_ATM';
+define code='33148';
+
+
+--delete Fn3ProductDelegate where product ='CAZ_ATM' and code in('44136','11000');
+
+--insert into productdistributor
+
+INSERT INTO  Fn3ProductDelegate   
+SELECT header,'&prod',weekday,distributor,delegate,'&code',description
+FROM    Fn3ProductDelegate   
+WHERE product='DIARIO' AND delegate='MADRID' AND header='MARCA'
+
+
+
+INSERT INTO FN3NODE
+SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+code='ESP' and
+header='MARCA' AND product='DIARIO'
+UNION
+(SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+code='PEN' and
+header='MARCA' AND product='DIARIO')
+UNION
+(SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+code='CAM' and
+header='MARCA' AND product='DIARIO')
+UNION
+(SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+fathernode='CAM' and
+header='MARCA' AND product='DIARIO')
+UNION
+(SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+fathernode='CAMMMP' and
+header='MARCA' AND product='DIARIO')
+UNION
+(SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+fathernode='CAMEXP' and
+header='MARCA' AND product='DIARIO')       
+
+
+INSERT INTO FN3NODE
+(SELECT header,'&prod',code,description,newsstand,fathernode
+FROM fn3node
+WHERE 
+fathernode LIKE 'CAM%' AND
+newsstand IS NOT NULL AND 
+header='MARCA' AND product='DIARIO')       
+
+
+INSERT INTO  Fn3ProductDelegate   
+SELECT header,'&prod',weekday,distributor,delegate,code,description
+FROM    Fn3ProductDelegate   
+WHERE product='DIARIO' AND delegate='MADRID' AND header='MARCA'
+
+
+
+
+
+
+--MODIFICACION FICHERO DE CARGA
+INSERT INTO fn3operation
+   SELECT header,product,newsstand,operationdate,Sum(service) AS service, Sum(incidence) AS incidence, Sum(return) AS return
+   FROM(
+     
+   SELECT pd.header AS header, pd.product AS product, ot.newsstand AS newsstand, 
+          ot.operationdate AS operationDate, 
+          Sum(ot.service) AS service, Sum(ot.incidence) AS incidence, Sum(ot.return) AS return
+   FROM Fn3OperationTmp ot, 
+        Fn3ProductDelegate pd, 
+        ( 
+          SELECT code
+          FROM   Fn3NewsStand
+          MINUS
+          SELECT code
+          FROM   Fn3NewsStandConcat
+        ) ns
+   WHERE ot.loadSession = '20091120_CAM_2' 
+     AND pd.distributor = 'GELESA' 
+     AND ot.delegate    = pd.delegate
+     AND pd.weekday     = decode(to_char(ot.operationDate, 'd'), '1', 'MON', 
+                                  '2', 'TUE', '3', 'WED', '4', 'THU', '5', 'FRI',
+                                  '6', 'SAT', '7', 'SUN') 
+     AND ot.newsstand  = ns.code
+     AND pd.code       = ot.codeproduct
+     AND ot.controlled = 'Y'
+     AND ot.service + ot.incidence - ot.return >= 0 
+     AND ot.service + ot.incidence > 0
+     AND ot.return >=  0
+   GROUP BY pd.header,ot.codeproduct, pd.product,
+            ot.newsstand, ot.operationdate
+   HAVING Count(*) = 1 )
+GROUP BY  header,product,newsstand,operationdate  
+UNION
+
+
+
+   SELECT header,product,newsstand,operationdate,Sum(service) AS service, Sum(incidence) AS incidence, Sum(return) AS return
+   FROM(
+     
+   SELECT pd.header AS header, pd.product AS product, ot.newsstand AS newsstand, 
+          ot.operationdate AS operationDate, 
+          Sum(ot.service) AS service, Sum(ot.incidence) AS incidence, Sum(ot.return) AS return
+   FROM Fn3OperationTmp ot, 
+        Fn3ProductDelegate pd, 
+        ( 
+          SELECT code
+          FROM   Fn3NewsStand
+          MINUS
+          SELECT code
+          FROM   Fn3NewsStandConcat
+        ) ns
+   WHERE ot.loadSession = '20091120_CAM_2' 
+     AND pd.distributor = 'GELESA' 
+     AND ot.delegate    = pd.delegate
+     AND pd.weekday     = decode(to_char(ot.operationDate, 'd'), '1', 'MON', 
+                                  '2', 'TUE', '3', 'WED', '4', 'THU', '5', 'FRI',
+                                  '6', 'SAT', '7', 'SUN') 
+     AND ot.newsstand  = ns.code
+     AND pd.code       = ot.codeproduct
+     AND ot.controlled = 'N'
+     AND ot.service + ot.incidence - ot.return >= 0 
+     AND ot.service + ot.incidence > 0
+     AND ot.return >=  0
+   GROUP BY pd.header,ot.codeproduct, pd.product,
+            ot.newsstand, ot.operationdate
+   HAVING Count(*) = 1 )
+GROUP BY  header,product,newsstand,operationdate  
+
+
+
+
+
+
+
+  
+
+
+

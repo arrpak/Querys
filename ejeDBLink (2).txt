@@ -1,0 +1,115 @@
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+create public database link FORMARCA2
+connect to FORMARCA
+identified by FORMARCA
+using '(description=(address=(protocol=TCP) (host=192.168.191.1)(port=1521))(connect_data=(sid=oracle83)))';
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+
+
+
+
+SELECT *
+FROM all_indexes
+WHERE table_name='FN3PRINTINGDETAIL'
+
+
+
+
+
+
+SELECT Count(*)
+FROM  FN3PRINTINGDETAIL
+
+
+CREATE DATABASE LINK  FORMARCAOLD
+USING 'FORMARCAB1';
+
+
+ SELECT *
+ FROM fn3waytype@FORMARCA2;
+
+
+DROP PUBLIC DATABASE LINK  "FORMARCAOLD";
+
+
+
+CREATE DATABASE LINK  FORMARCAOLD
+CONNECT TO FORMARCA IDENTIFIED BY FORMARCA
+USING 'FORMARCAB1';
+
+
+
+
+CREATE PUBLIC DATABASE LINK FORMARCAOLD CONNECT TO
+FORMARCA
+IDENTIFIED BY FORMARCA
+USING 'FORMARCAB1'
+
+
+
+
+
+SELECT * FROM user_db_links;
+
+SELECT * FROM all_db_links;
+
+SELECT *
+FROM fn3waytype@FORMARCA2;
+
+
+
+DELETE fn3printingdetail WHERE (dateprint=to_date('20100223','yyyymmdd') OR dateprint=to_date('20100224','yyyymmdd'))AND HEADER='MARCA';
+DELETE fn3printingnodeforsession WHERE (dateprint=to_date('20100223','yyyymmdd') OR dateprint=to_date('20100224','yyyymmdd'))AND HEADER='MARCA';
+DELETE fn3printing WHERE (dateprint=to_date('20100223','yyyymmdd') OR dateprint=to_date('20100224','yyyymmdd'))AND HEADER='MARCA';
+
+
+INSERT INTO fn3printing
+SELECT *
+FROM fn3printing@FORMARCA2
+WHERE
+(dateprint=to_date('20100223','yyyymmdd') OR dateprint=to_date('20100224','yyyymmdd'))
+AND HEADER='MARCA';
+
+
+INSERT INTO fn3printingnodeforsession
+SELECT *
+FROM fn3printingNODEFORSESSION@FORMARCA2
+WHERE
+(dateprint=to_date('20100223','yyyymmdd') OR dateprint=to_date('20100224','yyyymmdd'))
+AND HEADER='MARCA';
+
+
+INSERT INTO fn3printingdetail
+SELECT *
+FROM fn3printingDETAIL@FORMARCA2
+WHERE
+(dateprint=to_date('20100223','yyyymmdd') OR dateprint=to_date('20100224','yyyymmdd'))
+AND HEADER='MARCA';
+
+
+
+SELECT Sum(decision+increasedec)
+FROM fn3printingDETAIL
+WHERE
+(dateprint=to_date('20100223','yyyymmdd') )
+AND HEADER='MARCA';
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT Count(*)
+FROM fn3forecastseries
+WHERE forsession='2010022504.PV';

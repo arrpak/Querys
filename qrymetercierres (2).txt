@@ -1,0 +1,38 @@
+define dateprint='20110103';
+
+
+UPDATE fn3printingdetail
+SET decision=0,increasedec=0
+--SELECT Count(*) FROM fn3printingdetail
+--select newsstand FROM fn3printingdetail
+WHERE
+dateprint=To_Date('&dateprint','yyyymmdd')
+and decision>0
+and newsstand in
+(
+SELECT t1.newsstand
+FROM fn3closingfixed t1,fn3newsstandon t2
+WHERE
+t2.dateoff IS NULL
+--AND t1.newsstand LIKE '028%'
+AND datefrom <=To_Date('&dateprint','yyyymmdd')
+AND dateuntil>=To_Date('&dateprint', 'yyyymmdd')
+AND t1.newsstand=t2.newsstand
+);
+
+
+
+insert into fn3servicemodified
+select 'MARCA','DIARIO',t1.newsstand,To_Date('20080624','yyyymmdd'),0
+FROM fn3closingfixed t1,fn3newsstandon t2
+WHERE
+t2.dateoff IS NULL
+--AND (--t1.newsstand like '028%'		)
+AND datefrom<=To_Date('20080624','yyyymmdd')
+AND dateuntil>=To_Date('20080624','yyyymmdd')
+AND t1.newsstand=t2.newsstand
+and t1.newsstand not in
+(select newsstand
+from fn3servicemodified
+where modifieddate=To_Date('20080624','yyyymmdd')
+);

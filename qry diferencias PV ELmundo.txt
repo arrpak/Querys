@@ -1,0 +1,23 @@
+
+
+select *
+from
+(select newsstand,operationdate,service,incidence,(service+incidence-return) as venta
+from EMUoperation
+where header='ELMUNDO' and product='DIARIO' and
+operationdate=to_date('20100209','yyyymmdd')
+) ope,
+(
+select newsstand,dateprint,
+       sum(case when (decision + increaseDec) <= 15
+            then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as decision
+from EMUprintingdetail
+where header='ELMUNDO' and product='DIARIO' and
+dateprint=to_date('20100209','yyyymmdd')
+--node='AND'
+--AND newsstand='010001501104'
+AND orderf=1
+group by newsstand,dateprint) pri
+WHERE pri.newsstand=ope.newsstand
+AND service<>decision

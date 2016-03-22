@@ -1,0 +1,22 @@
+UPDATE bsr_d_parameter
+SET co_fixed='Y',vl_ini=vl_muprior
+WHERE co_parameter like'ColeccionMinerales2010%'
+and co_model like '%ElPais%'
+;
+
+
+
+
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComPublicoCAM' ,'DVDUniversoHawkings2011.ini', 'Obs.ComPublicoCAM', 0, 'Y', 'N',
+null, 0, null, 0.01, 0.2, null,0.03
+from dual;
+
+
+INSERT INTO   bsr_d_parameter
+select 'InformeMarketingComABCCAM' ,'FutbolinMinigols2011.iv', 'Obs.ComABCCAM', 0, 'Y', 'N',
+null, 0, null, 0.2, 0.2, null,null
+from dual;
+

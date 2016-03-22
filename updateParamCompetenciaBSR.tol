@@ -1,0 +1,49 @@
+
+
+/*Este código fija los parametros en bsr_d_parameter dada una cabecera, 
+una estsession de partida y un criterio de los inputs a fijar,fijandole el 
+valor dela estimacion dada*/
+
+Text header="ABC";
+Text estsession="e20130505Com.01";
+Text cond="(input LIKE '%2013%' OR input LIKE '%2013%')";
+
+
+Struct qryst (Text t,
+              Text value);
+
+
+Real DBOpen("vpnemu","emu","emu");
+
+
+
+
+Text qry="SELECT input,To_char(Value,'0.999999')
+fROM ezcestimationinput e
+WHERE estsession='"+estsession+"'
+AND output='Com"+header+"CAM'
+AND"+cond+" ";
+
+//WriteLn(qry);
+
+Set qryset = DBTable(qry, "qryst" );
+
+
+Set Result = EvalSet (qryset , Real (Set t)
+{
+//WriteLn(t[1]);
+Text qry="update bsr_d_parameter
+          set co_fixed='N', vl_ini="+t[2]+"
+          where co_parameter='"+t[1]+"'
+          and co_node='Obs.Com"+header+"CAM'
+          and co_model='InformeMarketingCom"+header+"CAM'";
+//WriteLn(qry);0
+Real r=DBExecQuery(qry)
+});
+
+
+
+
+
+
+Real DBClose("vpnemu");

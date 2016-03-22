@@ -1,0 +1,58 @@
+
+
+select pri.newsstand,pri.dateprint,
+  ((case when (pri.decision + pri.increaseDec) <= 15
+                        then   ceil(pri.decision + pri.increaseDec)
+                        else  round(pri.decision + pri.increaseDec) end)) tirada,
+                        ope.service,ope.service+ope.incidence-return as venta
+from fn3printingdetail pri,fn3operation ope
+where pri.header='MARCA'
+and pri.product='DIARIO' and
+pri.node='ANDCOR' and
+pri.dateprint=to_date('20040503','yyyymmdd') and
+ope.operationdate(+)=to_date('20040503','yyyymmdd') and
+ope.header(+)=pri.header and
+ope.product(+)=pri.product and
+ope.operationdate(+)=pri.dateprint and
+ope.newsstand (+) like'014%' and
+pri.newsstand like'014%' and
+pri.newsstand=ope.newsstand(+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select pri.newsstand,pri.dateprint,
+  ((case when (pri.decision + pri.increaseDec) <= 15
+                        then   ceil(pri.decision + pri.increaseDec)
+                        else  round(pri.decision + pri.increaseDec) end)) tirada,
+                        ope.service,ope.service+ope.incidence-return as venta
+from fn3printingdetail pri,fn3operation ope
+where pri.header='MARCA'
+and pri.product(+)='DIARIO' and
+pri.node(+)='ANDCOR' and
+pri.dateprint(+)=to_date('20040503','yyyymmdd') and
+ope.operationdate=to_date('20040503','yyyymmdd') and
+ope.header=pri.header(+) and
+ope.product=pri.product(+) and
+ope.operationdate=pri.dateprint(+) and
+ope.newsstand  like'014%' and
+pri.newsstand (+) like '014%' and
+pri.newsstand(+)=ope.newsstand;
+
+
+
+
+
+
+
+

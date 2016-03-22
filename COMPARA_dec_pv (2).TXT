@@ -1,0 +1,15 @@
+SELECT t07.newsstand,t07.DEC,t08.DEC
+from
+(SELECT newsstand,dateprint,Round(decision + increaseDec) AS dec
+FROM fn3printingdetail
+WHERE header='MARCA' AND product='DIARIO'
+AND dateprint=To_Date('20100407','yyyymmdd')
+AND orderf=1) t07,
+(SELECT newsstand,dateprint,Round(decision + increaseDec)  AS dec
+FROM fn3printingdetail
+WHERE header='MARCA' AND product='DIARIO'
+AND dateprint=To_Date('20100408','yyyymmdd')) t08
+WHERE
+t07.newsstand=t08.newsstand
+
+

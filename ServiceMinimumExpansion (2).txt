@@ -1,0 +1,15 @@
+UPDATE
+fn3printingdetail
+--select Count(*) FROM
+SET increasedec=0
+WHERE header='EXPANSION' AND
+dateprint=To_Date('20050616','yyyymmdd')
+AND increasedec<0
+AND newsstand IN
+(SELECT newsstand
+FROM fn3serviceminimum
+WHERE HEADER='EXPANSION' 
+AND weekday='TUE'
+AND service>1
+);
+COMMIT;

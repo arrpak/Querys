@@ -1,0 +1,88 @@
+ALTER TABLE "FORMARCA"."FN2ESTFORSESSION" ADD(CONSTRAINT "FK_ESTSESSIONNODOPADRE_ESTSESSION"
+FOREIGN KEY("ESTSESSIONNODOPADRE") REFERENCES
+"FORMARCA"."FN2ESTSESSION"("CODIGO"));
+
+
+
+alter table "formarca"."fn2OutputDef" 
+add
+( constraint "outputDefCHECK" check ( 
+    ( 
+      substr(outputDef, 1, length(replace(output, ' '))) =  
+      substr(output,    1, length(replace(output, ' '))) 
+    )
+    and
+    (
+      (
+        substr(outputDef, length(replace(output, ' ')) + 1, 1) = '.' 
+      )
+      or 
+      ( 
+        length(replace(outputdef, ' ')) = length(replace(output, ' '))
+      )
+    )
+  )
+);
+
+
+alter table fn2OutputDef
+add
+(
+  constraint outputDefCHECK
+  check
+  ( ( substr(outputDef, 1, length(replace(output, ' '))) =  
+      substr(output,    1, length(replace(output, ' '))) )
+    and ( ( substr(outputDef, length(replace(output, ' ')) + 1, 1) = '.' )
+      or ( length(replace(outputdef, ' ')) = length(replace(output, ' ')) ) )
+  )
+);
+
+
+
+
+select length(replace(outputdef, ' ')), length(replace(output, ' '))
+from fn2outputdef
+where length(replace(outputdef, ' ')) <> length(replace(output, ' '))
+    
+
+
+substr(outputDef, length(replace(output, ' ')) + 1, length(output)) = 
+rpad(' ', (length(output) - length(replace(output, ' '))), ' ') ) ); 
+
+
+
+
+select output, substr(outputDef, length(replace(output, ' ')) + 1, 1) as punto
+from fn2outputdef
+where substr(outputDef, length(replace(output, ' ')) + 1, 1) = '.'
+      or 
+      length(replace(output, ' ')) = length(replace(outputDef, ' '));
+
+
+
+select output, outputdef, substr(outputDef, length(replace(output, ' ')) + 1, 1) as punto
+from fn2outputdef
+where output = 'VentaMarcaCAMVIA';
+
+
+
+select OUTPUTDEF
+from fn2outputdef
+where substr(outputDef, 1, length(replace(output, ' '))) = substr(output, 1, length(replace(output, ' ')));
+
+select OUTPUTDEF, output, substr(outputDef, 1, length(output)), length(output), 
+length(fechado)
+from fn2outputdef
+where substr(outputDef, 1, length(output)) <> output;
+
+
+Select length(replace(nombre, ' '))
+from fn2puntoventa
+
+
+
+select output, outputdef from fn2outputdef
+where output <> outputdef;
+
+
+select '<'||rpad(' ',20, ' ')||'>' from dual

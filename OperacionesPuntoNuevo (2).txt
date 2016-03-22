@@ -1,0 +1,13 @@
+insert into fn3operation
+select header,product,newsstand,operationdate,max(service),max(incidence),max(return)
+from fn3operationnewstanotexist
+where newsstand='028200124836'
+group by header,product,newsstand,operationdate;
+
+
+
+
+
+delete
+from fn3operationnewstanotexist
+where newsstand='028200124836'

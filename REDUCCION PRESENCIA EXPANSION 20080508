@@ -1,0 +1,55 @@
+LUNES A VIERNES
+---------------
+SELECT fn3operation.newsstand,avg(service+incidence-RETURN)
+FROM fn3operation,
+(SELECT newsstand
+FROM fn3printingdetail
+WHERE
+header='EXPANSION'
+AND product='DIARIO'
+AND dateprint=dat('20090511')
+AND decision>0
+) t2
+WHERE
+header='EXPANSION'
+AND product='DIARIO'
+AND operationdate>=dat('20090301')
+AND fn3operation.newsstand=t2.newsstand
+AND To_Char(operationdate,'dy')<>'sáb'
+group BY fn3operation.newsstand
+ORDER BY 2 asc
+
+
+SABADO
+------
+SELECT fn3operation.newsstand,avg(service+incidence-RETURN)
+FROM fn3operation,
+(SELECT newsstand
+FROM fn3printingdetail
+WHERE
+header='EXPANSION'
+AND product='DIARIO'
+AND dateprint=dat('20090509')
+AND decision>0
+) t2
+WHERE
+header='EXPANSION'
+AND product='DIARIO'
+AND operationdate>=dat('20090301')
+AND fn3operation.newsstand=t2.newsstand
+AND To_Char(operationdate,'dy')='sáb'
+group BY fn3operation.newsstand
+ORDER BY 2 asc
+
+
+
+
+
+
+SELECT newsstand
+FROM fn3printingdetail
+WHERE
+header='EXPANSION'
+AND product='DIARIO'
+AND dateprint=dat('20090511')
+AND decision>0

@@ -1,0 +1,21 @@
+SELECT Count(*) FROM pruegh;
+
+
+CREATE INDEX "FORMARCA.STATIONIDX"   ON pruegh  ("STATION");
+CREATE INDEX "FORMARCA.YEARDX"   ON pruegh  ("YEAR");
+
+
+
+
+delete FROM pruegh WHERE moda IS null;
+
+
+
+ALTER TABLE pruegh ADD CONSTRAINT PK_Pruegh
+      PRIMARY KEY (station,YEAR,moda);
+
+
+SELECT station,YEAR,moda,Count(*)
+FROM pruegh
+GROUP BY  station,YEAR,moda
+HAVING Count(*)>1

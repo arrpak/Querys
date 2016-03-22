@@ -1,0 +1,27 @@
+select  outputdef,state,stateinfo
+ from fn2estimation
+where estsession='20001215.Patin.NumEjemp.PV'
+and state ='FIN'
+minus
+( select  outputdef,state,stateinfo
+ from fn2estimation
+where estsession='20001220.Patin.NumEjemp.PV'
+ and state ='FIN');
+
+
+select  count(*)
+ from fn2estimation
+where estsession='20001215.Patin.NumEjemp.PV'
+and state ='FIN'
+minus
+( select  count(*)
+ from fn2estimation
+where estsession='20001220.Patin.NumEjemp.PV'
+ and state ='FIN');
+
+
+
+ select  outputdef,stateinfo
+ from fn2estimation
+where estsession='20001220.Patin.NumEjemp.PV'
+ and state !='FIN';

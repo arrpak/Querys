@@ -1,0 +1,28 @@
+select
+header,product,
+CASE
+WHEN edition='NAC'  THEN 'Nacional'
+WHEN edition='ANDM' THEN 'Andalucía'
+WHEN edition='ARAM' THEN 'Aragon'
+when edition='ASTM' THEN 'Asturias'
+when edition='BALM' THEN 'Baleares'
+when edition='CANM' THEN 'Cantabria'
+when edition='CATM' THEN 'Cataluña'
+when edition='CLMM' THEN 'Castilla-La Mancha'
+when edition='COMM' THEN 'Comunidad Valenciana'
+when edition='CYLM' THEN  'Castilla-León'
+when edition='EUSM' THEN 'Pais Vasco'
+when edition='EXTM' THEN 'Extremadura'
+when edition='GALM' THEN 'Galicia'
+when edition='GRAM' THEN 'Canarias'
+when edition='MADM' THEN 'Madrid'
+when edition='MURM' THEN 'Murcia'
+when edition='NAVM' THEN 'Navarra'
+when edition='RIOM' THEN 'LaRioja'
+end
+,geographiczone,mes,anno,avg(service),avg(service-return) ,
+avg(return),(sum(return)/sum(service)) ,
+avg(numpvoutoff),avg(numpvopen)
+from fn3emuproductinformation
+where numpvoutoff>0
+group by header,product,edition,geographiczone,mes,anno

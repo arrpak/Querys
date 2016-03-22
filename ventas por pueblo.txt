@@ -1,0 +1,67 @@
+//Ventas por pueblo
+
+select town, operationdate, sum(service+incidence-return) as venta
+from fn3operation ope, fn3newsstand new
+where ope.newsstand = new.code and
+      new.town in ('ECIJA')
+group by town, operationdate
+order by operationdate, town
+
+
+select town, operationdate, sum(service+incidence-return) as venta
+from fn3operation ope, fn3newsstand new
+where ope.newsstand = new.code and
+      ope.operationdate >= to_date('20070501', 'YYYYMMDD') and
+      ope.operationdate <= to_date('20080415', 'YYYYMMDD') and
+      new.town in ('GETAFE')
+--and substr(ope.newsstand, 1, 3) = '039'
+group by town, operationdate
+order by operationdate, town
+;
+
+//Nodo-Pueblo
+select Nodo.fecha, ventaNod-ventaTown as venta
+from
+(
+select infodate as fecha, service+incidence-returncont as ventaNod
+from fn3nodeinformation
+where node = 'ASTINT'
+order by infodate
+) Nodo,
+(
+select operationdate as fecha, sum(service+incidence-return) as ventaTown
+from fn3operation ope, fn3newsstand new
+where ope.newsstand = new.code and
+      new.town in ('OVIEDO')
+group by town, operationdate
+order by operationdate
+) Pueblo
+where Nodo.fecha = Pueblo.fecha
+order by Nodo.fecha
+
+
+
+update fn3node
+set fathernode = 'BURPER'
+where fathernode = 'BURSIE' and
+      code in
+(
+select code
+from fn3newsstand
+where town in ('VILLAHOZ')
+)
+
+
+
+
+
+
+select town, dateprint, sum(decision+increasedec) as tirada
+from fn3printingdetail pri, fn3newsstand new
+where pri.newsstand = new.code and
+      pri.dateprint >= to_date('20061020', 'YYYYMMDD') and
+      pri.dateprint <= to_date('20061130', 'YYYYMMDD') and
+      new.town in ('ECIJA')
+group by town, dateprint
+order by dateprint, town	;
+

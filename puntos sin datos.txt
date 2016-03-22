@@ -1,0 +1,10 @@
+-- Puntos de Venta operativos que no mandan operacion
+select codigo
+from   fn2puntoventa
+where  operativo = 'S'
+MINUS
+select puntoventa
+from   fn2operacion
+where  cabecera = 'MARCA'  and
+       producto = 'DIARIO' and
+       fecha    = to_date('20001123', 'YYYYMMDD');

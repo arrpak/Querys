@@ -1,0 +1,6 @@
+UPDATE fn3printingdetail
+SET increasedec = Round((decision*0.024)*(-1)) --, decsys =  decision *(0.90)
+WHERE node = ''
+AND ORDERF = 1
+AND decsession NOT IN ('Serviciofijo', 'Serviciominimo', 'ServicioModificado')
+AND dateprint = To_Date('20071131','yyyymmdd')

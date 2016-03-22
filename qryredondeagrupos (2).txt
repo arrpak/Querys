@@ -1,0 +1,145 @@
+Define dateprint='20071123';
+Define orderf='2';
+Define grupo='Miranda';
+
+
+ SELECT newsstand,decision,increasedec,case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end   AS DEC,
+              case when ((decision + increaseDec)*RatioRed('MARCA','&dateprint','&orderf','&grupo',500) ) <= 15
+              then  Ceil ((decision + increaseDec)*RatioRed('MARCA','&dateprint','&orderf','&grupo',500) )
+              else  ROUND ((decision + increaseDec)*RatioRed('MARCA','&dateprint','&orderf','&grupo',500) ) end,
+              RatioRed('MARCA','20071123','2','&grupo',500)
+FROM  fn3printingdetail
+ WHERE
+     header         = 'MARCA'      and
+     product        = 'DIARIO'     AND
+     orderf         = '&orderf'     and
+     node       = 'NOR'        AND
+     dateprint =  to_date('&dateprint', 'YYYYMMDD') AND
+ newsstand IN
+ (
+ select        pri.newsstand
+              from fn3printingdetail pri, fn3codification cod,fn3newsstandgroup NEW
+where new.newsstandgroup = '&grupo'    and
+      pri.header         = 'MARCA'      and
+      pri.product        = 'DIARIO'     AND
+      pri.orderf         =  '&orderf'       and
+      pri.node           = 'NOR'        AND
+      pri.newsstand      = new.newsstand AND
+      cod.newsstand      = new.newsstand AND
+      pri.dateprint =  to_date('&dateprint', 'YYYYMMDD'))
+
+---------------------------------------------------------------------------------------
+
+SELECT RatioRed('MARCA','&dateprint',&orderf,'&grupo',500)  FROM dual;
+
+BEGIN
+REDONDEARGRUPO('MARCA',&orderf,Dat('&dateprint'),'&grupo',RatioRed('MARCA','&dateprint','&orderf','&grupo',500));
+END;
+/
+
+
+
+BEGIN
+REDONDEARGRUPO('MARCA',2,Dat('20071123'),'CastroUrdiales',RatioRed('20071123','2','CastroUrdiales'));
+END;
+
+
+BEGIN
+REDONDEARGRUPO('MARCA',2,Dat('20071123'),'Mondragon',RatioRed('20071123','2','Mondragon'));
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE REDONDEARGRUPO
+(v_heade IN VARCHAR2,v_orderf IN INTEGER ,v_date IN DATE,v_group IN VARCHAR2,v_ratio IN float)
+IS
+CURSOR c IS
+ SELECT newsstand,case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end   AS DEC
+FROM  fn3printingdetail
+ WHERE
+     header         = v_heade     and
+     product        = 'DIARIO'     AND
+     orderf         = v_orderf     and
+     dateprint      =  v_date      AND
+ newsstand IN
+ (
+ select        pri.newsstand
+              from fn3printingdetail pri, fn3codification cod,fn3newsstandgroup NEW
+where new.newsstandgroup = v_group    and
+      pri.header         = 'MARCA'      and
+      pri.product        = 'DIARIO'     AND
+      pri.orderf         =  v_orderf       and
+      pri.newsstand      = new.newsstand AND
+--fijo?????
+      cod.newsstand      = new.newsstand AND
+      pri.dateprint =  v_date);
+BEGIN
+  FOR i IN c LOOP
+    BEGIN
+       UPDATE fn3printingdetail
+    SET    increasedec=(i.DEC*v_ratio)-(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)
+    WHERE
+    orderf=v_orderf
+    AND header=v_heade
+    AND newsstand=i.newsstand
+    AND dateprint=v_date;
+    END;
+END LOOP;
+END;
+
+
+
+
+
+CREATE OR REPLACE FUNCTION RatioRed(header VARCHAR2, fec VARCHAR2,order VARCHAR2,GRP VARCHAR2,Total INTEGER )    RETURN float
+IS
+Ratio FLOAT;
+BEGIN
+select        Total/
+              (SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))
+              INTO ratio
+              from fn3printingdetail pri, fn3codification cod,fn3newsstandgroup NEW
+where new.newsstandgroup = GRP    and
+      pri.header         =  header      and
+      pri.product        = 'DIARIO'     AND
+      pri.orderf         =  order       and
+ --     pri.node         = 'NOR'        AND
+      pri.newsstand      = new.newsstand AND
+      cod.newsstand      = new.newsstand AND
+--      pri.forsession    <>'ServicioFijo' AND
+      pri.dateprint =  to_date(fec, 'YYYYMMDD')
+group by orderf;
+RETURN ratio;
+END;
+
+
+
+
+
+

@@ -1,0 +1,202 @@
+Define promocion = 'CamaraSanyo8MegaPixel';
+Define tipoprmocion = 'Regalos';
+Define precio = '99.95';
+Define descripcion = 'Camara digital Sanyo 8 MPX a 99.95€. Cartilla encartada 20081130. Cupones 5 de 8 de lunes a viernes. Ambito nacioncal';
+Define promocionpadre = 'Regalos';
+Define nodo = 'ESP';
+Define expTmsPro = 'C-WD(6)-WD(7)+Day(y2008m11d30)';
+Define fechaIni = '20081130';
+Define fechaFin = '20081210';
+Define diaPrimerCupon = '1';
+Define diaUltimoCupon = '5';
+Define diaPrimerComodin = '6';
+Define diaUltimoComodin = '8';
+Define setInputFN3 = 'PromocionesESP2008';
+Define setInpFatFN5 = 'PromoMarca2008';
+Define iniOmegaCartilla = '0.1';
+Define iniOmegaCupon = '0.05';
+Define inpCopia = 'MiniTDTNPG2008';
+
+insert into fn3promotion
+select 'MARCA', --header
+       'DIARIO', -- product
+       '&promocion', -- code
+       '&tipoprmocion', -- promotiontype
+       &precio, -- price
+       '&descripcion', -- description
+       '&promocionpadre' -- fatherpromotion
+from dual;
+
+insert into fn3promotionnode
+select 'MARCA', -- header
+       'DIARIO', -- product
+       '&promocion', -- promotion
+       '&nodo', -- node
+       '&expTmsPro', -- expression
+       to_date('&fechaIni', 'yyyymmdd'), -- inidate
+       to_date('&fechaFin', 'yyyymmdd'), -- enddate
+       &precio, -- price
+       '&descripcion' -- description
+from dual;
+
+insert into fn3input
+select '&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.Cartilla', -- code
+       'SqlProNodCreaPulseIni(Cabecera, Producto, "'||'&promocion'||'", FatherNodes)', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'Y', -- active
+       '&descripcion' -- description
+from dual
+union all
+select '&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.Cupon', -- code
+       'SqlProNodCreaIndNNFechPro(Cabecera, Producto, "'||'&promocion'||'", FatherNodes, &diaPrimerCupon, &diaUltimoCupon)', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'Y', -- active
+       '&descripcion' -- description
+from dual
+union all
+select '&setInputFN3', -- setinput
+       'Diario', -- dating
+       '&promocion'||'.Comodin', -- code
+       'SqlProNodCreaIndNNFechPro(Cabecera, Producto, "'||'&promocion'||'", FatherNodes, &diaPrimerComodin, &diaUltimoComodin)', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'N', -- active
+       '&descripcion' -- description
+from dual;
+
+insert into fn5setinput
+select '&promocion', -- code
+       1, -- orderf
+       'Y', -- inheritance
+       '&setInpFatFN5', -- setinputfather
+       '&descripcion' -- description
+from dual;
+
+insert into fn5input
+select '&promocion'||'.Cartilla', -- code
+       'SqlProNodCreaPulseN(Cabecera, Producto, "'||'&promocion'||'", FatherNodes, 0)', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       '&descripcion' -- description
+from dual
+union all
+select '&promocion'||'.Cupon', -- code
+       'SqlProNodCreaIndNNFechPro(Cabecera, Producto, "'||'&promocion'||'", FatherNodes, &diaPrimerCupon, &diaUltimoCupon)', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       '&descripcion' -- description
+from dual
+union all
+select '&promocion'||'.Comodin', -- code
+       'SqlProNodCreaIndNNFechPro(Cabecera, Producto, "'||'&promocion'||'", FatherNodes, &diaPrimerComodin, &diaUltimoComodin)', -- expression
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       '&descripcion' -- description
+from dual;
+
+insert into fn5inputsetinput
+select '&promocion', -- setinput
+       '&promocion'||'.Cartilla', -- input
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'Y', -- active
+       '&descripcion' -- description
+from dual
+union all
+select '&promocion', -- setinput
+       '&promocion'||'.Cupon', -- input
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'Y', -- active
+       '&descripcion' -- description
+from dual
+union all
+select '&promocion', -- setinput
+       '&promocion'||'.Comodin', -- input
+       '0.1', -- iniomega
+       NULL, -- inidelta
+       NULL, -- stdomega
+       NULL, -- stddelta
+       'N', -- active
+       '&descripcion' -- description
+from dual;
+
+insert into fn3outputinputinformation
+select output,
+       '&setInputFN3' as setinput,
+       dating,
+       '&promocion'||'.Cartilla' as input,
+       type,
+       '&iniOmegaCartilla' as omega,
+       delta,
+       stdomega,
+       stddelta,
+       'Y' as active
+from fn3outputinputinformation
+where input = '&inpCopia'||'.Cartilla'
+and type = 'F'
+union all
+select output,
+       '&setInputFN3' as setinput,
+       dating,
+       '&promocion'||'.Cupon' as input,
+       type,
+       '&iniOmegaCupon' as omega,
+       delta,
+       stdomega,
+       stddelta,
+       'Y' as active
+from fn3outputinputinformation
+where input = '&inpCopia'||'Cupon'
+and type = 'F';
+
+insert into fn5outputinput
+select output,
+       dating,
+       '&promocion' as setinput,
+       '&promocion'||'.Cartilla' as input,
+       type,
+       '&iniOmegaCartilla' as omega,
+       delta,
+       stdomega,
+       stddelta,
+       'Y' as active
+from fn5outputinput
+where input = '&inpCopia'||'Cartilla'
+and type = 'F'
+union all
+select output,
+       dating,
+       '&promocion' as setinput,
+       '&promocion'||'.Cupon' as input,
+       type,
+       '&iniOmegaCupon' as omega,
+       delta,
+       stdomega,
+       stddelta,
+       'Y' as active
+from fn5outputinput
+where input = '&inpCopia'||'.Cupon'
+and type = 'F';

@@ -1,0 +1,10 @@
+SELECT dateprint,Sum(round(decision+increasedec))
+FROM fn3printingdetail
+WHERE orderf=1
+AND header='MARCA'
+AND product='DIARIO'
+AND node='CAM'
+AND dateprint>SYSDATE-20
+AND newsstand IN (SELECT newsstand FROM fn3node WHERE fathernode='CAMVIP' AND header='MARCA' AND product='DIARIO')
+GROUP BY dateprint
+

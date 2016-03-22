@@ -1,0 +1,16 @@
+select operationdate,sum(service),sum(return),sum(decode(return,0,1))/count(*)
+from fn3newsstandgroup,fn3operation
+where
+operationdate>sysdate-20 and
+newsstandgroup='Opencor_Madrid' and
+fn3operation.newsstand=fn3newsstandgroup.newsstand
+group by operationdate;
+
+
+
+select fn3operation.newsstand,service,incidence,return,decode(return,0,1)
+from fn3operation,fn3newsstandgroup
+where
+operationdate=to_date('20051120','yyyymmdd') and
+newsstandgroup='Opencor_Madrid' and
+fn3operation.newsstand=fn3newsstandgroup.newsstand;

@@ -1,0 +1,5 @@
+SELECT sid, serial#, username, opname, sql_hash_value hash_value,
+           TO_CHAR(start_time,'HH24:MI:SS') "INICIO",
+           (sofar/totalwork)*100 "%"
+    FROM v$session_longops
+    WHERE (sofar/totalwork)*100 < 100 ;

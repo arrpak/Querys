@@ -1,0 +1,194 @@
+select tab1.code,tab2.code
+from
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Cordoba'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Cordoba'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab1,
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Cordoba'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Cordoba'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab2
+where tab1.codetown=tab2.codetown;
+------------
+------------
+select tab1.code,tab2.code
+from
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Granada'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Granada'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab1,
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Granada'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Granada'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab2
+where tab1.codetown=tab2.codetown;
+------------
+------------
+select tab1.code,tab2.code
+from
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Jaen'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Jaen'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab1,
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Jaen'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Jaen'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab2
+where tab1.codetown=tab2.codetown;
+------------
+------------
+select tab1.code,tab2.code
+from
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Almeria'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Almeria'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab1,
+(select code,codetown
+from
+(select new.code as code,new.town as codetown,new.province
+from fn3newsstand new,fn3newsstandon non
+where dateoff is null and
+province='Almeria'and
+new.code=non.newsstand) puntos,
+(select town,count(*)
+from fn3newsstand
+where province='Almeria'
+group by town
+having count(*)<6) towns 
+where towns.town=codetown) tab2
+where tab1.codetown=tab2.codetown;
+------------
+------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

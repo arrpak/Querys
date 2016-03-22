@@ -1,0 +1,130 @@
+
+DIFERENCIAS POR NODOS PADRE
+
+set pagesize 5000;
+
+select pri.newsstand,dec,ser
+from
+(select newsstand,service+incidence as ser
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate=to_date('20031128','yyyymmdd') 
+-- and substr(newsstand,1,3)='028'
+) ope,
+(select newsstand,round(decision+increasedec) as dec
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint=to_date('20031128','yyyymmdd') and
+node='AND' and
+orderf=1 )pri,
+(select newsstand
+from fn3node
+where header='MARCA' and product='DIARIO' and
+fathernode='ANDCADCAP') nod
+where
+pri.newsstand=ope.newsstand and
+nod.newsstand=pri.newsstand and
+abs(dec-ser)>3
+;
+
+
+
+DIFERENCIAS DE UN PUNTO
+
+select ope.operationdate,pri.newsstand,dec,ser
+from
+(select operationdate,newsstand,service+incidence as ser
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand='011000215085'
+) ope,
+(select dateprint,newsstand,round(decision+increasedec) as dec
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' 
+and newsstand='011000215085' and
+orderf=1 )pri
+where
+OPE.OPERATIONDATE>sysdate-30 and
+pri.newsstand=ope.newsstand and
+pri.dateprint=ope.operationdate
+;
+
+
+DIFERENCIAS POR DELEGACION
+
+set pagesize 5000;
+
+select pri.newsstand,dec,ser
+from
+(select newsstand,service+incidence as ser
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate=to_date('20031128','yyyymmdd') 
+-- and substr(newsstand,1,3)='028'
+) ope,
+(select newsstand,round(decision+increasedec) as dec
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint=to_date('20031204','yyyymmdd') and
+node='AND' and
+orderf=1 )pri,
+(select newsstand
+from fn3CODIFICATION
+where DELEGATE='CADIZ') nod
+where
+pri.newsstand=ope.newsstand and
+nod.newsstand=pri.newsstand and
+abs(dec-ser)>5
+;
+
+
+
+
+
+
+
+
+CUENTA LAS DIFERENCIAS POR DIA Y DELEGACION
+
+select count(*),operationdate
+from
+(select operationdate,newsstand,service+incidence as ser
+from fn3operation
+where header='MARCA' and product='DIARIO' and
+operationdate>=to_date('20031101','yyyymmdd') 
+-- and substr(newsstand,1,3)='028'
+) ope,
+(select orderf,dateprint,newsstand,round(decision+increasedec) as dec
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint>=to_date('20031101','yyyymmdd') and
+node='AND' and
+orderf=1 )pri,
+(select newsstand
+from fn3CODIFICATION
+where DELEGATE='SEVILLA') nod,
+(select dateprint||orderf as orde
+from fn3printing
+where header='MARCA' and product='DIARIO' and
+node='AND' and used='Y') used
+where
+pri.dateprint||pri.orderf=used.orde and
+pri.newsstand=ope.newsstand and
+nod.newsstand=pri.newsstand and
+pri.dateprint=ope.operationdate AND
+abs(dec-ser)>3
+group by ope.operationdate
+;
+
+
+
+
+
+
+
+
+
+
+
+
+

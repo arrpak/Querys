@@ -1,0 +1,138 @@
+--Solo poner la sesión actual y la anterior.
+
+Define newfs ='e20111113Com.01';
+Define oldest='e20111106Com.01';
+
+
+CREATE OR REPLACE VIEW ezcreporteejemplares
+as
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') as Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise'		)
+minus
+(select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.output='ComABCCAM'
+and ei.valuedate>=to_date('20090403','yyyymmdd')
+and ei.valuedate<=to_date('20090405','yyyymmdd'))
+)
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei
+where
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input = 'noise')
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei
+where
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input = 'Forecast')
+;
+
+
+
+
+CREATE OR REPLACE VIEW ezcreporteejemplaresentregado
+as
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise')
+minus
+(select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.output='ComABCCAM'
+and ei.valuedate>=to_date('20090403','yyyymmdd')
+and ei.valuedate<=to_date('20090405','yyyymmdd'))
+)
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei
+where
+ei.estsession = '&newfs'
+and  ei.dating     = 'Diario'
+and  ei.input = 'Forecast'
+)
+;
+
+
+CREATE OR REPLACE VIEW ezcreporteejemplaresold
+as
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.input != 'noise')
+minus
+(select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+esi.promotion Promocion,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei,EzcPromotionSetInput esi,EzcInputSetInput isi
+where
+isi.input = ei.input
+and  esi.setinput = isi.setinput
+and  ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.output='ComABCCAM'
+and ei.valuedate>=to_date('20090403','yyyymmdd')
+and ei.valuedate<=to_date('20090418','yyyymmdd'))
+)
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei
+where
+ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.input = 'noise')
+union
+select * from (select Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+ei.input as Promocion ,ei.valuedate fecha, to_char(ei.valuedate, 'mm') mes,
+to_char(ei.valuedate, 'yyyy') anno,Round(ei.issue, 0) NumEjemplares
+from EzcEstimationIssue ei
+where
+ei.estsession = '&oldest'
+and  ei.dating     = 'Diario'
+and  ei.input = 'Forecast');

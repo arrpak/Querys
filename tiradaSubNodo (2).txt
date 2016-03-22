@@ -1,0 +1,13 @@
+SELECT dateprint,Sum(Decision),Sum(increasedec),Sum(decision+increasedec)
+FROM
+(SELECT newsstand
+FROM fn3node
+WHERE header='MARCA' AND product='DIARIO'
+AND fathernode='CAVVALCAP')  t1,
+(SELECT *
+FROM fn3printingdetail
+WHERE header='MARCA' AND product='DIARIO'	and orderf=1
+AND node='CAVCMU' AND dateprint>=dat('20080814')) t2
+WHERE
+t1.newsstand=t2.newsstand
+GROUP BY dateprint ;

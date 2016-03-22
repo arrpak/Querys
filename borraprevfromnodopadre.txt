@@ -1,0 +1,72 @@
+select fn2outputdef.outputdef
+from   fn2puntoventa, fn2nodo, fn2output, fn2outputdef
+where  fn2puntoventa.operativo = 'S'              and
+       fn2nodo.nodopadre in ('CAMAER', 'CAMGAS', 'CAMVIA', 'CAMVIP', 'CAMVLR') and
+       fn2nodo.cabecera     = 'MARCA'             and
+       fn2nodo.producto     = 'DIARIO'            and
+       fn2puntoventa.codigo = fn2nodo.puntoventa  and
+       fn2nodo.cabecera     = fn2output.cabecera  and
+       fn2nodo.producto     = fn2output.producto  and
+       fn2nodo.codigo       = fn2output.nodo      and
+       fn2output.output     = fn2outputdef.output
+order  by fn2outputdef.outputdef;
+
+
+select count(*)
+from fn2forecastdetail,
+(
+ select fn2outputdef.outputdef as out
+ from   fn2puntoventa, fn2nodo, fn2output, fn2outputdef
+ where  fn2puntoventa.operativo = 'S'              and
+        fn2nodo.nodopadre in ('CAMAER', 'CAMGAS', 'CAMVIA', 'CAMVIP', 'CAMVLR') and
+        fn2nodo.cabecera     = 'MARCA'             and
+        fn2nodo.producto     = 'DIARIO'            and
+        fn2puntoventa.codigo = fn2nodo.puntoventa  and
+        fn2nodo.cabecera     = fn2output.cabecera  and
+        fn2nodo.producto     = fn2output.producto  and
+        fn2nodo.codigo       = fn2output.nodo      and
+        fn2output.output     = fn2outputdef.output
+) tab
+where fn2forecastdetail.outputdef  = tab.out and
+      fn2forecastdetail.forsession = '2001101222.PV';
+
+
+--select count(*)
+delete
+from fn2forecastdetail
+where fn2forecastdetail.forsession = '2001120411.PV' and
+      fn2forecastdetail.outputdef  in 
+(
+ select fn2outputdef.outputdef
+ from   fn2puntoventa, fn2nodo, fn2output, fn2outputdef
+ where  fn2puntoventa.operativo = 'S'              and
+        fn2nodo.nodopadre in ('CAMPER')  and
+        fn2nodo.cabecera     = 'MARCA'             and
+        fn2nodo.producto     = 'DIARIO'            and
+        fn2puntoventa.codigo = fn2nodo.puntoventa  and
+        fn2nodo.cabecera     = fn2output.cabecera  and
+        fn2nodo.producto     = fn2output.producto  and
+        fn2nodo.codigo       = fn2output.nodo      and
+        fn2output.output     = fn2outputdef.output
+);
+
+
+--select count(*)
+delete
+from fn2forecast
+where fn2forecast.forsession = '2001120411.PV' and
+      fn2forecast.outputdef  in 
+(
+ select fn2outputdef.outputdef
+ from   fn2puntoventa, fn2nodo, fn2output, fn2outputdef
+ where  fn2puntoventa.operativo = 'S'              and
+        fn2nodo.nodopadre in ('CAMPER')  and
+        fn2nodo.cabecera     = 'MARCA'             and
+        fn2nodo.producto     = 'DIARIO'            and
+        fn2puntoventa.codigo = fn2nodo.puntoventa  and
+        fn2nodo.cabecera     = fn2output.cabecera  and
+        fn2nodo.producto     = fn2output.producto  and
+        fn2nodo.codigo       = fn2output.nodo      and
+        fn2output.output     = fn2outputdef.output
+);
+

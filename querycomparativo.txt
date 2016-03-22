@@ -1,0 +1,107 @@
+
+DIF PREV - VENTA TRIM
+---------------------
+select infodate as dia,sumprev,venta
+from
+( select sum(forecast) as sumprev,valuedate
+  from fn3forecastseries
+  where
+  used='Y' and
+  output like 'VentaMarcaEXT%' and
+  valuedate>sysdate-1000
+  group by valuedate) previ,
+(   select infodate,sum(service+incidence-returncont) as venta
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='EXT'
+ group by infodate)
+where
+valuedate=infodate;
+
+
+DIF PREV - VENTA DIA
+---------------------
+select infodate as dia,sumprev,venta
+from
+( select sum(forecast) as sumprev,valuedate
+  from fn3forecastseries
+  where
+  used='Y' and
+  output like 'VentaMarcaCAM%' and
+  valuedate>sysdate-2000
+  group by valuedate) previ,
+(   select infodate,sum(service+incidence-returncont) as venta
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='CAM'
+ group by infodate)
+where
+valuedate=infodate;
+
+
+AGOTADOS A PARTIR DE UNA VENTA 
+------------------------------
+
+select to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))||'/01','yyyy/mm/dd') as operationdate ,
+sum(case when return=0 then 1 else 0 end)/count(*) as PorcAgot
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and newsstand like '028%' and
+service+incidence-return>30
+and operationdate>to_date('19940625','yyyymmdd')
+group by to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))||'/01','yyyy/mm/dd') ;
+
+
+
+
+set pagesize 100000;
+select avg(return)/(service+incidence)*100 as PorcDev,service+incidence-return as venta
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and operationdate>to_date('20040301','yyyymmdd')
+and operationdate>to_date('20040530','yyyymmdd')
+and newsstand like '028%' 
+and service+incidence-return>0
+group by service+incidence-return;
+
+
+
+
+
+DIF SERV - DECISION
+
+
+select pri.dateprint,Decitotal-servicio
+from
+(SELECT DATEPRINT, SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as Decitotal,orderf
+FROM FN3PRINTINGdetail
+WHERE HEADER='MARCA' and product='DIARIO' and
+node='CAM'
+group by dateprint,orderf) deci,
+(   select infodate,sum(service) as servicio
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='CAM'
+ group by infodate) serv,
+(
+select dateprint,orderf
+from fn3printing 
+  where header='MARCA' and product='DIARIO'
+   and node='CAM'
+and used='Y') pri
+where 
+infodate=pri.dateprint
+and pri.dateprint=deci.dateprint 
+and pri.dateprint||pri.orderf=deci.dateprint||deci.orderf;
+
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+--Suma de PV
+select substr(output,11,6),valuedate,count(*),sum(round(forecast))
+ from fn3forecastseries
+where forsession='2004050714.MG' 
+and(
+valuedate=to_date('20040506','yyyymmdd') or
+valuedate=to_date('20040507','yyyymmdd') or
+valuedate=to_date('20040508','yyyymmdd') or
+valuedate=to_date('20040509','yyyymmdd') or
+valuedate=to_date('20040510','yyyymmdd') or
+valuedate=to_date('20040511','yyyymmdd') 
+ )
+and output like 'VentaMarcaCAM%' 
+--AND DECISION>0
+group by valuedate,substr(output,11,6)
+order by valuedate,substr(output,11,6);
+
+
+
+
+
+
+
+
+
+select substr(output,12,2),
+valuedate,count(*),sum(round(forecast)) as prev,
+              SUM(case when decision <= 15
+              then  ceil (decision)
+              else  ROUND(decision) end) as deci,
+              1-(sum(round(forecast))/ SUM(case when decision <= 15
+              then  ceil (decision)
+              else  ROUND(decision) end)) PORCDEV    
+ from fn3forecastseries
+where forsession='2004043007.PV' 
+and(
+valuedate=to_date('20040502','yyyymmdd') 
+ )
+group by valuedate,substr(output,12,2);

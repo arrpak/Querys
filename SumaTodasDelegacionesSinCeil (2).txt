@@ -1,0 +1,303 @@
+define pridet='20090213';
+define fecha = '&pridet' ;
+define orderf=1;
+
+--SUMA TIRADA MARCA CAM
+
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,'' AS Codigo,
+       count(*) as PVServicio,
+       100*Ceil(((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))+ser.service)/100) AS TOTAL_____MARCA
+from
+(SELECT *
+FROM FN3SERVICECAM) ser,
+fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAM')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD') and
+     ser.header=pri.header and
+     to_char(pri.dateprint,'DY')= ser.weekday
+group by dateprint,delegate,ser.service
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,del.codigodam as Código,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod,fn3delegate del
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('EXT')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      cod.delegate=del.code and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate,del.codigodam
+UNION
+(
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,del.codigodam as Código,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod,fn3delegate del
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AND')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      cod.delegate=del.code and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate,del.codigodam)
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,'' AS Codigo,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTAL
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CATBAR')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION,'' AS Codigo,
+              count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-10)/100) AS TOTAL
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CAVCMU')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+union
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       upper(dele.province) AS DELEGACION,codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod, fn3delegate dele
+where pri.header      = 'MARCA'           and
+      pri.product     = 'DIARIO'          and
+      pri.node        = 'NOR'             and
+      pri.newsstand   = cod.newsstand     and
+      pri.orderf      = &orderf        and
+      pri.dateprint   = to_date('&fecha', 'YYYYMMDD') and
+      cod.distributor = dele.distributor  AND
+      cod.delegate!= 'VITORIA' AND
+      cod.delegate!= 'SANTANDER' and
+  --    cod.delegate!= 'SANSEBASTIAN' and
+      cod.delegate!= 'PAMPLONA' and
+      cod.delegate    = dele.code
+group by dateprint, dele.province,codigodam
+union
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'NAVARRA BAZTAN' AS DELEGACION,codigodam AS Código,
+       count(*) as NUMPV,
+       25*ceil((SUM(case when (decision + increaseDec) <= 15
+                         then  round(decision + increaseDec)
+                         else  ROUND(decision + increaseDec) end))/25) AS TOTALRED
+from fn3printingdetail pri, fn3newsstandgroup NEW,fn3delegate dele
+where new.newsstandgroup = 'Baztan'     and
+      pri.header         = 'MARCA'      and
+      pri.product        = 'DIARIO'     AND
+      pri.orderf         = &orderf        and
+      pri.node           = 'NOR'        AND
+      dele.code          = 'BAZTAN'     AND
+      distributor        = 'BERALAN'    AND
+      pri.newsstand      = new.newsstand and
+      pri.dateprint =  to_date('&fecha', 'YYYYMMDD')
+group by dateprint, orderf, 'Baztan',codigodam
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'NAVARRA SIN BAZTAN' AS DELEGACION,codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri,fn3codification cod,fn3delegate dele
+where pri.header    = 'MARCA'                         and
+      pri.product   = 'DIARIO'                        AND
+      pri.node      = 'NOR'                        and
+      pri.dateprint = to_date('&fecha', 'YYYYMMDD') and
+      pri.orderf      = &orderf AND
+      pri.newsstand=cod.newsstand AND
+      dele.code          = 'PAMPLONA'     AND
+      dele.distributor        = 'BERALAN'    AND
+      cod.delegate='PAMPLONA'
+       AND pri.newsstand not in(select newsstand from fn3newsstandgroup where newsstandgroup='Baztan')
+                    group by dateprint,codigodam
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'ALAVA MIRANDA DE EBRO' AS DELEGACION,codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod, fn3newsstand new,fn3delegate dele
+where pri.header    = 'MARCA'                         and
+      pri.product   = 'DIARIO'                        and
+      pri.node      = 'NOR'                           and
+      pri.dateprint = to_date('&fecha', 'YYYYMMDD') and
+      pri.orderf      = &orderf        and
+      pri.newsstand = cod.newsstand                   and
+      pri.newsstand = new.code                        AND
+      dele.code          = 'MIRANDA'     AND
+      dele.distributor   = 'BERALAN'    AND
+      cod.delegate  = 'VITORIA'                       and
+      new.town      = 'MIRANDA DE EBRO'
+group by dateprint,codigodam
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'ALAVA SIN MIRANDA DE EBRO' AS DELEGACION,codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod, fn3newsstand new,fn3delegate dele
+where pri.header    = 'MARCA'                         and
+      pri.product   = 'DIARIO'                        and
+      pri.node      = 'NOR'                           and
+      pri.dateprint = to_date('&fecha', 'YYYYMMDD') and
+      pri.orderf      = &orderf        and
+      pri.newsstand = cod.newsstand                   and
+      pri.newsstand = new.code                        AND
+      dele.code          = 'VITORIA'     AND
+      dele.distributor   = 'BERALAN'    AND
+      cod.delegate  = 'VITORIA'                       and
+      new.town      != 'MIRANDA DE EBRO'
+group by dateprint,codigodam
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'CANTABRIA RESTO' AS DELEGACION,dele.codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod,fn3delegate delE
+where pri.header    = 'MARCA'                         and
+      pri.product   = 'DIARIO'                        and
+      pri.node      = 'NOR'                           and
+      pri.dateprint = to_date('&fecha', 'YYYYMMDD') and
+      pri.orderf      = &orderf        and
+      pri.newsstand = cod.newsstand                   AND
+      dele.code          = 'SANTANDER'     AND
+      dele.distributor   = 'BERALAN'    AND
+      cod.delegate       = 'SANTANDER'
+      AND pri.newsstand not in(select newsstand from fn3newsstandgroup where newsstandgroup='CastroUrdiales')
+      AND substr(pri.newsstand, 1, 3) != '139'
+      group by dateprint,dele.codigodam
+union
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'CASTRO URDIALES ED VASCA' AS DELEGACION,dele.codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod,fn3delegate delE
+where pri.header    = 'MARCA'                         and
+      pri.product   = 'DIARIO'                        and
+      pri.node      = 'NOR'                           and
+      pri.dateprint = to_date('&fecha', 'YYYYMMDD') and
+      pri.orderf      = &orderf        AND
+      dele.code          = 'CASTROURDIALESVAS'     AND
+      dele.distributor   = 'BERALAN'    AND
+      pri.newsstand = cod.newsstand                   and
+      cod.delegate  = 'SANTANDER'                     and
+      substr(pri.newsstand, 1, 3) = '139'
+      group by dateprint,dele.codigodam
+union
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       'CASTRO URDIALES ED NAC' AS DELEGACION,dele.codigodam AS Código,
+       count(*) as NUMPV,
+ 100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod,fn3delegate delE, fn3newsstandgroup NEW
+where pri.header    = 'MARCA'                         and
+      pri.product   = 'DIARIO'                        and
+      pri.node      = 'NOR'                           and
+      pri.dateprint = to_date('&fecha', 'YYYYMMDD') and
+      pri.orderf      = &orderf        AND
+      dele.code          = 'CASTROURDIALES'     AND
+      dele.distributor   = 'BERALAN'    AND
+      pri.newsstand = cod.newsstand                   AND
+      new.newsstand = cod.newsstand                   and
+      cod.delegate  = 'SANTANDER'                     AND
+      NEW.newsstandgroup='CastroUrdiales'
+      group by dateprint,dele.codigodam
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACIÓN,
+       '' AS Codigo,
+       count(*) as PVServicio,
+       100*ceil((SUM(case when (decision + increaseDec) <= 15
+                          then round(decision + increaseDec)
+                          else ROUND(decision + increaseDec)
+                     end) - 30)/100) AS TOTALRED
+from fn3printingdetail pri,
+     fn3codification cod,
+     fn3delegate del
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('AST')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+      pri.dateprint = to_date('&pridet', 'YYYYMMDD') and
+      cod.delegate = del.code
+group by dateprint, delegate, codigodam
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION, '' AS Codigo,
+       count(*) as PVServicio,
+      100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('ARA')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate
+UNION
+select to_char(dateprint,'yyyy/mm/dd') AS FECHA,
+       rtrim(cod.delegate) AS DELEGACION, '' AS Codigo,
+       count(*) as PVServicio,
+      50*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end))/50) AS TOTALRED
+from fn3printingdetail pri, fn3codification cod
+where pri.header    = 'MARCA'       and
+      pri.product   = 'DIARIO'      and
+      pri.node  in ('CYLSOR2')   and
+      pri.newsstand = cod.newsstand and
+      pri.decision>0 and
+      pri.orderf = &orderf and
+     pri.dateprint = to_date('&pridet', 'YYYYMMDD')
+group by dateprint,delegate;

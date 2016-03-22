@@ -1,0 +1,45 @@
+SELECT q.*, gan+per+emp AS tot,
+  Round(gan/(gan+per+emp)*1000)/1000 AS pgan,
+  Round(emp/(gan+per+emp)*1000)/1000 AS pemp,
+  Round(per/(gan+per+emp)*1000)/1000 AS pper
+FROM (
+SELECT equipo, Sum(CASE WHEN tipo = 1 THEN total ELSE 0 END) AS gan,
+Sum(CASE WHEN tipo = 0 THEN total ELSE 0 END) AS emp,
+Sum(CASE WHEN tipo = -1 THEN total ELSE 0 END) AS per
+FROM (
+SELECT equipo, tipo, Sum(total) AS total
+FROM (
+
+SELECT equipo, tipo, total, 'a'
+FROM (
+SELECT equipolocal AS equipo, Sign(goleslocal-golesvisitante) AS tipo, Count(*) AS total
+FROM Fn3PartidoFutbol p, fn3Equipofutbol e
+WHERE p.equipolocal=e.codigo
+  AND tipoequipo='SEL'
+  AND valido = 'S'
+  AND Sign(goleslocal-golesvisitante) is NOT NULL
+GROUP BY equipolocal, Sign(goleslocal-golesvisitante)
+) a
+UNION
+SELECT equipo, tipo, total, 'b'
+FROM (
+SELECT equipovisitante AS equipo, Sign(-goleslocal+golesvisitante) AS tipo, Count(*) AS total
+FROM Fn3PartidoFutbol p, fn3Equipofutbol e
+WHERE p.equipovisitante=e.codigo
+  AND tipoequipo='SEL'
+  AND valido = 'S'
+  AND Sign(goleslocal-golesvisitante) is NOT NULL
+GROUP BY equipovisitante, Sign(-goleslocal+golesvisitante)
+) b
+) ab
+GROUP BY equipo, tipo
+)
+GROUP BY equipo
+) q
+ORDER BY pgan*3+pemp DESC
+
+
+
+SELECT *
+FROM fn3partidofutbol
+WHERE goleslocal IS null

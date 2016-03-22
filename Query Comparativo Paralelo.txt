@@ -1,0 +1,151 @@
+select tAux.fecha,
+       Nodo,
+       Edition,
+       PV,
+       Envio,
+       Tramo,
+       RatioPV,
+       Registrado,
+       NumPV,
+-- Tirada
+ ServReal,
+ AjusteReal,
+ Entrega,
+ TiradaFN,
+ (pdd.printing) as TiradaVoz ,
+-- Devolucion
+ DevReal,
+ DevFN,
+ ((greatest((pdd.printing-tAux.VentaReal), 0)*least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1))) as DevVozMin,
+ (greatest((pdd.printing-(tAux.VentaReal)), 0)) as DevVozMax,
+-- venta
+ VentaReal,
+ VentaFN,
+ ((pdd.printing-greatest((pdd.printing-(tAux.VentaReal)), 0))) VentaMinVoz,
+ ((pdd.printing-(greatest((pdd.printing-(tAux.VentaReal)), 0)*least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1))))
+
+VentaMaxVoz,
+-- agotado
+ AgoFN,
+ (Case when (pdd.printing-(tAux.VentaReal))<=0 then 1 else 0 end) as AgoVoz,
+ ((Case when (pdd.printing-(tAux.VentaReal)) = 0 then 1 else 0 end)*least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1))  as
+
+AgoVozOK,
+ ((Case when (pdd.printing-(tAux.VentaReal))> 0 then 1 else 0 end)*(1-least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1)))   as
+
+AgoSoloFN,
+ ((Case when (pdd.printing-(tAux.VentaReal))<=0 then 1 else 0 end)*least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1))  as
+
+AgoSoloVoz,
+ ((Case when (pdd.printing-(tAux.VentaReal))<=0 then 1 else 0 end)*(1-least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1)))
+
+as AgoComunes,
+-- ago ponderado por la venta
+ AgoPonFN,
+ ((Case when (pdd.printing-(tAux.VentaReal))<=0 then 1 else 0 end)*pdd.printing) as AgoPonVoz,
+ (((Case when (pdd.printing-(tAux.VentaReal))> 0 then 1 else 0 end)*(1-least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1)))
+
+*TiradaFN)  as agoPonSoloFN,
+ (((Case when (pdd.printing-(tAux.VentaReal))<=0 then 1 else 0 end)*least((TiradaFN-least(TiradaFN, tAux.VentaReal)),1))
+
+*pdd.printing)   as agoPonSoloVoz,
+ ((Case when (pdd.printing-(tAux.VentaReal))<=0 then 1 else 0 end)*(-1)*(pdd.printing-(tAux.VentaReal))) as ASV,
+ Case when pdd.printing-(tAux.VentaReal)<=0 then 1 else 0 end*pdd.printing as SVA,  -- servicio de la voz cuando agotan
+ Case when pdd.printing-(tAux.VentaReal)> 0 then 1 else 0 end*(1-least(TiradaFN-least(TiradaFN, tAux.VentaReal),1))* TiradaFN as
+
+SFNA, -- servicio de FN cuando slo agota ForNews
+-- otros campos
+ ModTirFN,
+ TipoServicio,
+ ifnull((Case when (pdd.printing-(tAux.VentaReal))> 0 then 1 else 0 end)*(1-least((TiradaFN-least(TiradaFN,
+
+tAux.VentaReal)),1))*least(RatioPV*VentaFN, greatest((pdd.printing-VentaFN),0)), 0) as ASF,
+ case when ((Case when (pdd.printing-(tAux.VentaReal))> 0 then 1 else 0 end)*(1-least((TiradaFN-least(TiradaFN,
+
+tAux.VentaReal)),1)))*RatioPV*VentaFN > greatest((pdd.printing-VentaFN),0) then 1 else 0 end as AgoVozCens,
+ case when ((Case when (pdd.printing-(tAux.VentaReal))> 0 then 1 else 0 end)*(1-least((TiradaFN-least(TiradaFN,
+
+tAux.VentaReal)),1)))*RatioPV*VentaFN > greatest((pdd.printing-VentaFN),0) then pdd.printing else 0 end as AgoPonVozCens
+from
+(
+  select
+  p.header       as cabecera,
+  p.product      as producto,
+  pd.valuedate   as Fecha,
+  n.fathernode   as Nodo,
+  n.edition      as Edition,
+  pd.newsstand   as PV,
+  s.code         as Envio,
+  case
+         when (op.service-op.adjustment-op.returned) <= 002 then '[001 - 002]'
+         when (op.service-op.adjustment-op.returned) <= 005 then '[003 - 005]'
+         when (op.service-op.adjustment-op.returned) <= 010 then '[006 - 010]'
+         when (op.service-op.adjustment-op.returned) <= 015 then '[011 - 015]'
+         when (op.service-op.adjustment-op.returned) <= 020 then '[016 - 020]'
+         when (op.service-op.adjustment-op.returned) <= 050 then '[021 - 050]'
+         when (op.service-op.adjustment-op.returned) <= 100 then '[051 - 100]'
+         when (op.service-op.adjustment-op.returned) <= 150 then '[101 - 150]'
+         else '[151 - INF]' end  as Tramo,
+ psr.ratio as RatioPV,
+ case when registr = 'R' then 1 else 0 end as Registrado,
+ 1 as NumPV,
+-- Tirada
+ op.service as ServReal,
+ op.adjustment as AjusteReal,
+ op.service-op.adjustment as Entrega,
+ (pd.printing) as TiradaFN,
+-- Devolucion
+ ((op.returned)) as DevReal,
+ ((pd.printing-least(pd.printing, op.service-op.adjustment-op.returned))) as DevFN,
+-- venta
+ ((op.service-op.adjustment-op.returned)) as VentaReal,
+ (least(pd.printing, op.service-op.adjustment-op.returned)) as VentaFN,
+-- agotado
+ ((1-least((pd.printing-least(pd.printing, op.service-op.adjustment-op.returned)),1))) as AgoFN,
+-- ago ponderado por la venta
+ (pd.printing*(1-least((pd.printing-least(pd.printing, op.service-op.adjustment-op.returned)),1))) as AgoPonFN,
+-- otros campos
+ (greatest(abs((op.service-op.adjustment)-pd.printing), 0)) as ModTirFN,
+ serviceType as TipoServicio
+From VozPrintingDetail pd, VozPrinting p, VozOperationDiario op,
+     VozShipment s, VozNode n, VozParallelSegmentRatio psr
+where p.header    = 'VOZ'
+  and p.product   = 'DIARIO'
+  and p.node      = 'GALICIA'
+  and p.valuedate >= str_to_date('2007/10/08', '%Y/%m/%d')
+  and p.valuedate <= str_to_date('2007/10/14', '%Y/%m/%d')
+  and p.used      = 'Y'
+  and p.header    = pd.header
+  and p.product   = pd.product
+  and p.node      = pd.node
+  and p.valuedate = pd.valuedate
+  and p.orderf    = pd.orderf
+  and n.header    = pd.header
+  and n.product   = pd.product
+  and n.edition   = pd.edition
+  and n.newsStand = pd.newsstand
+  and pd.header     = op.header
+  and pd.product    = op.product
+  and pd.newsStand  = op.newsstand
+  and pd.edition    = op.edition
+  and pd.valuedate  = op.operationdate
+  and s.newsstand   = pd.newsstand
+  and s.edition     = pd.edition
+  and s.fornews     = 'Y'
+  and (s.stateOn = 'Y' or s.dateOff >= '20060901')
+  and convert(psr.segment USING utf8) = case when (op.service-op.adjustment-op.returned) <= 002 then '[001 - 002]'
+                                             when (op.service-op.adjustment-op.returned) <= 005 then '[003 - 005]'
+                                             when (op.service-op.adjustment-op.returned) <= 010 then '[006 - 010]'
+                                             when (op.service-op.adjustment-op.returned) <= 015 then '[011 - 015]'
+                                             when (op.service-op.adjustment-op.returned) <= 020 then '[016 - 020]'
+                                             when (op.service-op.adjustment-op.returned) <= 050 then '[021 - 050]'
+                                             when (op.service-op.adjustment-op.returned) <= 100 then '[051 - 100]'
+                                             when (op.service-op.adjustment-op.returned) <= 150 then '[101 - 150]'
+                                             else '[151 - INF]' end
+ ) tAux
+ left join VozPrintingDetailDistParallel60Days pdd
+  on  pdd.header    = tAux.cabecera
+  and pdd.product   = tAux.producto
+  and pdd.shipment  = tAux.envio
+  and pdd.valuedate = tAux.fecha
+order by Fecha, Nodo, Edition

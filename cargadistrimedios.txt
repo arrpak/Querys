@@ -1,0 +1,202 @@
+  insert INTO fn3operation
+  SELECT pd.header AS header, pd.product AS product, ot.newsstand AS newsstand,
+          ot.operationdate AS operationDate,
+          Sum(ot.service) AS service, Sum(ot.incidence) AS incidence, Sum(ot.return) AS RETURN
+   FROM Fn3OperationTmp ot,
+        Fn3ProductDelegate pd,
+        (
+          SELECT code
+          FROM   Fn3NewsStand
+          MINUS
+          SELECT code
+          FROM   Fn3NewsStandConcat
+        ) ns
+   WHERE ot.loadSession = '20080226_ANDEXT4'
+     AND pd.distributor = 'DISTRIMEDIOS'
+     AND ot.delegate    = pd.delegate
+     AND pd.weekday     = decode(to_char(ot.operationDate, 'd'), '1', 'MON',
+                                  '2', 'TUE', '3', 'WED', '4', 'THU', '5', 'FRI',
+                                  '6', 'SAT', '7', 'SUN')
+     AND ot.newsstand  = ns.code
+     AND pd.code       = ot.codeproduct
+     AND ot.controlled = 'Y'
+     AND ot.service + ot.incidence - ot.return >= 0
+     AND ot.service + ot.incidence > 0
+     AND ot.return >=  0
+   GROUP BY pd.header, pd.product, ot.codeProduct,
+            ot.newsstand, ot.operationdate
+   HAVING Count(*) = 1
+   UNION
+   SELECT pd.header, pd.product, nsc.newcode, ot.operationdate,
+          sum(ot.service), sum(ot.incidence), sum(ot.return)
+   FROM Fn3OperationTmp ot,
+        Fn3ProductDelegate pd,
+        Fn3NewsStandConcat nsc
+   WHERE ot.loadSession = '20080226_ANDEXT4'
+     AND pd.distributor = 'DISTRIMEDIOS'
+     AND ot.delegate    = pd.delegate
+     AND pd.weekday     = decode(to_char(ot.operationDate, 'd'), '1', 'MON',
+                                  '2', 'TUE', '3', 'WED', '4', 'THU', '5', 'FRI',
+                                  '6', 'SAT', '7', 'SUN')
+     AND (ot.return != 0 OR ot.return  = 0 AND ot.controlled = 'Y')
+     AND ot.newsstand IN(
+                 SELECT DISTINCT ot.newsstand
+                 FROM Fn3OperationTmp ot
+                 WHERE ot.loadSession = '20080222_ANDEXT3'
+                   AND ot.service + ot.incidence- ot.return >= 0
+                   AND ot.service + ot.incidence > 0
+                   AND ot.return >= 0
+                 GROUP BY ot.newsstand, ot.operationdate,ot.codeproduct
+                 HAVING Count(*)=1
+               )
+     AND pd.code  = ot.codeproduct
+     AND nsc.code = ot.newsstand
+     AND ot.service + ot.incidence - ot.return >= 0
+     AND ot.service + ot.incidence > 0
+     AND ot.return >=  0
+   GROUP BY pd.header, pd.product, nsc.newcode, ot.operationdate
+
+
+
+
+   -------------------------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------------------------------
+      -------------------------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------------------------------
+
+
+     insert INTO fn3operation
+  SELECT pd.header AS header, pd.product AS product, ot.newsstand AS newsstand,
+          ot.operationdate AS operationDate,
+          max(ot.service) AS service, max(ot.incidence) AS incidence, max(ot.return) AS RETURN
+   FROM Fn3OperationTmp ot,
+        Fn3ProductDelegate pd,
+        (
+          SELECT code
+          FROM   Fn3NewsStand
+          MINUS
+          SELECT code
+          FROM   Fn3NewsStandConcat
+        ) ns
+   WHERE ot.loadSession = '20080226_ANDEXT4'
+     AND pd.distributor = 'DISTRIMEDIOS'
+     AND ot.delegate    = pd.delegate
+     AND pd.weekday     = decode(to_char(ot.operationDate, 'd'), '1', 'MON',
+                                  '2', 'TUE', '3', 'WED', '4', 'THU', '5', 'FRI',
+                                  '6', 'SAT', '7', 'SUN')
+     AND ot.newsstand  = ns.code
+     AND pd.code       = ot.codeproduct
+     AND ot.controlled = 'Y'
+     AND ot.service + ot.incidence - ot.return >= 0
+     AND ot.service + ot.incidence > 0
+     AND ot.return >=  0
+   GROUP BY pd.header, pd.product, ot.codeProduct,
+            ot.newsstand, ot.operationdate
+   HAVING Count(*) = 2
+   UNION
+   SELECT pd.header, pd.product, nsc.newcode, ot.operationdate,
+        max(ot.service), max(ot.incidence), max(ot.return)
+   FROM Fn3OperationTmp ot,
+        Fn3ProductDelegate pd,
+        Fn3NewsStandConcat nsc
+   WHERE ot.loadSession = '20080226_ANDEXT4'
+     AND pd.distributor = 'DISTRIMEDIOS'
+     AND ot.delegate    = pd.delegate
+     AND pd.weekday     = decode(to_char(ot.operationDate, 'd'), '1', 'MON',
+                                  '2', 'TUE', '3', 'WED', '4', 'THU', '5', 'FRI',
+                                  '6', 'SAT', '7', 'SUN')
+     AND (ot.return != 0 OR ot.return  = 0 AND ot.controlled = 'Y')
+     AND ot.newsstand IN(
+                 SELECT DISTINCT ot.newsstand
+                 FROM Fn3OperationTmp ot
+                 WHERE ot.loadSession = '20080222_ANDEXT3'
+                   AND ot.service + ot.incidence- ot.return >= 0
+                   AND ot.service + ot.incidence > 0
+                   AND ot.return >= 0
+                 GROUP BY ot.newsstand, ot.operationdate,ot.codeproduct
+                 HAVING Count(*)=2
+               )
+     AND pd.code  = ot.codeproduct
+     AND nsc.code = ot.newsstand
+     AND ot.service + ot.incidence - ot.return >= 0
+     AND ot.service + ot.incidence > 0
+     AND ot.return >=  0
+   GROUP BY pd.header, pd.product, nsc.newcode, ot.operationdate
+
+
+   -------------------------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------------------------------
+      -------------------------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------------------------------------
+
+
+ SELECT Count(*),operationdate
+-- delete
+ FROM fn3operation
+ WHERE operationdate>=dat('20080211')
+ AND SubStr(newsstand,1,3) IN
+ ('004','006','010','021','023','029','014','011','029','018','041','052','013')
+ GROUP BY operationdate
+
+ SELECT *
+ FROM fn3operation
+ WHERE operationdate>=dat('20080211')
+ AND SubStr(newsstand,1,3) IN
+ ('004','006','010','021','023','029','014','011','029','018','041','052','013')
+
+delete
+ FROM fn3operation
+ WHERE operationdate>=dat('20080211')
+ AND NEWSSTAND='029000563035'
+
+
+
+ delete
+ FROM fn3operation
+ WHERE operationdate>=dat('20080204')
+ AND SubStr(newsstand,1,3) IN
+ ('004','006','010','021','023','029','014','011','029','018','041','052','013')
+
+
+
+select operationdate,count(*)
+from
+(
+select newsstand
+from fn3node
+where substr(fathernode,1,6)='ANDGRA'
+and header='MARCA' and product='DIARIO') nod,fn3operation ope
+where ope.header='MARCA' and ope.product='DIARIO'
+and ope.newsstand=nod.newsstand
+and ope.operationdate>=dat('20080204')
+group by operationdate
+having count(*)<1000
+
+
+
+delete
+--select count(*)
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand in
+(
+select newsstand
+from fn3node
+where substr(fathernode,1,6)='ANDGRA'
+and header='MARCA' and product='DIARIO')
+and operationdate in(dat('20080204'),dat('20080211'),dat('20080212'),dat('20080228'))
+
+
+
+
+
+
+
+
+
+
+

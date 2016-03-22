@@ -1,0 +1,90 @@
+
+CREATE OR REPLACE VIEW PAR2009 AS
+SELECT   DISTINCT t1.competicion,t1.dominio,t1.categoria,temporada,fase,jornada,fechapartido,'N' AS NEUTRAL,
+         CASE WHEN GOLESLOCAL<0 THEN 'N' ELSE 'S' END AS VALIDO ,'90'AS MIN,t2.codigo AS LOCAL ,t3.codigo AS VISITANTE,goleslocal,golesvisitante,penaltieslocal,
+         NULL AS penaltiesvisitante,null AS INTERES
+FROM fn3partidofutbolrsssf2009 t1,fn3equipofutbolrsssf2008 t2,fn3equipofutbolrsssf2008 t3
+WHERE
+--t1.dominio='UCR' and
+t1.equipolocal=t2.equipo    AND
+t1.equipovisitante=t3.equipo   AND
+t1.dominio=t2.dominio AND
+--GOLESLOCAL>=0  AND
+t1.dominio=t3.dominio
+ORDER BY jornada;
+
+
+SELECT DISTINCT CODIGO,DESCRIPCION
+--SELECT *
+FROM fn3equipofutbolrsssf2008
+WHERE CODIGO IN
+(SELECT DISTINCT(LOCAL)
+FROM PAR2009)
+
+
+SELECT codigo,dominio,Count(*)
+from
+(SELECT DISTINCT codigo,dominio,descripcion
+FROM fn3equipofutbolrsssf2008ok)
+GROUP BY codigo,dominio
+HAVING Count(*)>1
+ORDER BY dominio
+
+
+)
+
+
+UPDATE   fn3equipofutbolrsssf2008ok
+SET DESCRIPCION='MUNICH 1860'
+WHERE CODIGO='M18'
+
+
+
+
+
+
+SELECT      *
+FROM fn3partidofutbolrssf2010
+WHERE (GOLESLOCAL<0)
+
+
+UPDATE     fn3partidofutbolrssf2010 SET DOMINIO='IRE' WHERE DOMINIO='IRL';
+UPDATE     fn3partidofutbolrssf2010 SET DOMINIO='SBA' WHERE DOMINIO='SER';
+
+--DELETE   fn3equipofutbolrsssf2008 WHERE EQUIPO='Banat';
+select * from     fn3partidofutbolrssf2010 WHERE DOMINIO='GRE' ORDER BY jornada;
+
+--DELETE  fn3partidofutbolrssf2010 WHERE DOMINIO = 'ITA';
+
+
+
+SELECT jornada,Count(*)
+FROM
+fn3partidofutbolrssf2010
+WHERE DOMINIO = 'SBA'
+GROUP BY jornada
+
+
+
+
+ select EQUIPOLOCAL,EQUIPOVISITANTE,JORNADA
+  from     fn3partidofutbolrssf2010 WHERE DOMINIO='ISL'
+  MINUS
+(SELECT  EQUIPOLOCAL,EQUIPOVISITANTE,JORNADA
+ FROM fn3partidofutbolrssf2010 t1,fn3equipofutbolrsssf2008 t2,fn3equipofutbolrsssf2008 t3
+WHERE
+t1.dominio='ISL' and
+t1.equipolocal=t2.equipo    AND
+t1.equipovisitante=t3.equipo   AND
+t1.dominio=t2.dominio AND
+t1.dominio=t3.dominio
+)
+
+
+
+
+SELECT  CODIGO,DESCRIPCION,Count(*)
+FROM
+fn3equipofutbolrsssf2008
+GROUP BY CODIGO,DESCRIPCION
+HAVING Count(*)>1

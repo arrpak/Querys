@@ -1,0 +1,263 @@
+
+-- Theta=0.96 FN3FUERZAEQUIPOAUX5
+
+CREATE TABLE FN3FUERZAEQUIPOAUX5
+AS SELECT * FROM FN3FUERZAEQUIPOAUx4  WHERE FECHA=DAT('19920304');
+
+
+CREATE INDEX   FN3FUERZAEQUIPOidx3  ON   FN3FUERZAEQUIPO   (fecha,equipo);
+
+
+update     FN3FUERZAEQUIPOAUX5
+SET fuerza=0
+WHERE FECHA=DAT('19920304')
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX5 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('19920305')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Theta=0.92 FN3FUERZAEQUIPOAUX5
+
+CREATE TABLE FN3FUERZAEQUIPOAUX6
+AS SELECT * FROM FN3FUERZAEQUIPOAUX5  WHERE FECHA=DAT('19920304');
+
+
+CREATE INDEX   FN3FUERZAEQUIPOAUX6IDX  ON   FN3FUERZAEQUIPOAUX6   (fecha,equipo);
+
+
+update     FN3FUERZAEQUIPOAUX6
+SET fuerza=0
+WHERE FECHA=DAT('19920304')
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX6 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('19920304')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX6 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('20080531')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Theta=0.98 -- Factor=0.9; FN3FUERZAEQUIPOAUX7
+
+CREATE TABLE FN3FUERZAEQUIPOAUX7
+AS SELECT * FROM FN3FUERZAEQUIPOAUX6  WHERE FECHA=DAT('19920304');
+
+
+CREATE INDEX   FN3FUERZAEQUIPOAUX7IDX  ON   FN3FUERZAEQUIPOAUX7   (fecha,equipo);
+
+
+update     FN3FUERZAEQUIPOAUX7
+SET fuerza=0
+WHERE FECHA=DAT('19920304')
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX7 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('19920304')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX7 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('20080531')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- DifGol Max de 5 goles  FN3FUERZAEQUIPOAUX8
+
+CREATE TABLE FN3FUERZAEQUIPOAUX8
+AS SELECT * FROM FN3FUERZAEQUIPOAUX7  WHERE FECHA=DAT('19920304');
+
+
+CREATE INDEX   FN3FUERZAEQUIPOAUX8IDX  ON   FN3FUERZAEQUIPOAUX8   (fecha,equipo);
+
+
+update     FN3FUERZAEQUIPOAUX8
+SET fuerza=0
+WHERE FECHA=DAT('19920304')
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX8 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('19920304')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX8 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('20080531')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- FACTOR = 0.7  FN3FUERZAEQUIPOAUX9
+
+CREATE TABLE FN3FUERZAEQUIPOAUX9
+AS SELECT * FROM FN3FUERZAEQUIPOAUX8  WHERE FECHA=DAT('19920304');
+
+
+CREATE INDEX   FN3FUERZAEQUIPOAUX9IDX  ON   FN3FUERZAEQUIPOAUX9   (fecha,equipo);
+
+
+update     FN3FUERZAEQUIPOAUX9
+SET fuerza=0
+WHERE FECHA=DAT('19920304')
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX9 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('19920304')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX9 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('20080531')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------
+
+-- FACTOR = 0.7  fuerzas iniciales no nulas FN3FUERZAEQUIPOAUX10
+
+CREATE TABLE FN3FUERZAEQUIPOAUX13
+AS SELECT * FROM FN3FUERZAEQUIPOAUX12  WHERE FECHA=DAT('19920304');
+
+
+truncate table 	 FN3FUERZAEQUIPOAUX13;
+
+
+
+
+CREATE INDEX   FN3FUERZAEQUIPOAUX13IDX  ON   FN3FUERZAEQUIPOAUX13   (fecha,equipo);
+
+
+
+--truncate table 	FN3FUERZAEQUIPOAUX10;
+--DROP TABLE FN3FUERZAEQUIPOAUX10;
+
+INSERT INTO fn3fuerzaequipoaux10
+SELECT  t1.equipolocal,dat('19920304'),t1.gol+t2.gol
+FROM
+(SELECT equipolocal,Round(Avg(goleslocal-golesvisitante),2)   AS gol
+FROM
+fn3partidofutbol t1,fn3equipofutbol t2
+WHERE
+valido='S'
+AND fechapartido>=To_Date('19920101','yyyymmdd')
+AND tipoequipo='SEL'
+AND equipolocal=codigo
+GROUP BY equipolocal
+) t1,
+(SELECT equipovisitante,-1*Round(Avg(goleslocal-golesvisitante),2)   AS gol
+FROM
+fn3partidofutbol t1,fn3equipofutbol t2
+WHERE
+valido='S'
+AND fechapartido>=To_Date('19920101','yyyymmdd')
+AND tipoequipo='SEL'
+AND equipovisitante=codigo
+GROUP BY equipovisitante
+) t2
+WHERE equipolocal=equipovisitante
+ORDER BY 2 desc
+
+
+
+
+
+
+update     FN3FUERZAEQUIPOAUX10
+SET fuerza=0
+WHERE FECHA=DAT('19920304')
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX10 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('19920304')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+SELECT descripcion,fecha,fuerza
+FROM FN3FUERZAEQUIPOAUX10 t1,fn3equipofutbol t2
+WHERE FECHA=DAT('20080531')
+AND t2.codigo=t1.equipo
+AND tipoequipo='SEL'
+ORDER BY FUERZA DESC;
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------
+
+
+
+select competicion,fechapartido,equipolocal,equipovisitante,goleslocal,golesvisitante,fuerza
+from fn3partidofutbol t1,fn3fuerzaequipoaux8 t2
+where
+(t1.equipolocal='AUT' or t1.equipovisitante='AUT')
+and t2.equipo='AUT'
+and t2.fecha=t1.fechapartido
+order by fechapartido

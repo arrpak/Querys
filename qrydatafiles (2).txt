@@ -1,0 +1,53 @@
+select tablespace_name tablespace
+, file_name
+, decode(actual_size,-1,'n/a (offline)',actual_size) actual
+, decode(shrink_to,-1,'n/a'
+,null,'can''t be shrinked'
+,actual_size,'can''t be shrinked'
+, shrink_to) shrink_to
+from (
+select -- locally managed files that can be resized
+-- (last used block < last free block)
+d.tablespace_name
+, d.file_id
+, d.file_name
+, d.blocks*t.blocksize/1024 actual_size
+, nvl((m.maxblock-1)*t.blocksize/1024,
+(64*1024+t.bitmapped*t.blocksize)/1024) shrink_to
+from dba_data_files d
+, sys.ts$ t
+, (select u.fileid file_id
+, max(u.block+u.length) maxblock --last used block +1
+from dba_lmt_used_extents u group by fileid ) m
+where m.file_id(+)=d.file_id
+and d.tablespace_name =t.name
+and t.bitmapped > 0
+union -- Offline LMT
+select d.tablespace_name
+, d.file_id, d.file_name, -1
+, -1 -- -1 => n/a, null => cannot be resized
+from dba_data_files d
+where bytes is null -- Offline LMT: Size is unknown
+union -- dictionary managed
+select df.tablespace_name
+, a.file#
+, df.file_name
+, df.bytes/1024
+, case when nvl(min(a.bl-1),df.blocks) > 2 --nvl: no free space
+then nvl(min(a.bl-1),df.blocks)*(df.bytes/df.blocks)/1024
+else 2*(df.bytes/df.blocks)/1024 end
+from (select f.ts#, f.file#, block# bl
+from sys.fet$ f
+start with block#=(select d.blocks-f.length+1 m
+from dba_data_files d where f.file#=d.file_id)
+--end of free space area = end of datafile
+connect by prior block#=length+block# --if area before is also free
+) a
+, dba_data_files df
+, dba_tablespaces ts
+where df.file_id = a.file# (+) -- a no rows -> no free space
+and df.tablespace_name = ts.tablespace_name
+and ts.extent_management='DICTIONARY'
+group by df.tablespace_name, a.file#, df.file_name, df.blocks, df.bytes
+)
+order by tablespace_name, file_name;

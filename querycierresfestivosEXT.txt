@@ -1,0 +1,24 @@
+UPDATE fn3printingdetail
+SET decision=0,increasedec=0
+WHERE header='MARCA' AND node='EXT' AND dateprint=dat('20071206') AND decision>0
+AND NEWSSTAND IN
+(
+SELECT newsstand
+FROM fn3printingdetail
+WHERE header='MARCA' AND node='EXT' AND dateprint=dat('20071206') AND decision>0
+MINUS
+(
+SELECT ope.newsstand
+FROM fn3operation ope, fn3newsstandon non
+WHERE
+(ope.newsstand LIKE '006%' OR ope.newsstand LIKE '010%')
+AND
+(
+operationdate=dat('20071012') OR 
+operationdate=dat('20071101') OR 
+operationdate=dat('20071012') OR 
+operationdate=dat('20070501')
+)
+AND  non.dateoff IS NULL
+AND service>0
+AND non.newsstand=ope.newsstand));

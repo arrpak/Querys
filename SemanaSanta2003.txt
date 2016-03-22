@@ -1,0 +1,22 @@
+set pagesize 3000;
+select tir.newsstand,ven.venta,ven.return,tir.tirada
+from
+(select newsstand,service-return as Venta,return
+from fn3operation
+where header='MARCA'  and product='DIARIO' and
+newsstand like '028%' and
+operationdate=to_date('20020328','yyyymmdd')) ven,
+(select newsstand,round(decision+increasedec) as tirada
+from fn3printingdetail
+where header='MARCA' and product='DIARIO' and
+dateprint=to_date('20030412','yyyymmdd') and
+node='CAM' and orderf=1) tir
+where
+tir.newsstand=ven.newsstand and
+tir.tirada<ven.venta
+;
+
+
+
+
+

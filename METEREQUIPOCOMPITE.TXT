@@ -1,0 +1,21 @@
+INSERT INTO fn3equipocompite
+SELECT 'CLASMUNDIAL','MUN','PRIMERA','2003/2005',codigo,0
+FROM fn3equipofutbol
+WHERE tipoequipo='SEL'
+AND CODIGO NOT IN
+(
+SELECT equipo
+FROM fn3equipocompite
+WHERE temporada='2003/2005' AND competicion='CLASMUNDIAL')
+
+
+
+INSERT INTO fn3equipocompiteFASE
+SELECT 'CLASMUNDIAL','MUN','PRIMERA','2003/2005','UNICAUNI',codigo,'CLA',0
+FROM fn3equipofutbol
+WHERE tipoequipo='SEL'
+AND CODIGO NOT IN
+(
+SELECT equipo
+FROM fn3equipocompiteFASE
+WHERE temporada='2003/2005' AND competicion='CLASMUNDIAL')

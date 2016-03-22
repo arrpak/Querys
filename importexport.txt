@@ -1,0 +1,26 @@
+CREATE TABLE FN3WAYTYPEKK
+AS
+SELECT *
+FROM FN3WAYTYPE
+
+
+SELECT * FROM FN3WAYTYPEKK
+
+DROP TABLE FN3WAYTYPEKK
+
+SELECT * FROM FN3WAYTYPEKKk
+
+exp formarca/formarca@formarca file=c:\bakup.dmp Log=c:\bkp.Log tables=fn3partidofutbol
+
+imp formarca/formarca@formarca file=c:\bakup.dmp log=c:\import_log.log buffer=1000000 tables=fn3waytypekkk
+
+
+
+SELECT *
+FROM fn3newsstand
+WHERE town='ALCALA DE HENARES' AND NEWSSTANDTYPE='EV'
+
+
+
+fn3ojd
+

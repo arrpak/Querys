@@ -1,0 +1,34 @@
+select substr(f1.output,0,30),avg(f1.STANDARIZEDRESIDUALS)*100
+from fn3estimationseries f1,fn3estimationseries f2
+where f1.estsession='20020823_CAM.PV' and
+--output='VentaMarca028000100002'
+f1.output like 'VentaMarca0280001%' and
+f1.output=f2.output and
+f1.estsession=f2.estsession
+group by f1.output;
+
+
+
+
+--Todos los dias
+select substr(output,0,30),avg(STANDARIZEDRESIDUALS)
+from fn3estimationseries
+where estsession='20020823_CAM.PV' and
+--output='VentaMarca028000100002'
+output like 'VentaMarca0280001%'
+group by output;
+
+--Mes de agosto
+select substr(output,0,30),avg(STANDARIZEDRESIDUALS)
+from fn3estimationseries
+where estsession='20020823_CAM.PV' and
+--output='VentaMarca028000100002'
+output like 'VentaMarca0280001%' and
+valuedate>to_date('2002/08/01','yyyy/mm/dd')
+group by output;
+
+select avg(STANDARIZEDRESIDUALS)
+from fn3estimationseries
+where estsession='20020823_CAM.PV' and
+valuedate>to_date('2002/08/01','yyyy/mm/dd');
+

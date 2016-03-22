@@ -1,0 +1,88 @@
+//para sacar tramos
+SELECT Count(*),(service+incidence-RETURN)
+FROM fn3operation
+WHERE header='MARCA' AND product='DIARIO'
+AND operationdate>=To_Date('20070101','yyyymmdd')
+AND newsstand LIKE '028%'
+GROUP BY  (service+incidence-RETURN)
+ORDER BY 2
+
+
+
+
+
+
+//VENTA TRAMOS
+
+SELECT Count(*),Round(Avg((to_number(decode((SERVICE+INCIDENCE+RETURN),0,'',(SERVICE + INCIDENCE - RETURN )))) ),2),To_Char(operationdate,'yyyy'),
+case
+       when (SERVICE+INCIDENCE-RETURN) <= 005 then '[000 - 005]'
+       when (SERVICE+INCIDENCE-RETURN) <= 008 then '[006 - 008]'
+       when (SERVICE+INCIDENCE-RETURN) <= 011 then '[009 - 011]'
+       when (SERVICE+INCIDENCE-RETURN) <= 014 then '[012 - 014]'
+       when (SERVICE+INCIDENCE-RETURN) <= 017 then '[015 - 017]'
+       when (SERVICE+INCIDENCE-RETURN) <= 021 then '[018 - 021]'
+       when (SERVICE+INCIDENCE-RETURN) <= 025 then '[022 - 025]'
+       when (SERVICE+INCIDENCE-RETURN) <= 031 then '[026 - 031]'
+       when (SERVICE+INCIDENCE-RETURN) <= 042 then '[032 - 042]'
+       else '(43 o mas]' end  as Tramo 
+
+FROM fn3operation
+WHERE
+operationdate>To_Date('20070101','yyyymmdd')
+AND operationdate<To_Date('20110101','yyyymmdd')
+AND header='MARCA' AND PRODUCT='DIARIO'
+AND newsstand LIKE '028%'
+group BY 
+case
+       when (SERVICE+INCIDENCE-RETURN) <= 005 then '[000 - 005]'
+       when (SERVICE+INCIDENCE-RETURN) <= 008 then '[006 - 008]'
+       when (SERVICE+INCIDENCE-RETURN) <= 011 then '[009 - 011]'
+       when (SERVICE+INCIDENCE-RETURN) <= 014 then '[012 - 014]'
+       when (SERVICE+INCIDENCE-RETURN) <= 017 then '[015 - 017]'
+       when (SERVICE+INCIDENCE-RETURN) <= 021 then '[017 - 021]'
+       when (SERVICE+INCIDENCE-RETURN) <= 025 then '[022 - 025]'
+       when (SERVICE+INCIDENCE-RETURN) <= 031 then '[026 - 031]'
+       when (SERVICE+INCIDENCE-RETURN) <= 042 then '[032 - 042]'
+       else '(43 o mas]' end ,
+       To_Char(operationdate,'yyyy')
+ORDER BY 3,2
+
+
+
+
+
+
+
+
+
+
+
+
+
+//VENTA POR NODO
+
+
+
+ select  to_date(to_char(infoDate,'yyyy')||'/12/01','yyyy/mm/dd'),
+CASE 
+WHEN      node = 'CAMATI'  Then 'atipicos'
+when      node = 'CAMCAP'  then 'capital'
+when      node = 'CAMSIE'  then 'sierra'
+when      (node = 'CAMGAS'  or  node = 'CAMVIA'  or  node = 'CAMVIP' or  node = 'CAMVLR'  or  node = 'CAMAER') then 'varios'
+when     ( node = 'CAMPER' or  node = 'CAMPERVG' ) then 'periferia' end,
+avg((serviceCont + incidenceCont - returnCont) +
+    estimatedSale) as VentaTotal 
+from formarca.fn3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'CAMATI' or  node = 'CAMCAP' or  node = 'CAMGAS' or  node = 'CAMPER' or  node = 'CAMPERVG' or  node = 'CAMSIE' or  node = 'CAMVIA' or  node = 'CAMVIP' or  node = 'CAMVLR'  OR node = 'CAMAER' )
+    and (INFODATE >=  to_date('2007/01/01', 'yyyy/mm/dd')  )
+group by   to_date(to_char(infoDate,'yyyy')||'/12/01','yyyy/mm/dd'),
+CASE 
+WHEN    node = 'CAMATI'  Then 'atipicos'
+when      node = 'CAMCAP'  then 'capital'
+when      node = 'CAMSIE'  then 'sierra'
+when      (node = 'CAMGAS'  or  node = 'CAMVIA'  or  node = 'CAMVIP' or  node = 'CAMVLR'  or  node = 'CAMAER') then 'varios'
+when     ( node = 'CAMPER' or  node = 'CAMPERVG' ) then 'periferia' end
+order by to_date(to_char(infoDate,'yyyy')||'/12/01','yyyy/mm/dd')

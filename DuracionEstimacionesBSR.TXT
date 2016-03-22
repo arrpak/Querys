@@ -1,0 +1,13 @@
+SELECT *
+from
+(SELECT output,(estdate-iniestdate)*86400/60 AS dur_old,varcount,datacount,stddeviation,schwarz
+FROM EZCestimation
+WHERE
+estsession='20090616.01.InformeSemanal.BSR') t1,
+(SELECT output,(estdate-iniestdate)*86400/60 AS dur_new,varcount,datacount,stddeviation,schwarz
+FROM fn3estimation
+WHERE
+estsession='20090623.01.InformeSemanal.BSR') t2
+WHERE
+t1.output=t2.output
+

@@ -1,0 +1,120 @@
+--spool c:\nuevonodopadre.txt
+--select 'Update fn3node set fathernode="'||nodonuevo||'" where newsstand="'||newsstand||'";'
+-- newsstand,nodonuevo
+--from
+(
+select news.newsstand as newsstand,
+stddev(sie.venta/news.venta)/avg(sie.venta/news.venta) AS SIE,
+stddev(peri.venta/news.venta)/avg(peri.venta/news.venta) AS PERI,
+stddev(GAS.venta/news.venta)/avg(gas.venta/news.venta) AS GAS,
+stddev(CAP.venta/news.venta)/avg(cap.venta/news.venta) AS CAP,
+stddev(PERI.venta/news.venta)/avg(peri.venta/news.venta) AS PER,
+stddev(PERIVG.venta/news.venta)/avg(perivg.venta/news.venta) AS PERIVG,
+stddev(VLR.venta/news.venta)/avg(vlr.venta/news.venta) AS VLR,
+stddev(VIA.venta/news.venta)/avg(via.venta/news.venta) AS VIA,
+fnode.fathernode as NodoViejo,
+case when            stddev(sie.venta/news.venta)<stddev(peri.venta/news.venta)
+      AND            stddev(sie.venta/news.venta)<stddev(VIP.venta/news.venta) then 'CAMSIE'
+      else case when stddev(peri.venta/news.venta) <stddev(sie.venta/news.venta) AND      
+                     stddev(peri.venta/news.venta)<stddev(VIP.venta/news.venta) then 'CAMPER'
+      else 'CAMVIP' end end AS NodoNuevo
+from
+(
+select operationdate,newsstand,service+incidence-return as venta
+from fn3operation
+where header='MARCA' and product='DIARIO'
+and newsstand = '028000100002'
+--and newsstand like '0280001%'
+and service+incidence-return>0) news,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMPER') PERI,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMPERVG') PERIVG,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMSIE') SIE,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMVIP') VIP,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMGAS') GAS,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMATI') ATI,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMVLR') VLR,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMVIA') VIA,
+(select node,infodate,service+incidence-returncont+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and product='DIARIO'
+and node='CAMCAP') CAP,
+(select newsstand,fathernode
+from fn3node
+where header='MARCA' and product='DIARIO'
+and (fathernode='CAMPER' or 
+     fathernode='CAMSIE' or 
+     fathernode='CAMATI' or 
+     fathernode='CAMPERVG' or 
+     fathernode='CAMCAP' or 
+     fathernode='CAMGAS' or 
+     fathernode='CAMVIA' or 
+     fathernode='CAMVLR' or 
+     fathernode='CAMVIP'))  fnode,
+(select newsstand
+from fn3newsstandon
+where dateoff is null) operativo
+where
+sie.infodate=operationdate and
+peri.infodate=operationdate and
+periVG.infodate=operationdate and
+GAS.infodate=operationdate and
+VIP.infodate=operationdate and
+ATI.infodate=operationdate and
+VLR.infodate=operationdate and
+VIA.infodate=operationdate and
+CAP.infodate=operationdate and
+fnode.newsstand=news.newsstand and
+operativo.newsstand=news.newsstand 
+group by news.newsstand,fnode.fathernode)
+;
+--where nodonuevo<>nodoviejo;
+--spool off
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

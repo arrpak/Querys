@@ -1,0 +1,37 @@
+select tab1.output,tab1.value,tab2.value
+from fn3estimationinput tab1,fn3estimationinput tab2
+where
+tab1.estsession='20020322_CAM.PV'
+and tab2.estsession='200204115_CAM.PV'
+and tab1.value>tab2.value
+and tab1.input='RatioCie'
+and tab1.input=tab2.input
+and tab1.output=tab2.output
+;
+
+
+
+--select tab1.output,
+select sum(tab1.value),sum(tab2.value)
+from fn3estimationinput tab1,fn3estimationinput tab2
+where
+tab1.estsession='20020411_CAM.PV'
+and tab2.estsession='20020415_CAM.PV'
+and tab1.input='RatioCie'
+and tab1.input=tab2.input
+and tab1.output=tab2.output
+group by tab1.estsession,tab2.estsession
+;
+
+
+select tab1.newsstand,tab1.decision+tab1.increasedec,
+                      tab2.decision+tab2.increasedec
+from fn3printingdetail tab1,fn3printingdetail tab2
+where tab1.dateprint=to_Date('20020409','yyyymmdd')
+and  tab1.dateprint=to_Date('20020411','yyyymmdd')
+and tab1.orderf=1
+and tab2.orderf=1
+and tab1.newsstand like '028%'
+and  tab1.newsstand=tab2.newsstand;
+
+ 

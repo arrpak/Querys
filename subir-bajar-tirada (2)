@@ -1,0 +1,6 @@
+
+update FN3PARTIDOFUTBOL
+SET goleslocal=0,golesvisitante=2
+WHERE FECHAPARTIDO=To_Date('2007/11/25','yyyy/mm/dd')
+AND equipolocal='NUM'
+AND equipovisitante='G74'

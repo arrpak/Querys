@@ -1,0 +1,29 @@
+insert into fn3closingfixed
+select code,to_date('20030802','yyyymmdd'),to_date('20030802','yyyymmdd'),
+to_date('20030730','yyyymmdd')
+from fn3newsstand
+where code in(
+select code
+ from fn3newsstand
+ where company like '%METRO%' and
+ code in
+ (select newsstand
+ from fn3newsstandon
+ where dateoff is null));
+
+
+
+select tab1.node,tab1.ventotal,tab2.ventotal,
+(tab2.ventotal/tab1.ventotal*100)-100 as PORC
+from
+(select infodate,node,service+incidence-returncont+estimatedsale as ventotal
+from fn3nodeinformation
+where infodate=to_date('20020727','yyyymmdd')
+and (node like 'AND%' or node like 'EXT%')) Tab1,
+(select infodate,node,service+incidence-returncont+estimatedsale as ventotal
+from fn3nodeinformation
+where infodate=to_date('20020803','yyyymmdd')
+and (node like 'AND%' or node like 'EXT%')) Tab2
+where tab1.node=tab2.node and
+tab1.ventotal>0
+order by tab1.node;

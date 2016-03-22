@@ -1,0 +1,67 @@
+
+delete fn3outputinputinformation
+where
+output='VentaMarcaCAMCAP'
+AND TYPE='E';
+
+
+
+
+select *
+from fn3outputinputinformation2
+where
+output='VentaMarcaCAMCAP'
+AND TYPE='E';
+
+
+
+update fn3input
+set active='N'
+where
+SETINPUT='IntervencionCAMCAP' or setinput='CAMCAP';
+commit;
+
+
+
+
+INSERT INTO fn3outputinputinformation
+SELECT  OUTPUT,'Eliminados', DATING,INPUT,'E',NULL,NULL,NULL,NULL,'Y'           
+FROM fn3estimationinput
+WHERE estsession='20061226.MG'
+AND output ='VentaMarcaCAMCAP'
+AND Value<0
+AND ORDERF=0
+AND input NOT LIKE 'Cos%'
+AND input NOT LIKE 'Int%'
+AND input NOT LIKE 'Sin%'
+AND input NOT LIKE '%AS%'
+AND input NOT LIKE '%Sr%'
+AND input NOT LIKE '%As%'
+AND input NOT LIKE '%Fes%'
+AND input NOT LIKE 'BodaReal'
+AND INPUT NOT IN
+(
+SELECT INPUT
+FROM fn3outputinputinformation
+WHERE output ='VentaMarcaCAMCAP'
+AND TYPE='E')
+;
+COMMIT;
+
+
+
+insert into fn3input
+select 'CAMCAP','Diario',
+'Inter'||to_char(valuedate,'YYYY')||to_char(valuedate,'mm')||
+to_char(valuedate,'dd'),
+'Pulse(y'||to_char(valuedate,'YYYY')||'m'||to_char(valuedate,'mm')||'d'||
+to_char(valuedate,'dd')||',Diario)',
+to_number(0),null,null,null,'Y',null
+from fn3estimationseries
+where
+output='VentaMarcaCAMCAP' and
+estsession='20061226.MG' and
+dating='Diario' and
+abs(standarizedresiduals)>3.5;
+
+

@@ -1,0 +1,33 @@
+Name                            Null?    Type
+------------------------------- -------- ----
+HEADER                          NOT NULL CHAR(12)
+PRODUCT                         NOT NULL CHAR(12)
+NEWSSTAND                       NOT NULL CHAR(12)
+OPERATIONDATE                   NOT NULL DATE
+SERVICE                         NOT NULL NUMBER(38)
+INCIDENCE                       NOT NULL NUMBER(38)
+RETURN                          NOT NULL NUMBER(38)
+
+
+select newsstand,sum(service),count(*)
+from fn3operation
+where header='EXPANSION' and
+product='DIARIO' and
+operationdate>to_date('20020815','yyyymmdd') and
+return=0 and
+service>0
+group by newsstand
+order by count(*);
+
+
+
+select newsstand,sum(return)/sum(service) as PorcDev
+from fn3operation
+where header='MARCA' and
+product='DIARIO' and
+operationdate>to_date('20020815','yyyymmdd') and
+--return=0 and
+newsstand like '028%' and
+service>0
+group by newsstand
+order by PorcDev desc;

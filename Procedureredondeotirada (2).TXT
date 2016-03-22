@@ -1,0 +1,146 @@
+CREATE OR REPLACE PROCEDURE redondeotirada
+(v_heade IN VARCHAR2,v_product IN VARCHAR2,v_nod IN VARCHAR2,v_datep IN DATE)
+iS
+v_forsession VARCHAR(50) ;
+q1           VARCHAR(500) ;
+v_simdec     VARCHAR(50);
+v_orderf     NUMBER;
+v_total      NUMBER;
+v_totalused  NUMBER;
+
+--Orden de tirada usada
+BEGIN
+SELECT orderf into v_orderf
+FROM fn3printing
+WHERE
+header     = v_heade AND
+product    = v_product AND
+dateprint  = v_datep AND
+node       = v_nod   AND
+used       ='Y';
+
+--Total tirada usada
+SELECT       100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED INTO v_totalused
+FROM fn3printingdetail
+where
+header     = v_heade   AND
+product    = v_product AND
+dateprint  = v_datep   AND
+node       = v_nod   AND
+orderf     = v_orderf
+;
+
+--Total tirada 101
+SELECT       100*ceil((SUM(case when (decision + increaseDec) <= 15
+              then  round(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end)-30)/100) AS TOTALRED INTO v_total
+FROM fn3printingdetail
+where
+header     = v_heade   AND
+product    = v_product AND
+dateprint  = v_datep   AND
+node       = v_nod   AND
+orderf     = v_orderf
+;
+
+INSERT INTO fn3printing
+VALUES (v_heade,v_product,v_nod,v_datep,200,'N',v_datep,sysdate,null);
+
+
+INSERT INTO  fn3printingdetail
+select v_heade,v_product,v_nod,v_datep,200,newsstand,forsession,decision,decision*v_totalused/v_total,decsession,decsys
+--CASE WHEN OUTPUT ='VentaMarca39005001108' THEN '039005001108'
+--ELSE SubStr(output,11,12) END ,
+FROM fn3printingdetail
+WHERE
+header     = v_heade   AND
+product    = v_product AND
+dateprint  = v_datep   AND
+node       = v_nod   AND
+orderf     = v_orderf
+;
+
+
+ /*
+--Dbms_Output.Put_Line('Tirada  '||100+i);
+
+
+Dbms_Output.Put_Line('Insertado en PrintingDetail');
+
+
+-- Saco el orden de la tirada usada
+SELECT orderf into v_orderf
+FROM fn3printing
+WHERE
+header     = v_heade AND
+product    = v_product AND
+dateprint  = v_datep AND
+node       = v_nod   AND
+used       ='Y';
+
+DELETE fn3printingdetail
+WHERE newsstand IN
+(SELECT newsstand
+FROM fn3openingannounced
+WHERE valuedate=v_datep AND
+OPEN='N');
+
+
+-- Borramos los puntos con servicios especiales
+DELETE fn3printingdetail
+WHERE
+header     = v_heade AND
+product    = v_product AND
+dateprint  = v_datep AND
+node       = v_nod
+AND orderf = i+100
+AND newsstand IN
+(SELECT newsstand
+FROM fn3printingdetail
+WHERE
+header     = v_heade AND
+product    = v_product AND
+dateprint  = v_datep AND
+node       = v_nod   AND
+forsession IN ('ModificacionServicio','ServicioFijo','ServicioMinimo' ) AND
+orderf     = v_orderf);
+
+-- Insertamos los puntos con servicios especiales
+INSERT INTO fn3printingdetail
+select header,product,node,dateprint,i+100,newsstand,forsession,decision,0--increasedec
+,decsession,decsys
+FROM fn3printingdetail
+WHERE
+header     = v_heade AND
+product    = v_product AND
+dateprint  = v_datep AND
+node       = v_nod   AND
+orderf     = v_orderf AND
+newsstand IN
+(SELECT newsstand
+FROM fn3printingdetail
+WHERE
+header     = v_heade AND
+product    = v_product AND
+dateprint  = v_datep AND
+node       = v_nod   AND
+forsession IN ('ModificacionServicio','ServicioFijo','ServicioMinimo' ) AND
+orderf     = v_orderf);
+COMMIT ;
+END LOOP;   */
+END;
+/
+
+
+
+
+
+
+-- delete fn3printingdetail where dateprint= To_Date('20090102') and orderf=200;
+   delete fn3printing where dateprint= To_Date('20090102') and orderf=200;
+
+begin
+ redondeotirada('MARCA','DIARIO','CAM',To_Date('20090102'));
+ END;

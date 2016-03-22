@@ -1,0 +1,62 @@
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMAER' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMATI' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMCAP' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMGAS' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMPER' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMSIE' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMVIP' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMVLR' and
+      infodate>=to_date('20020801','yyyymmdd'); 
+
+select infodate,to_char(infoDate, 'DY'),node,service+incidence-return+estimatedsale as venta
+from fn3nodeinformation
+where header='MARCA' and
+      product='DIARIO' and
+      node='CAMVIP' and
+      infodate>=to_date('20020801','yyyymmdd'); 

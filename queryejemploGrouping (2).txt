@@ -1,0 +1,8 @@
+
+
+--decode(grouping(pd.dateprint), 1, 'Todas_las_fechas',to_char(pd.dateprint)) as Fecha,
+SELECT Grouping(operationdate),operationdate,Sum(Service)
+FROM fn3operation
+WHERE SubStr(newsstand,1,3)='028'
+AND operationdate>SYSDATE-15
+GROUP BY cube(operationdate)

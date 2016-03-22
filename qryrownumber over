@@ -1,0 +1,5 @@
+SELECT town, code,way,row_number() over (PARTITION BY town order by code) AS orden
+FROM fn3newsstand
+WHERE town IN ('MADRID', 'MOSTOLES')
+  AND code LIKE '028%'
+ORDER BY town, code

@@ -1,0 +1,54 @@
+
+
+Real DBOpen("vpnemu","emu","emu");
+
+
+
+Text qry1="
+select *
+from
+(
+SELECT   header||product||edition||geographiczone,
+         infodate,service,
+         return,estimatedsale,numpvopen,numpvoutoff ,
+              (CASE WHEN GEOGRAPHICZONE IN
+         ('ALA','ALG','ALI','ALM','ARA','AST','BAD','BAR','BUR','CAC','CAD',
+          'CAS','CCA','CMU','COB','GRA','GUI','HUE','JAE','JER','LRI',
+           'MAL','MEL','NAV','SEV','SOR','VAL','VIZ') THEN 1 
+           WHEN GEOGRAPHICZONE='MAD' THEN 2 ELSE 0 END) AS Zonabayes
+FROM emuproductinformation
+WHERE header='MARCA'
+--AND geographiczone='MAD'
+and infodate>=to_date('20080101','yyyymmdd')
+order by 1,infodate asc
+)
+";
+
+Set names=  [[ "servicio","devolucion","venta","abiertos","agotados","zonabayes" ]];
+Set Data=DBSeriesTable(qry1,Diario,names);
+
+Set ZonasBayes=Select (Data,Real (Set s)
+{ 
+Real EQ(1,AvrS(s[6]))
+});
+
+
+Set ZonasNoBayes=Select (Data,Real (Set s)
+{ 
+Real EQ(0,AvrS(s[6]))
+});
+
+Set ZonaMadrid=Select (Data,Real (Set s)
+{ 
+Real EQ(2,AvrS(s[6]))
+});
+
+Real Ois.Store ( [[ ZonaMadrid , ZonasBayes ,ZonasNoBayes ]],
+"C:\Documents and Settings\fjarroyo\Mis documentos\Bayes\Formacion\TOL\DatosZonas.oza");
+
+Real DBClose("vpnemu");
+
+
+Set Ois.Load("C:\Documents and Settings\fjarroyo\Mis documentos\Bayes\Formacion\TOL\DatosZonas.oza");
+
+

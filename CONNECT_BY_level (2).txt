@@ -1,0 +1,3 @@
+ SELECT level a, level b, level c
+ FROM dual
+  CONNECT BY level <= 100 ;

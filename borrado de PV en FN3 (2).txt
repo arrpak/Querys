@@ -1,0 +1,161 @@
+delete from fn3servicemodified
+where newsstand='02814824487';
+-----------------------------------------
+delete from fn3servicefixed
+where newsstand='02814824487';
+-----------------------------------------
+delete from fn3probnotoutoff
+where output='VentaMarca02814824487';
+
+delete from fn3probnotoutoff
+where output='VentaExpansion02814824487';
+-----------------------------------------
+delete from fn3printingdetail
+where newsstand='02814824487';
+----------------------------------------------
+delete from fn3forecastseries
+where output='VentaMarca02814824487';
+
+delete from fn3forecastseries
+where output='VentaExpansion02814824487';
+-----------------------------------------
+delete from fn3forecast
+where output='VentaExpansion02814824487';
+
+delete from fn3forecast
+where output='VentaMarca02814824487';
+--------------------------------------------
+delete from fn3estimationarima
+where output='VentaMarca02814824487';
+
+delete from fn3estimationseries
+where output='VentaMarca02814824487';
+
+delete from fn3estimation
+where output='VentaMarca02814824487';
+
+delete from fn3estimation
+where output='VentaExpansion02814824487';
+
+
+delete from fn3outputdating
+where output='VentaMarca02814824487';
+
+delete from fn3outputdating
+where output='VentaExpansion02814824487';
+
+delete fn3processcontroloutput
+where output='VentaMarca02814824487';
+
+delete from fn3outputdatinghistorical
+where output='VentaMarca02814824487';
+
+delete from fn3output
+where CODE='VentaMarca02814824487';
+
+delete fn3processcontroloutput
+where output='VentaExpansion02814824487';
+
+delete from fn3outputdatingaux
+where output='VentaExpansion02814824487';
+
+
+delete from fn3output
+where CODE='VentaExpansion02814824487';
+
+delete from fn3estimation
+where output='VentaExpansionLibro02814824487';
+
+
+delete from fn3outputdating
+where output='VentaExpansionLibro02814824487';
+
+delete from fn3outputdatingaux
+where output='VentaExpansionLibro02814824487';
+
+
+delete from fn3output
+where CODE='VentaExpansionLibro02814824487';
+
+-------------------
+delete from fn3estimation
+where output='VentaMarcaMoneda02814824487';
+
+delete from fn3estimationaux
+where output='VentaMarcaMoneda02814824487';
+
+delete from fn3outputdating
+where output='VentaMarcaMoneda02814824487';
+
+delete from fn3outputdatingaux
+where output='VentaMarcaMoneda02814824487';
+
+delete from fn3output
+where CODE='VentaMarcaMoneda02814824487';
+
+-------------------
+delete from fn3estimation
+where output='VentaMarcaSegunda02814824487';
+
+delete from fn3estimationaux
+where output='VentaMarcaSegunda02814824487';
+
+delete from fn3outputdating
+where output='VentaMarcaSegunda02814824487';
+
+delete from fn3outputdatingaux
+where output='VentaMarcaSegunda02814824487';
+
+delete from fn3output
+where CODE='VentaMarcaSegunda02814824487';
+
+----------------------------------
+delete from fn3estimation
+where output='VentaMarcaCD02814824487';
+
+delete from fn3estimationaux
+where output='VentaMarcaCD02814824487';
+
+delete from fn3outputdating
+where output='VentaMarcaCD02814824487';
+
+delete from fn3outputdatingaux
+where output='VentaMarcaCD02814824487';
+
+delete from fn3output
+where CODE='VentaMarcaCD02814824487';
+-------------------------------------
+----------------------------------
+delete from fn3estimation
+where output='VentaMarcaGuia02814824487';
+
+delete from fn3estimationaux
+where output='VentaMarcaGuia02814824487';
+
+delete from fn3outputdating
+where output='VentaMarcaGuia02814824487';
+
+delete from fn3outputdatingaux
+where output='VentaMarcaGuia02814824487';
+
+delete from fn3output
+where CODE='VentaMarcaGuia02814824487';
+-------------------------------------
+delete from fn3node
+where  newsstand='02814824487';
+
+delete from fn3codification
+where newsstand='02814824487';
+
+delete from fn3newsstandon
+where newsstand='02814824487';
+
+delete from fn3newsstand
+where code='02814824487';
+
+
+
+
+
+
+

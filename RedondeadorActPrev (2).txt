@@ -1,0 +1,48 @@
+DECLARE
+prop    NUMBER;
+decpv   NUMBER;
+header  VARCHAR2(50);
+product VARCHAR2(50);
+node    VARCHAR2(50);
+fecha   VARCHAR2(50);
+
+BEGIN
+
+
+header:='MARCA';
+product:='DIARIO';
+node:='CAM';
+fecha:='20090110';
+
+SELECT  SUM(servicecont+incidence-returncont) INTO prop
+FROM fn3nodeinformation
+WHERE
+header='MARCA'
+AND product='DIARIO'
+AND node='CAM'
+AND infodate=To_Date(fecha,'YYYYMMDD')
+GROUP BY infodate
+;
+
+dbms_output.put_line(prop);
+
+SELECT Sum(forecast)
+INTO decpv
+from fn3forecastseries
+WHERE
+forsession LIKE '%ActPrev%'
+AND valuedate=dat(fecha)
+and output like 'VentaMarca028%';
+
+dbms_output.put_line(decpv);
+
+UPDATE fn3forecastseries
+SET forecast = greatest(0.5,forecast*(prop/decpv))
+WHERE
+forsession LIKE '%ActPrev%'
+AND valuedate=dat(fecha)
+and output like 'VentaMarca028%';
+
+
+END;
+

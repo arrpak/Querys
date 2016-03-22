@@ -1,0 +1,20 @@
+insert into fn2puntoventa (codigo,operativo)
+values('111111111111','S');
+
+insert into Fn2Nodo
+values ('MARCA', 'DIARIO', '111111111111',
+        'nodo terminal', '111111111111', 'CAMPER');
+
+INSERT INTO Fn2Output values
+('VentaMarca111111111111','MARCA','DIARIO','111111111111');
+
+insert into Fn2OutputDef
+values ('VentaMarca111111111111','VentaMarca111111111111','Diario',
+to_date('1993/01/01','YYYY/MM/DD'),to_date('2010/01/01','YYYY/MM/DD'),
+'Mod_D0_SAR0_0MA0_S');
+
+
+INSERT INTO Fn2Estimation
+ (EstSession, OutputDef, Arima, EstDate, State, StateInfo)
+   VALUES ('FICTICIA','VentaMarca111111111111','Mod_D0_SAR0_0MA0_S',
+  to_date('2000/01/01','YYYY/MM/DD'),'FIN','Fin de la Estimacion');

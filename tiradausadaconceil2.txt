@@ -1,0 +1,31 @@
+define node='NOR';
+
+DELETE fn3printingdetail
+WHERE
+node='&node'
+AND dateprint>=dat('20090131')
+AND orderf=200;
+
+DELETE fn3printing
+WHERE
+node='&node'
+AND dateprint>=dat('20090131')
+AND orderf=200;
+
+
+
+begin
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090131'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090201'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090202'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090203'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090204'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090205'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090206'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090207'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090208'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090209'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090210'));
+tiradausadaconceil2('MARCA','DIARIO','&node',DAT('20090211'));
+END;
+

@@ -1,0 +1,4 @@
+select * from expoperation 
+where ruta='0000004'
+and punto='00144'
+and  dia>to_date('2000/11/01','yyyy/mm/dd')

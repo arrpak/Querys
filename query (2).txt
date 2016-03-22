@@ -1,0 +1,66 @@
+set linesize 300
+column sid format 999
+column res heading 'Resource Type' format a20
+column id1 format 9999999
+column id2 format 9999999
+column lmode heading 'Lock Held' format a14
+column request heading 'Lock Req.' format a14
+column serial# format 99999
+column username  format a10
+column terminal heading Term format a20
+column tab format a25
+column owner format a16
+select  l.sid,s.serial#,s.username,s.terminal,
+        decode(l.type,'RW','RW - Row Wait Enqueue',
+                   'TM','TM - DML Enqueue',
+                   'TX','TX - Trans Enqueue',
+                   'UL','UL - User',l.type||'System') res,
+        substr(t.name,1,150) tab,u.name owner,
+        l.id1,l.id2,
+        decode(l.lmode,1,'No Lock',
+                2,'Row Share',
+                3,'Row Exclusive',
+                4,'Share',
+                5,'Shr Row Excl',
+                6,'Exclusive',null) lmode,
+        decode(l.request,1,'No Lock',
+                2,'Row Share',
+                3,'Row Excl',
+                4,'Share',
+                5,'Shr Row Excl',
+                6,'Exclusive',null) request
+from v$lock l, v$session s,
+sys.user$ u,sys.obj$ t
+where l.sid = s.sid
+and s.type != 'BACKGROUND'
+and t.obj# = l.id1
+and u.user# = t.owner#
+order by terminal;
+
+
+
+/*
+  SET LINESIZE 100
+COLUMN spid FORMAT A10
+COLUMN username FORMAT A10
+COLUMN program FORMAT A45
+
+SELECT s.terminal,
+       s.inst_id,
+       s.sid,
+       s.serial#,
+       p.spid,
+       s.username,
+       s.program
+       FROM   gv$session s
+       JOIN gv$process p ON p.addr = s.paddr AND p.inst_id = s.inst_id
+WHERE  s.type != 'BACKGROUND'
+ORDER BY terminal;
+
+
+
+
+
+ALTER SYSTEM KILL SESSION '334,34053';
+
+*/

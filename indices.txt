@@ -1,0 +1,35 @@
+SELECT Count(*)
+from fn3operationrepeated
+WHERE newsstand LIKE '028%'
+
+
+
+Select min(operationdate),max(operationdate),product
+from fn3operation
+WHERE
+--substr(newsstand,1,3)='028' and
+header='MARCA' AND
+product='CD' AND
+newsstand >'0280' AND
+newsstand <'0284' and
+operationdate>=to_date('2004/01/02', 'YYYY/MM/DD') and
+operationdate<=to_date('2009/12/08', 'YYYY/MM/DD')
+group by product;
+
+
+
+
+SELECT Count(*)
+from fn3operation
+
+
+
+
+Select *
+From user_segments
+order by SEGMENT_TYPE,bytes desc;
+
+SELECT *
+FROM fn3operationreturnzero
+WHERE newsstand LIKE '028%'
+ORDER BY operationdate

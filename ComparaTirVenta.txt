@@ -1,0 +1,94 @@
+select priDet.dateprint,
+         service                    serv, 
+         incidence                  inc, 
+         return                     dev,
+         service+incidence-return   venta,
+         floor(decision+increasedec+1)     decision1, 
+         decision+increasedec       decision 
+           from Fn3Printing pri, Fn3PrintingNodeForSession priNodFor,
+       Fn3PrintingDetail priDet, Fn3Operation ope,
+  (
+    select nod.newsStand, nod.fatherNode as fatherNode
+    from   Fn3Node nod,
+    (
+      select code as nodoPadre
+      from Fn3Node
+      where header     = 'MARCA' and
+            product    = 'DIARIO' and
+            fatherNode like 'EXT%'
+    ) nodPad
+    where  nod.header     = 'MARCA' and
+           nod.product    = 'DIARIO' and
+           nod.fathernode = nodPad.nodoPadre
+  ) tabAux
+  where  priDet.header     = 'MARCA'              and
+         priDet.product    = 'DIARIO'              and
+                     priDet.node       like 'EXT%' and
+         pri.used          = 'Y'                           and
+         priDet.dateprint  = to_date('2003/07/01', 'YYYY/MM/DD')    and
+         priDet.decision   > 0                             and
+         priDet.header     = pri.header                    and
+         priDet.header     = priNodFor.header              and
+         priDet.header     = ope.header                    and
+         priDet.product    = pri.product                   and
+         priDet.product    = priNodFor.product             and
+         priDet.decision   <15                             and
+         priDet.product    = ope.product                   and
+         priDet.node       = priNodFor.node                and
+         priDet.node       = pri.node                      and
+         priNodFor.sonnode = tabaux.fathernode             and
+         priDet.dateprint  = pri.dateprint                 and
+         priDet.dateprint  = priNodFor.dateprint           and
+         priDet.dateprint  = ope.operationdate             and
+         priDet.orderf     = priNodFor.orderf                 and
+         priDet.orderf     = pri.orderf                    and
+         priDet.newsStand  = ope.newsStand                 and
+         priDet.newsStand  = tabaux.newsStand
+union
+(
+select priDet.dateprint,
+         service                    serv, 
+         incidence                  inc, 
+         return                     dev,
+         service+incidence-return   venta,
+         floor(decision+increasedec+1)     decision1, 
+         decision+increasedec       decision 
+           from Fn3Printing pri, Fn3PrintingNodeForSession priNodFor,
+       Fn3PrintingDetail priDet, Fn3Operation ope,
+  (
+    select nod.newsStand, nod.fatherNode as fatherNode
+    from   Fn3Node nod,
+    (
+      select code as nodoPadre
+      from Fn3Node
+      where header     = 'MARCA' and
+            product    = 'DIARIO' and
+            fatherNode like 'EXT%'
+    ) nodPad
+    where  nod.header     = 'MARCA' and
+           nod.product    = 'DIARIO' and
+           nod.fathernode = nodPad.nodoPadre
+  ) tabAux
+  where  priDet.header     = 'MARCA'              and
+         priDet.product    = 'DIARIO'              and
+                     priDet.node       like 'EXT%' and
+         pri.used          = 'Y'                           and
+         priDet.dateprint  = to_date('2003/07/01', 'YYYY/MM/DD')    and
+         priDet.decision   > 0                             and
+         priDet.header     = pri.header                    and
+         priDet.header     = priNodFor.header              and
+         priDet.header     = ope.header                    and
+         priDet.product    = pri.product                   and
+         priDet.product    = priNodFor.product             and
+         priDet.decision   >=15                             and
+         priDet.product    = ope.product                   and
+         priDet.node       = priNodFor.node                and
+         priDet.node       = pri.node                      and
+         priNodFor.sonnode = tabaux.fathernode             and
+         priDet.dateprint  = pri.dateprint                 and
+         priDet.dateprint  = priNodFor.dateprint           and
+         priDet.dateprint  = ope.operationdate             and
+         priDet.orderf     = priNodFor.orderf                 and
+         priDet.orderf     = pri.orderf                    and
+         priDet.newsStand  = ope.newsStand                 and
+         priDet.newsStand  = tabaux.newsStand);

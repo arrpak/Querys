@@ -1,0 +1,134 @@
+
+DIF PREV - VENTA TRIM
+---------------------
+
+
+select valuedate as dia,sumprev,venta
+from
+( select sum(forecast) as sumprev,valuedate
+  from fn3forecastseries
+  where
+  used='Y' and
+  (output like 'VentaMarcaANDHUE%'OR
+   output like 'VentaMarcaANDMGA%'OR
+   output like 'VentaMarcaANDSEV%'OR
+   output like 'VentaMarcaANDCAD%')
+ and
+  valuedate>=to_date('20020102','yyyymmdd') and
+  valuedate<=to_date('20040630','yyyymmdd')
+  group by valuedate) previ,
+(  select infodate,sum(service+incidence-returncont) as venta
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='AND1'
+ group by infodate)
+where
+valuedate=infodate
+
+
+
+DIF PREV - VENTA DIA
+---------------------
+select infodate as dia,sumprev,venta
+from
+( select sum(forecast) as sumprev,valuedate
+  from fn3forecastseries
+  where
+  used='Y' and
+ (output like 'VentaMarcaANDHUE%'OR
+   output like 'VentaMarcaANDMGA%'OR
+   output like 'VentaMarcaANDSEV%'OR
+   output like 'VentaMarcaANDCAD%')
+ and
+  valuedate>sysdate-2000
+  group by valuedate) previ,
+(   select infodate,sum(service+incidence-returncont) as venta
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='AND'
+ group by infodate)
+where
+valuedate=infodate;
+
+
+AGOTADOS A PARTIR DE UNA VENTA 
+------------------------------
+
+select to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))||'/01','yyyy/mm/dd') as operationdate ,
+sum(case when return=0 then 1 else 0 end)/count(*) as PorcAgot
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and 
+(
+newsstand like '021%' OR 
+newsstand like '011%' OR 
+newsstand like '029%' OR 
+newsstand like '041%' 
+)
+and
+service+incidence-return>30
+and operationdate>to_date('20000625','yyyymmdd')
+and operationdate<to_date('20040630','yyyymmdd')
+group by to_date(to_char(operationdate,'yyyy')||'/'||to_char(to_number(to_char(operationdate,'q')+(2*(to_number(to_char(operationdate,'q'))-1))))||'/01','yyyy/mm/dd') ;
+
+
+DIF SERV - DECISION
+
+
+select pri.dateprint,servicio-Decision
+from
+(SELECT DATEPRINT, SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as Decision,orderf
+FROM FN3PRINTINGdetail
+WHERE HEADER='MARCA' and product='DIARIO' 
+and dateprint>=to_date('20040101','yyyymmdd') 
+and dateprint<=to_date('20040630','yyyymmdd')
+and node='AND'
+and newsstand not like '052%'
+group by dateprint,orderf) deci,
+(   select infodate,sum(service) as servicio
+  from fn3nodeinformation
+   where header='MARCA' and product='DIARIO'
+   and node='AND1'
+ group by infodate) serv,
+(
+select dateprint,orderf
+from fn3printing 
+  where header='MARCA' and product='DIARIO'
+   and node='AND'
+and dateprint>=to_date('20040101','yyyymmdd') 
+and dateprint<=to_date('20040630','yyyymmdd')
+and used='Y') pri
+where 
+infodate=pri.dateprint
+and pri.dateprint=deci.dateprint 
+and pri.dateprint||pri.orderf=deci.dateprint||deci.orderf;
+
+
+
+AGOTADO TAMAÑO KIOSKO
+---------------------
+select service+incidence-return as venta,
+sum(case when return=0 then 1 else 0 end)/count(*) as PorcAgot
+from fn3operation
+where
+header='MARCA' and product='DIARIO'
+and operationdate>=to_date('20040101','yyyymmdd') 
+and operationdate<=to_date('20040630','yyyymmdd')
+and
+service>0
+and
+(newsstand like '011%' OR 
+ newsstand like '021%' OR 
+ newsstand like '041%' OR 
+ newsstand like '029%' )
+group by service+incidence-return
+;
+
+
+
+
+
+

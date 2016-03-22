@@ -1,0 +1,24 @@
+insert into fn3newsstandgroup
+SELECT 'Getafe',FN3CODIFICATION.NEWSSTAND AS PUNTODEVENTA
+--       FN3CODIFICATION.DISTRIBUTORROUTE AS RUTA,
+--       FN3NEWSSTAND.TOWN AS ZONA
+FROM  FN3CODIFICATION, FN3NEWSSTAND
+WHERE (FN3NEWSSTAND.TOWN = 'GETAFE' OR
+      FN3NEWSSTAND.TOWN = 'PERALES DEL RIO' OR
+      FN3NEWSSTAND.TOWN = 'EL BERCIAL') AND
+FN3NEWSSTAND.CODE = FN3CODIFICATION.NEWSSTAND
+ORDER BY FN3CODIFICATION.DISTRIBUTORROUTE;
+
+
+
+select sum(decision),sum(increasedec),sum(decision)+sum(increasedec)
+from fn3printingdetail
+where dateprint=to_date('20020524','yyyymmdd') and
+header='MARCA'
+and product='DIARIO'
+and orderf=2
+and newsstand in
+(
+select newsstand from
+fn3newsstandgroup
+where newsstandgroup='Getafe');

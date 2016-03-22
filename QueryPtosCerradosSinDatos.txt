@@ -1,0 +1,37 @@
+SELECT newsstand,To_Char(Max(op1),'YYYY/mm/dd')
+FROM
+(
+SELECT ope.newsstand,Max(operationdate) AS op1
+FROM fn3operation ope,fn3newsstandon non
+WHERE
+(ope.newsstand like '011%' or
+ope.newsstand like '041%' or ope.newsstand like '029%' or
+ope.newsstand like '021%' or ope2.newsstand like '013%' or
+ope.newsstand like '004%' or ope.newsstand like '014%' or
+ope.newsstand like '023%' or ope.newsstand like '052%' OR
+ope.newsstand like '006%' or ope.newsstand like '010%' or
+ope.newsstand like '018%' OR ope.newsstand like '028%' )
+AND service>0
+AND dateoff IS NULL
+AND ope.newsstand=non.newsstand
+AND operationdate >To_Date('20061212','yyyymmdd')
+GROUP BY ope.newsstand
+UNION
+(
+SELECT ope2.newsstand,Max(operationdate) AS op1
+FROM fn3operationnotcontrolled ope2,fn3newsstandon non
+WHERE
+(ope2.newsstand like '011%' or
+ope2.newsstand like '041%' or ope2.newsstand like '029%' or
+ope2.newsstand like '021%' or ope2.newsstand like '013%' or
+ope2.newsstand like '004%' or ope2.newsstand like '014%' or
+ope2.newsstand like '023%' or ope2.newsstand like '052%' OR
+ope2.newsstand like '006%' or ope2.newsstand like '010%' or
+ope2.newsstand like '018%' OR ope2.newsstand LIKE '028%')
+AND service>0
+AND dateoff IS NULL
+AND ope2.newsstand=non.newsstand
+AND operationdate >To_Date('20060212','yyyymmdd')
+GROUP BY ope2.newsstand)
+) GROUP BY newsstand
+ORDER BY To_Char(Max(op1),'YYYY/mm/dd') desc

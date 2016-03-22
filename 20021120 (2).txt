@@ -1,0 +1,9 @@
+select substr(est.output, 1, 30) as out, estPower, value--, count(*)
+from   fn3Estimation est, fn3EstimationInput estInp
+where  est.estSession = '20021119_CAM.PV' and
+       estInp.input   = 'IncremCoche'     and
+       est.estSession = estInp.estSession and
+       est.output     = estInp.output     and
+       est.dating     = estInp.dating     and
+       (value between  0.098 and 0.102 or
+        value between  0.99 and 1.01);

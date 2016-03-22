@@ -1,0 +1,54 @@
+
+
+
+
+Select parti.equipolocal,parti.difgol,p1/p2
+from
+(
+select equipolocal,goleslocal-golesvisitante as DifGol,
+categoria,count(*) as p1
+from fn3partidofutbol 
+where
+dominio='SPA' and categoria='PRIMERA'
+and valido='S'
+group by equipolocal,goleslocal-golesvisitante,categoria) parti,
+(SELECT equipo
+from fn3equipocompite
+where competicion='LIGA' and temporada='2004/2005' and categoria='PRIMERA') equipos,
+(select equipolocal,count(*) as p2
+from fn3partidofutbol
+where
+dominio='SPA' and categoria='PRIMERA'
+and valido='S'
+group by equipolocal) total
+where
+equipos.equipo=parti.equipolocal and
+parti.equipolocal=total.equipolocal;
+
+
+
+
+
+
+Select parti.equipovisitante,parti.difgol,p1/p2
+from
+(
+select equipovisitante,golesvisitante-goleslocal  as DifGol,
+categoria,count(*) as p1
+from fn3partidofutbol 
+where
+dominio='SPA' and categoria='PRIMERA'
+and valido='S'
+group by equipovisitante,golesvisitante-goleslocal,categoria) parti,
+(SELECT equipo
+from fn3equipocompite
+where competicion='LIGA' and temporada='2004/2005' and categoria='PRIMERA') equipos,
+(select equipovisitante,count(*) as p2
+from fn3partidofutbol
+where
+dominio='SPA' and categoria='PRIMERA'
+and valido='S'
+group by equipovisitante) total
+where
+equipos.equipo=parti.equipovisitante and
+parti.equipovisitante=total.equipovisitante;

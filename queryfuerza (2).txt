@@ -1,0 +1,37 @@
+spool c:\f1.txt
+select * 
+--select count(*)
+from fn3fuerzaequipo
+where equipo in
+(select distinct(equipo)
+from fn3equipocompite
+where competicion='LIGA' and
+CATEGORIA='SEGUNDA' and
+dominio='SPA') and
+fecha<to_date('1996/01/02','yyyy/mm/dd');
+spool off;
+spool c:\f2.txt
+select * 
+--select count(*)
+from fn3fuerzaequipo
+where equipo in
+(select distinct(equipo)
+from fn3equipocompite
+where competicion='LIGA' and
+CATEGORIA='SEGUNDA' and
+dominio='SPA') and
+fecha>=to_date('1996/01/02','yyyy/mm/dd') and
+fecha<to_date('2000/03/02','yyyy/mm/dd');
+spool off;
+spool c:\f3.txt
+select * 
+--select count(*)
+from fn3fuerzaequipo
+where equipo in
+(select distinct(equipo)
+from fn3equipocompite
+where competicion='LIGA' and
+CATEGORIA='SEGUNDA' and
+dominio='SPA') and
+fecha>=to_date('2000/03/02','yyyy/mm/dd');
+spool off;

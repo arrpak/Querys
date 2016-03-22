@@ -1,0 +1,7 @@
+select valuedate,to_char(valuedate,'day')as DiaSemana,
+round(sum(forecast)) as prevision,round(sum(decision)) as tirada
+from fn2forecastdetail
+where valuedate>sysdate
+and
+forsession='2002020918.PV'
+group by valuedate;

@@ -1,0 +1,85 @@
+set newpage
+set termout off
+set colsep '|'
+set head off
+set feedback off
+set trimspool on
+set linesize 1000
+set pagesize 50000
+spool C:/Marca.txt
+  select fecha,
+         count(*) as Puntos,
+         sum(servicio+incidencia) as Servicio,
+         sum(devolucion) as Devolucion,
+         sum(devolucion)/sum(servicio+incidencia)*100 as PorDev,
+         (count(*)-sum(least(1,devolucion)))/count(*)*100 as PorAgo,
+         (sum(servicio)-sum(least(1,devolucion)*servicio))*100/
+         greatest(1,sum(servicio)) as PorAgoPond
+  from   fn2operacion, fn2nodo
+  where  nodoPadre  = 'CAMATI' and 
+         fecha     >= to_date('20011105','yyyymmdd') and
+         fecha     <= to_date('20011111','yyyymmdd') and
+         servicio + incidencia - devolucion > 0   and
+         fn2operacion.cabecera = 'MARCA' and
+         fn2operacion.producto = 'DIARIO' and
+         fn2operacion.cabecera = fn2nodo.cabecera and
+         fn2operacion.producto = fn2nodo.producto and
+         fn2operacion.puntoventa = fn2nodo.puntoventa
+  group  by fecha, nodoPadre;
+spool off
+
+------------------------------------------------------------------------------------------
+
+set newpage
+set termout off
+set colsep '|'
+set head off
+set feedback off
+set trimspool on
+set linesize 1000
+set pagesize 50000
+spool C:/Exp.txt
+   select dia,
+         count(*) as Puntos,
+         sum(servicio+incidencia) as Servicio,
+         sum(devolucion) as Devolucion,
+         sum(devolucion)/sum(servicio+incidencia)*100 as PorDev,
+         (count(*)-sum(least(1,devolucion)))/count(*)*100 as PorAgo,
+         (sum(servicio)-sum(least(1,devolucion)*servicio))*100/
+         greatest(1,sum(servicio)) as PorAgoPond    from   expoperation, fn2nodo
+    where  nodoPadre = 'CAMCAP' and 
+           dia    > to_date('2001/11/04', 'YYYY/MM/DD') and
+           fn2nodo.cabecera = 'MARCA' and
+           fn2nodo.producto = 'DIARIO' and
+           servicio + incidencia > 0   and
+           expoperation.ruta = substr(fn2nodo.puntoventa, 1, 7) and
+           expoperation.punto = substr(fn2nodo.puntoventa, 8, 5)
+    group  by dia, nodoPadre;
+spool off;
+
+------------------------------------------------------------------------------------------
+set newpage
+set termout off
+set colsep '|'
+set head off
+set feedback off
+set trimspool on
+set linesize 1000
+set pagesize 50000
+spool C:/Marca2.txt
+  select fecha,
+         count(*) as Puntos,
+         sum(servicio+incidencia) as Servicio,
+         sum(devolucion) as Devolucion,
+         sum(devolucion)/sum(servicio+incidencia)*100 as PorDev,
+         (count(*)-sum(least(1,devolucion)))/count(*)*100 as PorAgo,
+         (sum(servicio)-sum(least(1,devolucion)*servicio))*100/
+         greatest(1,sum(servicio)) as PorAgoPond
+  from   fn2operacion
+  where  fecha     >= to_date('20011105','yyyymmdd') and
+--         fecha     <= to_date('20011105','yyyymmdd') and
+         servicio + incidencia - devolucion > 0   and
+         fn2operacion.cabecera = 'MARCA' and
+         fn2operacion.producto = 'DIARIO'
+  group  by fecha;
+spool off

@@ -1,0 +1,33 @@
+delete from fn3nodesaleadvance
+where header='ASMARCA' and
+node='CAM';
+
+insert into fn3nodesaleadvance
+select 'ASMARCA','DIARIO',adv.NODE,adv.saledate,
+TO_DATE('20020603','YYYYMMDD'),
+adv.service+inf.service as Ser,
+adv.return+inf.return as Dev,
+adv.sale+inf.estimatedsale+inf.service+inf.incidence-inf.return as Venta
+from fn3nodesaleadvance adv,fn3nodeinformation inf 
+where 
+adv.header='AS' and
+inf.header='MARCA' and
+adv.product='DIARIO' and
+inf.product='DIARIO' and
+adv.node='CAM' and
+inf.node='CAM'and
+infodate=saledate
+order by adv.saledate asc;
+
+
+
+insert into fn3outputsetinput
+ select 'VentaMarcaAsCAM',setinput,'Diario',0
+ from fn3outputsetinput
+where output='VentaAsCAM'
+union
+ select 'VentaMarcaAsCAM',setinput,'Diario',0
+ from fn3outputsetinput
+where output='VentaMarcaCAM';
+
+

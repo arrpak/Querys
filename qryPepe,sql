@@ -1,0 +1,216 @@
+select
+CASE node
+WHEN 'AND' THEN 'Andalucía'
+WHEN 'EXT' THEN 'Extremadura'
+WHEN 'CAM' THEN 'Madrid'
+WHEN 'CAVCMU' THEN 'Levante'
+WHEN 'CATBAR' THEN 'Barcelona'
+WHEN 'NOR' THEN 'Norte'
+WHEN 'ARA' THEN 'Aragón'
+WHEN 'CYLSOR2' THEN 'Soria'
+WHEN 'AST' THEN 'Asturias'
+END,
+ To_Char(infoDate,'yyyy') as año ,
+ To_Char(infoDate,'mm') as mes ,
+ To_Char(infoDate,'yyyy/mm/dd') as infoDate ,
+(service) as Servicio ,
+(returnCont + (service - serviceCont + incidence -
+    incidenceCont - estimatedSale)) as DevolucionTotal ,
+((serviceCont + incidenceCont - returnCont) +
+    estimatedSale) as VentaTotal ,
+(numOutOffCont) as PvAgotadosTotal,
+(numOpen) as PvAbiertos
+from formarca.Fn3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'AND' OR node='EXT' OR node='CAM' OR node='CAVCMU' OR node='CATBAR' OR node='NOR' or
+        node = 'ARA' OR node = 'CYLSOR2' OR node = 'AST')
+    and (INFODATE >=  to_date('2006/07/01', 'yyyy/mm/dd')   and
+INFODATE <  to_date('2007/12/01', 'yyyy/mm/dd')  )
+    and (( to_char(INFODATE, 'mm')  = '08' or  to_char(INFODATE, 'mm')  = '07'))
+order by node,infoDate
+
+---------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+
+
+
+select
+ To_Char(infoDate,'yyyy') as año ,
+ To_Char(infoDate,'mm') as mes ,
+ To_Char(infoDate,'yyyy/mm/dd') as infoDate ,
+sum(service) as Servicio ,
+sum(returnCont + (service - serviceCont + incidence -
+    incidenceCont - estimatedSale)) as DevolucionTotal ,
+sum((serviceCont + incidenceCont - returnCont) +
+    estimatedSale) as VentaTotal ,
+sum(numOutOffCont) as PvAgotadosTotal,
+sum(numOpen) as PvAbiertos
+from formarca.Fn3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'AND' OR node='EXT' OR node='CAM' OR node='CAVCMU' OR node='CATBAR' OR node='NOR' or
+        node = 'ARA' OR node = 'CYLSOR2' OR node = 'AST')
+    and (INFODATE >=  to_date('2006/07/01', 'yyyy/mm/dd')   and
+INFODATE <  to_date('2007/12/01', 'yyyy/mm/dd')  )
+    and (( to_char(INFODATE, 'mm')  = '08' or  to_char(INFODATE, 'mm')  = '07'))
+GROUP BY To_Char(infoDate,'yyyy/mm/dd'), To_Char(infoDate,'yyyy'),To_Char(infoDate,'mm');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select
+   Replace(node,' ','') as Prefijo,
+   infoDate+364 as infoDate ,
+   ((serviceCont + incidenceCont - returnCont) + estimatedSale) as VentaTotalTras ,
+   NULL as VentaTotal
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'CATBAR')
+  and ( infodate >= To_date('20060701', 'YYYYMMDD'))
+  and ( infodate <= To_date('20060817', 'YYYYMMDD'))
+union
+ select
+   Replace(node,' ','') as Prefijo,
+   infoDate  as infoDate ,
+   null as VentaTotalTras ,
+   ((serviceCont + incidenceCont - returnCont) + estimatedSale) as VentaTotal
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'CATBAR')
+  and ( infodate >= To_date('20070701', 'YYYYMMDD'))
+  and ( infodate <= To_date('20070817', 'YYYYMMDD'))
+order by infoDate,Prefijo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select
+   Replace(node,' ','') as Prefijo,
+   infoDate+364 as infoDate ,
+   ((serviceCont + incidenceCont - returnCont) + estimatedSale) as VentaTotalTras ,
+   NULL as VentaTotal
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'ANDMGA')
+  and ( infodate >= To_date('20060701', 'YYYYMMDD'))
+  and ( infodate <= To_date('20060817', 'YYYYMMDD'))
+union
+ select
+   Replace(node,' ','') as Prefijo,
+   infoDate  as infoDate ,
+   null as VentaTotalTras ,
+   ((serviceCont + incidenceCont - returnCont) + estimatedSale) as VentaTotal
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'ANDMGA')
+  and ( infodate >= To_date('20070701', 'YYYYMMDD'))
+  and ( infodate <= To_date('20070817', 'YYYYMMDD'))
+order by infoDate,Prefijo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT pri.dateprint,SUM(case when (decision + increaseDec) <= 15
+              then  ceil(decision + increaseDec)
+              else  ROUND(decision + increaseDec) end) as Decision,nif.tirada as Tirada
+FROM fn3printingdetail pridet ,fn3printing pri,
+(SELECT infodate,service+incidencecont AS tirada
+FROM fn3nodeinformation
+WHERE header='MARCA' AND product='DIARIO' AND node='CCA') nif
+WHERE
+pri.used='Y' AND
+pri.dateprint>=To_Date('20070701','yyyymmdd') and
+pri.node='NOR' AND
+pri.dateprint=pridet.dateprint AND
+pri.orderf=pridet.orderf AND
+pri.node=pridet.node AND
+--nif.node='CCA' AND
+nif.infodate=pri.dateprint AND
+pri.dateprint=pridet.dateprint AND
+pri.dateprint=nif.infodate AND
+newsstand IN (
+SELECT newsstand
+FROM fn3newsstandon
+WHERE dateoff IS NULL AND (newsstand LIKE '039%' OR newsstand LIKE '139%'))
+GROUP BY pri.dateprint,nif.tirada
+
+
+
+
+
+select
+   Replace(node,' ','') as Prefijo,
+   infoDate+364 as infoDate ,
+   ((serviceCont + incidenceCont - returnCont) + estimatedSale) as VentaTotalTras ,
+   NULL as VentaTotal
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'ANDMGAPLA')
+  and ( infodate >= To_date('20060701', 'YYYYMMDD'))
+  and ( infodate <= To_date('20060817', 'YYYYMMDD'))
+union
+ select
+   Replace(node,' ','') as Prefijo,
+   infoDate  as infoDate ,
+   null as VentaTotalTras ,
+   ((serviceCont + incidenceCont - returnCont) + estimatedSale) as VentaTotal
+from formarca.FN3NODEINFORMATION
+where ( header = 'MARCA')
+  and ( product = 'DIARIO')
+  and ( node = 'ANDMGAPLA')
+  and ( infodate >= To_date('20070701', 'YYYYMMDD'))
+  and ( infodate <= To_date('20070817', 'YYYYMMDD'))
+order by infoDate,Prefijo
+
+
+
+
+
+
+

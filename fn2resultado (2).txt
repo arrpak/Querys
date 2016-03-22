@@ -1,0 +1,121 @@
+drop table Fn2Resultado;
+drop table Fn2AvanceVentaGlobal;
+drop table Fn2DiaSemana;
+drop table Fn2ServicioFijo;
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2Resultado
+--
+-- PURPOSE: Definicion de la tabla de resultados
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  cabecera           char(12),
+  producto           char(12),
+  nodo               char(12),
+  fecha              date,
+  numpv              float(24),
+  porcdev            float(24),
+  porcagot           float(24),
+  porcagotpond       float(24),
+  foreign key       (cabecera,producto,nodo) references Fn2Nodo,
+  constraint  resultadoPK primary key(cabecera,producto,nodo,fecha)
+                             using index tablespace Marca_IDX
+) 
+  pctfree 10
+  pctused 40
+  tablespace Marca
+  storage (  initial 50K
+             next 50K
+             maxextents 249
+             pctincrease 50);
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2AvanceVentaGlobal
+--
+-- PURPOSE: Definicion de la tabla de los avances 
+--          de la venta global.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  cabecera           char(12),
+  producto           char(12),
+  nodo               char(12),
+  fechaVenta         date,
+  fechaComunicacion  date,
+  servicio           integer,
+  devolucion         integer,
+  venta              integer   not null,
+  foreign key        (cabecera, producto, nodo) references Fn2Nodo,
+  constraint  avanceVentaGlobalPK  primary key
+              (cabecera, producto, nodo, fechaVenta, fechaComunicacion)
+                         using index tablespace Marca_IDX
+) 
+  pctfree 10
+  pctused 40
+  tablespace Marca
+  storage (  initial 50K
+             next 50K
+             maxextents 249
+             pctincrease 50);
+
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2DiaSemana
+--
+-- PURPOSE: Tabla de definicion de los dias de la semana
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  codigo           char(3),
+  descripcion      char(20),
+  constraint  diaSemanaPK  primary key (codigo)
+                         using index tablespace Marca_IDX
+) 
+  pctfree 10
+  pctused 40
+  tablespace Marca
+  storage (  initial 50K
+             next 50K
+             maxextents 249
+             pctincrease 50);
+
+insert into Fn2DiaSemana values ('LUN','LUNES');
+insert into Fn2DiaSemana values ('MAR','MARTES');
+insert into Fn2DiaSemana values ('MIE','MIERCOLES');
+insert into Fn2DiaSemana values ('JUE','JUEVES');
+insert into Fn2DiaSemana values ('VIE','VIERNES');
+insert into Fn2DiaSemana values ('SAB','SABADO');
+insert into Fn2DiaSemana values ('DOM','DOMINGO');
+
+--////////////////////////////////////////////////////////////////////////////
+   create table Fn2ServicioFijo
+--
+-- PURPOSE: Tabla de definicion de los puntos de venta que requieren
+--          un servicio prefijado.
+--
+--////////////////////////////////////////////////////////////////////////////
+(
+  cabecera           char(12),
+  producto           char(12),
+  puntoVenta         char(12),
+  diaSemana          char(12),
+  fechaDesde         date,
+  fechaHasta         date,
+  servicio           integer     not null,
+  foreign key     (cabecera, producto) references Fn2Producto,
+  foreign key     (puntoVenta)         references Fn2PuntoVenta,
+  foreign key     (diaSemana)          references Fn2DiaSemana,
+  constraint      servicioFijoPK  primary key
+        (cabecera, producto, puntoVenta, diaSemana, fechaDesde, fechaHasta)
+                         using index tablespace Marca_IDX
+) 
+  pctfree 10
+  pctused 40
+  tablespace Marca
+  storage (  initial 50K
+             next 50K
+             maxextents 249
+             pctincrease 50);
+
+

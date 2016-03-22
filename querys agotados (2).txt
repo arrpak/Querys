@@ -1,0 +1,41 @@
+select count(*) from opemarca
+where devolucion=0 and
+servicio+incidencia>0 and
+dia =to_date('2000/10/17','yyyy/mm/dd');
+
+
+select count(*) from opemarca
+where devolucion=0 and
+servicio+incidencia>0 and
+ruta<='0000028' and
+dia =to_date('2000/10/17','yyyy/mm/dd');
+
+
+select count(*) from opemarca
+where devolucion=0 and
+servicio+incidencia>0 and
+ruta>'0000028' and ruta <'2000000' and
+dia =to_date('2000/10/17','yyyy/mm/dd');
+
+select count(*) from opemarca
+where devolucion=0 and
+servicio+incidencia>0 and
+ruta>='20000000' and
+dia =to_date('2000/10/17','yyyy/mm/dd');
+
+/////QUERYS EN FN2 NUMERO DE KIOSCOS AGOTADOS
+
+select count(*)from fn2operacion
+where devolucion=0 and
+servicio+incidencia>0 and
+fecha=to_date('2000/12/17','yyyy/mm/dd');
+
+select count(*)from fn2puntoventa
+where operativo='S';
+
+/////QUERYS EN FN2 AGOTADO PONDERADO
+
+
+
+
+

@@ -1,0 +1,103 @@
+--Previsiones de un nodo
+
+select valuedate,forecast,forsession
+from fn3forecastseries
+where output='VentaMarcaCAMCAP' and
+valuedate>=to_date('20030124','yyyymmdd')
+order by valuedate,forsession;
+
+
+
+
+
+
+
+--Suma de previsiones
+select valuedate,sum(forecast)
+from fn3forecastseries
+where forsession='2007091219.MG'
+and(
+valuedate=to_date('20070912','yyyymmdd') or
+valuedate=to_date('20070913','yyyymmdd') or
+valuedate=to_date('20070914','yyyymmdd') or
+valuedate=to_date('20070915','yyyymmdd') or
+valuedate=to_date('20070916','yyyymmdd') or
+valuedate=to_date('20070917','yyyymmdd') or
+valuedate=to_date('20070918','yyyymmdd') or
+valuedate=to_date('20070919','yyyymmdd')
+) and
+output like 'VentaMarcaAND%'
+group by valuedate;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Suma por nodos y dias
+
+ select substr(output,0,28),sum(forecast),valuedate
+ from fn3forecastseries
+where forsession='2002111320_CAM2'
+and
+(
+valuedate=to_date('20021113','yyyymmdd')
+)
+ group by output,valuedate
+order by valuedate;
+
+--Suma de PV
+select valuedate,count(*),sum(round(forecast)),sum(round(decision))
+    ,(sum(round(decision))-sum(round(forecast)))/sum(round(decision)) AS Porc
+ from fn3forecastseries
+where forsession='2004112704.PV'
+and(
+valuedate=to_date('20041126','yyyymmdd') or
+valuedate=to_date('20041127','yyyymmdd') or
+valuedate=to_date('20041128','yyyymmdd') or
+valuedate=to_date('20041129','yyyymmdd') or
+valuedate=to_date('20041130','yyyymmdd') or
+valuedate=to_date('20041201','yyyymmdd')
+)
+and output like 'VentaMarca028%'
+AND DECISION>0
+group by
+valuedate;
+
+--Estado de la prevision
+select count(*),state,stateinfo
+from fn3forecast
+where  forsession='2004112704.PV'
+and output like 'VentaMarca028%'
+group by state,stateinfo;
+
+
+
+-- Numero de diag
+select count(*),stateinfo
+ from fn3forecast
+where forsession='2002101219_CAM'
+ stateinfo like'%diag%'
+ group by stateinfo;
+
+
+
+select count(*),state
+from fn3forecast
+where forsession='2003040815_CAM.PV'
+group by state;
+
+------------------------------------------NODOS
+select substr(forsession,1,40),substr(output,1,30),valuedate,forecast
+from fn3forecastseries
+where output='VentaMarcaCAMPER' and
+valuedate=to_date('20020404','yyyymmdd');

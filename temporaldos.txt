@@ -1,0 +1,27 @@
+(
+SELECT p.node, f.forsession, e.output, e.dating, e.transformation, p.dateprint
+FROM   fn3printingnodedecsession pnd, fn3decision d, fn3printing p, fn5forecast f, fn5estimation e, fn3output o, fn3node n
+WHERE  pnd.decsession = d.decsession
+  AND  pnd.header     = p.header
+  AND  pnd.product    = p.product
+  AND  pnd.node       = p.node
+  AND  pnd.dateprint  = p.dateprint
+  AND  pnd.orderf     = p.orderf
+  AND  pnd.header     = o.header
+  AND  pnd.product    = o.product
+  AND  pnd.header     = n.header
+  AND  pnd.product    = n.product
+  AND  pnd.sonnode    = n.fathernode
+  AND  d.forsession   = f.forsession
+  AND  f.estsession   = e.estsession
+  AND  f.output       = e.output
+  AND  f.dating       = e.dating
+  AND  f.output       = o.code
+  AND  o.node         = n.code
+  AND  p.header       = 'MARCA'
+  AND  p.product      = 'DIARIO'
+  AND  p.dateprint    >= to_date('2009/01/02', 'YYYY/MM/DD')
+  AND  p.dateprint    <= to_date('2009/01/15', 'YYYY/MM/DD')
+  AND  p.used         = 'Y'
+  AND  n.newsstand IS NOT NULL
+)

@@ -1,0 +1,14 @@
+SELECT *
+FROM scott.emp
+
+CREATE TABLE EMP
+AS
+SELECT *
+FROM scott.emp
+
+truncate TABLE emp
+
+
+insert INTO emp
+SELECT *
+FROM scott.emp

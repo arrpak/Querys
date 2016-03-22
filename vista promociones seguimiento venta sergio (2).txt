@@ -1,0 +1,32 @@
+CREATE OR REPLACE VIEW promo
+as
+SELECT HEADER||promotion AS PROMOTION,dateprint AS inidateint
+from
+(SELECT *
+FROM fn3promotiondate
+WHERE header='MARCA'
+AND inidateint>=dat ('20080101')
+AND node IN ('CAM','PEN','ESP')
+ORDER BY promotion) t1,
+(SELECT dateprint
+FROM fn3printing
+WHERE node='CAM' AND header='MARCA' AND product='DIARIO'
+AND dateprint>dat('20080101') AND orderf=1) t2
+WHERE dateprint>=inidateint AND
+dateprint<=enddateint
+
+
+
+SELECT *
+FROM PROMO
+
+
+
+QUERY DEL EXCEL
+---------------
+SELECT To_Char(inidateint),inidateint,rowconcat('SELECT distinct promotion FROM promo
+WHERE to_char(inidateint)=to_char('''||inidateint||''')','   -   ')
+FROM promo
+WHERE inidateint>=dat('20091201')
+GROUP BY To_Char(inidateint),inidateint
+ORDER BY inidateint;

@@ -1,0 +1,103 @@
+define estsession1='e20100131Com.02';
+define estsession2='e20100124Com.IC';
+define fechafin='20100210';
+--define estsession2='e20091227Com.01';
+
+
+SELECT t1.cabecera,t1.promocion,t1.numejemplares AS NewEJ,t2.numejemplares AS OldEj ,
+(t1.numejemplares-t2.numejemplares)/t1.numejemplares AS dif
+FROM
+ ( select estsession,Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+        esi.promotion Promocion,
+        Avg(ei.issue) NumEjemplares
+    from EzcEstimationIssue ei,
+         EzcPromotionSetInput esi,
+         EzcInputSetInput isi
+  where isi.input = ei.input
+   and  esi.setinput = isi.setinput
+   and  ei.estsession = '&estsession1'
+   and  ei.dating     = 'Diario'
+   and  ei.input != 'noise'
+   and ei.valuedate<=to_date(&fechafin,'yyyymmdd')
+   GROUP BY Replace(Replace(ei.output, 'Com'), 'CAM') ,esi.promotion,estsession   ) t1,
+   ( select estsession,Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+        esi.promotion Promocion,Avg(ei.issue) NumEjemplares
+    from EzcEstimationIssue ei,
+         EzcPromotionSetInput esi,
+         EzcInputSetInput isi
+  where isi.input = ei.input
+   and  esi.setinput = isi.setinput
+   and  ei.estsession = '&estsession2'
+   and  ei.dating     = 'Diario'
+   and  ei.input != 'noise'
+   and ei.valuedate<=to_date(&fechafin,'yyyymmdd')
+   GROUP BY Replace(Replace(ei.output, 'Com'), 'CAM') ,esi.promotion,estsession   ) t2
+WHERE t1.promocion=t2.promocion
+AND t1.cabecera=t2.cabecera
+ORDER BY ABS((t1.numejemplares-t2.numejemplares)/t1.numejemplares) desc;
+
+
+/*
+
+SELECT Count (*),output
+--delete
+FROM EzcEstimationIssue
+WHERE    estsession ='e20100117Com.02'
+GROUP BY output;
+
+
+
+define promo='CentroPlanchadoSolac2009';
+
+select t1.Cabecera,t1.Promocion,t1.valuedate,t1.numejemplares AS NewWJ,t2.numejemplares AS OldEj
+
+FROM
+ ( select estsession,Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+        esi.promotion Promocion,
+         valuedate,
+         sum(issue) as NumEjemplares
+    from EzcEstimationIssue ei,
+         EzcPromotionSetInput esi,
+         EzcInputSetInput isi
+  where isi.input = ei.input
+   and  esi.setinput = isi.setinput
+   and  ei.estsession = '&estsession1'
+   and promotion='&promo'
+   and  ei.dating     = 'Diario'
+   and  ei.input != 'noise'
+   group by estsession,Replace(Replace(ei.output, 'Com'), 'CAM'),
+            esi.promotion, valuedate
+ ) t1,
+ ( select estsession,Replace(Replace(ei.output, 'Com'), 'CAM') Cabecera,
+        esi.promotion Promocion,
+         valuedate,
+         sum(issue) as NumEjemplares
+    from EzcEstimationIssue ei,
+         EzcPromotionSetInput esi,
+         EzcInputSetInput isi
+  where isi.input = ei.input
+   and  esi.setinput = isi.setinput
+   and  ei.estsession = '&estsession2'
+   and promotion='&promo'
+   and  ei.dating     = 'Diario'
+   and  ei.input != 'noise'
+   group by estsession,Replace(Replace(ei.output, 'Com'), 'CAM'),
+            esi.promotion, valuedate
+
+ ) t2
+WHERE t1.promocion=t2.promocion
+AND t1.cabecera=t2.cabecera
+AND t1.cabecera=t2.cabecera
+and t1.valuedate=t2.valuedate
+ORDER BY t1.valuedate asc;
+
+
+							*/
+
+
+
+
+
+
+
+

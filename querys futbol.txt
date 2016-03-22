@@ -1,0 +1,85 @@
+SELECT  competicion, t1.dominio, categoria, temporada,
+        fase, jornada, fechapartido, neutral, valido,
+        minjugados, equipolocal, equipovisitante,t2.descripcion,t3.descripcion,
+        goleslocal, golesvisitante, penaltieslocal,
+        penaltiesvisitante, interes
+FROM fn3partidofutbol2011 T1,
+(SELECT DISTINCT CODIGO,DESCRIPCION FROM  FN3EQUIPOFUTBOL2011 WHERE DOMINIO='SPA') T2,
+(SELECT DISTINCT CODIGO,DESCRIPCION FROM  FN3EQUIPOFUTBOL2011 WHERE DOMINIO='SPA') T3
+where
+COMPETICION = 'LIGA'  AND  t1.DOMINIO = 'SPA'   AND categoria='PRIMERA'
+AND t1.equipolocal=t2.codigo
+AND t1.equipovisitante=t3.codigo
+ORDER BY FECHAPARTIDO;
+
+
+
+
+
+
+SELECT Count(*)
+FROM fn3partidofutbol2011
+where
+COMPETICION = 'LIGA'  AND  DOMINIO = 'SPA';
+
+
+
+
+
+
+
+SELECT  competicion, t1.dominio, categoria, temporada,
+        fase, jornada, fechapartido, neutral, valido,
+        minjugados, equipolocal, equipovisitante,t2.descripcion,t3.descripcion,
+        goleslocal, golesvisitante, penaltieslocal,
+        penaltiesvisitante, interes
+FROM fn3partidofutbol T1,
+(SELECT DISTINCT CODIGO,DESCRIPCION FROM  FN3EQUIPOFUTBOL WHERE NACION='SPA') T2,
+(SELECT DISTINCT CODIGO,DESCRIPCION FROM  FN3EQUIPOFUTBOL WHERE NACION='SPA') T3
+where
+COMPETICION = 'LIGA'  AND  t1.DOMINIO = 'SPA'     AND categoria='PRIMERA'
+AND t1.equipolocal=t2.codigo
+AND t1.equipovisitante=t3.codigo
+AND TEMPORADA='2011/2012'
+ORDER BY FECHAPARTIDO;
+
+
+
+UPDATE  FN3EQUIPOCOMPITEFASE
+SET TIPO='CLA'
+WHERE
+COMPETICION='UEFA' AND DOMINIO='EUR' AND CATEGORIA='PRIMERA' AND TEMPORADA='2012/2013' AND FASE='1RONDADOB'
+AND EQUIPO IN
+(
+SELECT EQUIPO
+FROM
+FN3EQUIPOCOMPITEFASE
+WHERE
+COMPETICION='UEFA' AND DOMINIO='EUR' AND CATEGORIA='PRIMERA' AND TEMPORADA='2012/2013'
+AND FASE='1RONDADOB'
+INTERSECT
+SELECT EQUIPO
+FROM
+FN3EQUIPOCOMPITEFASE
+WHERE
+COMPETICION='UEFA' AND DOMINIO='EUR' AND CATEGORIA='PRIMERA' AND TEMPORADA='2012/2013'
+AND FASE='PREVIA1DOB');
+
+
+
+DELETE fn3equipocompitefase WHERE COMPETICION='CLASMUNDIAL' AND DOMINIO='EUR' AND TEMPORADA='2011/2014';
+DELETE fn3equipocompite     WHERE COMPETICION='CLASMUNDIAL' AND DOMINIO='EUR' AND TEMPORADA='2011/2014';
+
+
+
+
+SELECT initcap(descripcion)
+FROM FN3EQUIPOFUTBOL;
+
+
+
+
+
+
+
+

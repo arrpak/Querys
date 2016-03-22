@@ -1,0 +1,32 @@
+insert into fn3nodesaleadvance
+select 'MARCA','DIARIO','BAL',
+      t1.saledate,
+      to_date('20020307','yyyymmdd'),
+      sum(t1.service)-sum(t2.service)-sum(t3.service)
+      -sum(t4.service)-sum(t5.service)-sum(t6.service),
+      sum(t1.return)-sum(t2.return)-sum(t3.return)
+      -sum(t4.return)-sum(t5.return)-sum(t6.return),
+      sum(t1.sale)-sum(t2.sale)-sum(t3.sale)
+      -sum(t4.sale)-sum(t5.sale)-sum(t6.sale)
+from fn3nodesaleadvance t1 ,fn3nodesaleadvance t2,
+     fn3nodesaleadvance t3 ,fn3nodesaleadvance t4,
+     fn3nodesaleadvance t5 ,fn3nodesaleadvance t6
+where t1.node='LEVBAL' and
+      t2.node='CAVCAS' and
+      t3.node='CAVVAL' and
+      t4.node='CAVALI' and  
+      t5.node='CMU'    and
+      t6.node='ALB'    and
+      t1.saledate<to_date('20020101','yyyymmdd') and
+      t1.saledate=t2.saledate     and 
+      t2.saledate=t3.saledate     and 
+      t3.saledate=t4.saledate     and
+      t4.saledate=t5.saledate     and
+      t5.saledate=t6.saledate    
+group by t1.node,t2.node,t3.node,t4.node,t5.node,t6.node,
+         t1.saledate,t2.saledate,t3.saledate,t4.saledate,
+         t5.saledate,t6.saledate;
+
+select node,saledate,service
+from fn3nodesaleadvance
+where node='LEV';

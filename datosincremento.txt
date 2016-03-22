@@ -1,0 +1,167 @@
+define header    = 'ELMUNDO';
+define product   = 'DIARIO';
+define dia       = '20110415';
+define sesion    = 'F2011032424.PV';
+define agotado   = '0.85';
+define numdia    = 'Viernes' -- Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo
+define anterior  = 1; -- Numero de Dias anteriores a la ultima fecha
+
+
+ SELECT
+   Replace(node,' ','')                                           as Prefijo,
+   infoDate                                                       as infoDate ,
+(serviceCont + incidenceCont)                                     as "Ser Inc Cont" ,
+(returnCont)                                                      as "Dev Cont" ,
+(serviceCont + incidenceCont - returnCont)                        as "Ven Cont" ,
+(numPv)                                                           as NumPv ,
+(numOpen)                                                         as PvAbiertos ,
+(numOutOffCont)                                                   as PvAgotadosControlados ,
+ Round( to_number(Decode((serviceCont + incidenceCont), 0, '',
+(returnCont) / (serviceCont + incidenceCont) )),5)                as "% Dev Cont" ,
+
+ Round( to_number(Decode((numOpenCont), 0, '',
+(numOutOffCont) / (numOpenCont) )),5)                             as "% Ago Cont" ,
+ Round( to_number(Decode((serviceCont + incidenceCont - returnCont + estimatedSale), 0, '',
+(servOutOffCont) / (serviceCont + incidenceCont - returnCont + estimatedSale) )),5)          as "% Ago Pond Cont"
+
+FROM emuNODEINFORMATION
+
+WHERE ( header = '&header')
+  AND ( product = '&product')
+  AND ( node = 'CAMCAPCEN01'
+   OR   node = 'CAMCAPCEN02'
+   OR   node = 'CAMCAPEXT01'
+   OR   node = 'CAMCAPEXT02'
+   OR   node = 'CAMCAPEXT03'
+   OR   node = 'CAMRUTFOR')
+  AND (( to_char(INFODATE, 'd')  = CASE
+                                    WHEN '&numdia' = 'Lunes '    THEN '1'
+                                    WHEN '&numdia' = 'Martes'    THEN '2'
+                                    WHEN '&numdia' = 'Miercoles' THEN '3'
+                                    WHEN '&numdia' = 'Jueves'    THEN '4'
+                                    WHEN '&numdia' = 'Viernes'   THEN '5'
+                                    WHEN '&numdia' = 'Sabado'    THEN '6'
+                                    WHEN '&numdia' = 'Domingo'   THEN '7'
+                                   END ))
+
+  AND infodate >= (
+
+                     SELECT
+                        Max(infoDate)-&anterior*7
+                      FROM emuNODEINFORMATION
+                      WHERE ( header  = '&header')
+                        AND ( product = '&product')
+                        AND ( node = 'CAMCAPCEN01'
+                          OR    node = 'CAMCAPCEN02'
+                          OR    node = 'CAMCAPEXT01'
+                          OR    node = 'CAMCAPEXT02'
+                          OR    node = 'CAMCAPEXT03'
+                          OR    node = 'CAMRUTFOR')
+                        AND (  ( to_char(INFODATE, 'd')  = CASE
+                                                              WHEN '&numdia' = 'Lunes '    THEN '1'
+                                                              WHEN '&numdia' = 'Martes'    THEN '2'
+                                                              WHEN '&numdia' = 'Miercoles' THEN '3'
+                                                              WHEN '&numdia' = 'Jueves'    THEN '4'
+                                                              WHEN '&numdia' = 'Viernes'   THEN '5'
+                                                              WHEN '&numdia' = 'Sabado'    THEN '6'
+                                                              WHEN '&numdia' = 'Domingo'   THEN '7'
+                                                           END
+                               )
+                            )
+                  )
+
+
+--order by infoDate,Prefijo
+
+
+
+
+
+ UNION  ALL
+
+
+
+
+SELECT
+ CASE
+ WHEN REPLACE(decode(Grouping(t.code),1, 'VentaCAMCAP', t.code),'Venta','') = 'CAMCAP' THEN 'CAMRUTFOR'
+ ELSE REPLACE(decode(Grouping(t.code),1, 'VentaCAMCAP', t.code),'Venta','')
+ END                                               as Prefijo,
+ t.valuedate                                       as infodate,
+  NULL                                             as "Ser Inc Cont",
+  NULL                                             as "Dev Cont",
+ Sum(t.previsionPV)                                as "Ven Cont",
+ NULL                                              as NumPv,
+ NULL                                              as PvAbiertos,
+ NULL                                              as PvAgotadosControlados,
+ NULL                                              as "% Dev Cont",
+ NULL                                              as "% Ago Cont",
+ NULL                                              as "% Ago Pond Cont"
+
+
+from emuForecastSeries fs,
+(
+SELECT    fss.forsessionfather,
+    (1 -ds.probnotoutof) as AgotadoObjetivo,
+    ds.valuedate valuedate, d.decsession DecSession,
+    ofa.code code, Count(*) NumPV,
+    Sum(round(ds.forecast)) as PrevisionPv,
+    Sum(round(CASE WHEN TabSSp.ServiceSpecial = 666666 THEN ds.decision
+ELSE TabSSp.ServiceSpecial END))  as DecisionPv,
+    Sum(Round(ds.decision)) AS DecisionSistemaPv
+FROM  emuDecisionSeries ds,  emuDecision d,
+      emuForecastSession fss, emuOPENINGANNOUNCED opa,
+      emuNODE nod, emuOutput ofa, emuNODE nod2,
+(
+SELECT o.code Output,
+     o.node Newsstand,
+     o.header Header,
+     o.product Product,
+     Nvl(ssp.service, 666666) ServiceSpecial
+FROM
+(
+SELECT sp.header, sp.product, sp.newsstand, sp.service, sp.servicetype
+FROM   emuSERVICESPECIAL sp
+WHERE    sp.header = '&header'
+  AND    sp.product = '&product'
+  AND    to_date('&dia', 'yyyymmdd')   between sp.dateFrom AND
+      CASE WHEN sp.dateUntil IS NULL then  to_date('&dia', 'yyyymmdd')
+ELSE sp.dateUntil END
+  AND   CASE WHEN sp.weekday = 'ALL' THEN
+to_char( to_date('&dia', 'yyyymmdd') , 'DY', 'nls_date_language = English')
+ ELSE sp.weekday END
+ = to_char( to_date('&dia', 'yyyymmdd') , 'DY', 'nls_date_language = English')
+) ssp, emuOutput o
+WHERE ssp.header      (+) = o.header
+  AND  ssp.product      (+) = o.product
+  AND  ssp.newsstand  (+) = o.node
+  AND  o.header  = '&header'
+  AND  o.product = '&product'
+) TabSSp
+WHERE ds.decsession = d.decsession
+    AND TabSSp.output = ds.output
+    AND d.forsession  = fss.code
+    AND fss.code      = '&sesion'
+    AND ds.valuedate  =   to_date('&dia', 'yyyymmdd')
+    AND nod.fathernode IN ('CAMCAPCEN', 'CAMCAPEXT')
+    AND nod.header    = nod2.header
+    AND nod.product   = nod2.product
+    AND nod.CODE      = nod2.FATHERNODE
+    AND ofa.header    = nod2.header
+    AND ofa.product   = nod2.product
+    AND ofa.node      = nod2.FATHERNODE
+    AND nod2.header   = TabSSp.header
+    AND nod2.product  = TabSSp.product
+    AND nod2.code     = TabSSp.newsstand
+        AND tabSSp.newsstand = opa.newsstand
+        AND ds.valuedate = opa.valuedate
+        AND opa.OPEN = 'Y' and ds.probnotoutof= &agotado
+GROUP BY ds.valuedate, ds.probnotoutof, fss.forsessionfather,
+d.decsession, ofa.code
+   )t
+WHERE  t.forsessionfather =  fs.forsession (+)
+  AND  t.valuedate = fs.valuedate (+)
+  AND  t.code = fs.output  (+)
+GROUP BY rollup(t.code), t.valuedate, t.decsession, t.AgotadoObjetivo
+
+ORDER BY infodate,prefijo

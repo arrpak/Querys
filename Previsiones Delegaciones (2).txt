@@ -1,0 +1,34 @@
+select delegate,valuedate,count(*),sum(round(forecast))
+ from fn3forecastseries,fn3codification
+where forsession='2004043007.PV' 
+and(
+valuedate=to_date('20040502','yyyymmdd') or
+valuedate=to_date('20040503','yyyymmdd') 
+ )
+and 'VentaMarca'||fn3codification.newsstand=fn3forecastseries.output
+--AND DECISION>0
+group by valuedate,delegate
+order by valuedate,delegate;
+
+
+
+
+
+
+
+
+
+select substr(output,12,2),
+valuedate,count(*),sum(round(forecast)) as prev,
+              SUM(case when decision <= 15
+              then  ceil (decision)
+              else  ROUND(decision) end) as deci,
+              1-(sum(round(forecast))/ SUM(case when decision <= 15
+              then  ceil (decision)
+              else  ROUND(decision) end)) PORCDEV    
+ from fn3forecastseries
+where forsession='2004043007.PV' 
+and(
+valuedate=to_date('20040502','yyyymmdd') 
+ )
+group by valuedate,substr(output,12,2);

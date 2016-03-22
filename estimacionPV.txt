@@ -1,0 +1,55 @@
+
+----------------------------------------------------------------------------------------
+-- Los que tienen un modelo igual al inicial
+-- Con Power=0
+
+select substr(estsession,0,20) as estsession ,
+       substr(fn2estimation.outputdef,0,30),power,
+           substr(fn2estimation.arima,0,22),stddeviation
+from fn2estimation,fn2arimadef
+where estsession='20011016.PV'  and
+           fn2estimation.arima  like '%Mod_D0_SAR0_0MA0_S%' and
+          stddeviation >0.3 and
+          power=0 and     
+           fn2estimation.arima=fn2arimadef.description
+order by   stddeviation desc ,outputdef asc;
+
+-- Con Power=1
+
+select substr(estsession,0,20),substr(fn2estimation.outputdef,0,30),power,
+           substr(fn2estimation.arima,0,22),stddeviation
+from fn2estimation,fn2arimadef
+where estsession='20011016.PV'  and
+           fn2estimation.arima  like '%Mod_D0_SAR0_0MA0_S%' and
+          stddeviation >4.2 and
+          power=1 and     
+           fn2estimation.arima=fn2arimadef.description
+order by   stddeviation desc ,outputdef asc;
+
+
+-----------------------------------------------------------------------------------------
+select substr(outputdef,0,30),substr(arima,0,22)
+from fn2outputdef
+where arima not like '%Mod_D0_SAR0_0MA0_S%' and
+             (outputdef like 'VentaMarca1%' or
+              outputdef like 'VentaMarca2%' or
+              outputdef like 'VentaMarca3%')
+order by outputdef
+
+
+select substr(estsession,0,25),substr(outputdef,0,30),
+           substr(arima,0,22),stddeviation
+from fn2estimation
+where estsession='20011016.PV'  
+and outputdef='VentaMarca000000100002'
+order by power,stddeviation,outputdef;
+
+
+-- Los que tienen un modelo distinto al inicial
+select substr(estsession,0,20),substr(fn2estimation.outputdef,0,30),power,
+           substr(fn2estimation.arima,0,22),stddeviation
+from fn2estimation,fn2arimadef
+where estsession='20011016.PV'  and
+           fn2estimation.arima not like '%Mod_D0_SAR0_0MA0_S%' and
+           fn2estimation.arima=fn2arimadef.description
+order by power,stddeviation,outputdef;

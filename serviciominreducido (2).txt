@@ -1,0 +1,8 @@
+BEGIN
+serviciomin4reducido('MARCA','CAM',DAT('20091013'),1,DAT('20091002'),DAT('20090929'),DAT('20091003'),DAT('20091003'));
+END;
+
+
+(v_heade IN VARCHAR2,v_nod IN VARCHAR2,v_datep IN DATE,
+v_orden IN INTEGER,v_datecomp1 IN DATE,v_datecomp2 IN DATE,
+v_datecomp3 IN DATE,v_datecomp4 IN DATE )

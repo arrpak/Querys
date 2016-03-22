@@ -1,0 +1,12 @@
+
+
+
+
+alter system set "_gby_hash_aggregation_enabled"=false; 
+
+
+
+alter system set optimizer_features_enable='9.2.0';
+
+
+ alter system set optimizer_features_enable='11.1.0.6';

@@ -1,0 +1,11 @@
+INSERT INTO fn3partidofutbol select 'COPABALCANES','MUN','PRIMERA','1934/1934','UNICAUNI','UNICA',dat('1935/01/01'),'N','S',90,'GRE','BUL',1,2,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'COPABALCANES','MUN','PRIMERA','1934/1934','UNICAUNI','UNICA',dat('1935/01/01'),'N','S',90,'RUM','YUG',0,4,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1941/1941','UNICAUNI','UNICA',dat('1941/10/05'),'N','S',90,'SUE','ALE',4,2,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1946/1946','UNICAUNI','UNICA',dat('1946/09/15'),'N','S',90,'NOR','SUE',0,3,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1948/1948','UNICAUNI','UNICA',dat('1948/09/19'),'N','S',90,'NOR','SUE',3,5,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1949/1949','UNICAUNI','UNICA',dat('1949/10/02'),'N','S',90,'SUE','NOR',3,3,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1950/1950','UNICAUNI','UNICA',dat('1950/09/24'),'N','S',90,'NOR','SUE',1,3,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'CLASMUNDIAL','MUN','PRIMERA','1968/1970','UNICAUNI','UNICA',dat('1971/11/14'),'N','S',90,'MAT','HUN',0,2,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1978/1978','UNICAUNI','UNICA',dat('1978/04/26'),'N','S',90,'POL','BUL',1,0,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'EUROCOPA','MUN','PRIMERA','1992/1992','UNICAUNI','UNICA',dat('1992/06/12'),'N','S',90,'CEI','ALE',1,1,null,null,null from dual;
+INSERT INTO fn3partidofutbol select 'AMISTOSO','MUN','PRIMERA','1993/1993','UNICAUNI','UNICA',dat('1993/02/03'),'N','S',90,'PEU','RUM',0,2,null,null,null from dual;

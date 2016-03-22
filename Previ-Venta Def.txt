@@ -1,0 +1,43 @@
+
+
+set pagesize 5000;
+spool c:\20031128CAM.txt;
+select forse.dateprint,ope.newsstand,forseries.prev as prevision,ope.ven venta ,abs(forseries.prev-ope.ven) dif
+from
+(
+select deta.dateprint,deta.newsstand,forse.forsession
+from fn3printingnodeforsession forse,fn3printingdetail deta,fn3node father
+where forse.header='MARCA' and forse.product='DIARIO' and
+forse.node='CAM' and
+forse.orderf=1 and
+forse.dateprint = to_date('20031128','yyyymmdd') and
+deta.header     = forse.header and
+father.header   = forse.header and
+deta.product    = forse.product and
+father.product  = forse.product and
+deta.dateprint  = forse.dateprint and
+deta.node       = forse.node and
+deta.orderf     = forse.orderf and
+father.fathernode= forse.sonnode and 
+deta.newsstand  = father.newsstand 
+) forse,
+(select newsstand,service+incidence-return as ven
+from fn3operation ope
+where
+header='MARCA' and product='DIARIO' and
+operationdate=to_date('20031128','yyyymmdd') 
+and newsstand like '028%') ope,
+(select substr(output,11,12) as out,round(forecast) as prev,forsession
+from fn3forecastseries
+where 
+substr(output,11,3)='028' and
+valuedate=to_date('20031128','yyyymmdd')) forseries
+where
+forse.forsession=forseries.forsession and
+out=ope.newsstand and
+--forse.dateprint=forseries.valuedate and
+out=forse.newsstand
+order by abs(forseries.prev-ope.ven) asc;
+spool off;
+
+
