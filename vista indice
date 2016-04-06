@@ -1,4 +1,7 @@
 
+
+
+
 CREATE VIEW indice
 as
 SELECT t1.codigo,(t1.tot*t1.dif+t2.tot*t2.dif)/(t1.tot+t2.tot) AS indice
